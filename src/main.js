@@ -207,7 +207,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderActivePanel();
     if (viewControls) viewControls.render();
     if (floatingGizmo) floatingGizmo.update();
-    if (productSwitcher) productSwitcher.render();
     if (creationScreen && creationScreen.isOpen) {
       creationScreen.render();
     }
