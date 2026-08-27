@@ -375,7 +375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       viewControls.setMode('3d');
     }
     if (floatingGizmo) floatingGizmo.update();
-    renderActivePanel();
+    setActiveTab('colors');
     historyManager.push(state);
   };
 
