@@ -375,7 +375,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   let textPanel = null;
   let logoPanel = null;
 
-  const renderActivePanel = () => {
+  function renderActivePanel() {
+    if (!tabContentRoot) return;
     tabContentRoot.innerHTML = '';
     if (activeTab === 'colors') {
       colorPanel = new ColorPanel(tabContentRoot, state, onStateChange);
@@ -384,7 +385,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (activeTab === 'logos') {
       logoPanel = new LogoPanel(tabContentRoot, state, onStateChange);
     }
-  };
+  }
 
   const historyManager = new HistoryManager(state, (restoredState) => {
     state = restoredState;
