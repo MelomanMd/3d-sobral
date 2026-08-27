@@ -9,33 +9,19 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z'/></svg>">
 </head>
 <body>
-  <!-- Header Navigation -->
-  <header class="app-header">
-    <div class="brand-group">
-      <a href="https://sobral.ch" target="_blank" rel="noopener noreferrer" class="brand-logo-wrap" title="SOBRAL Workwear">
-        <img src="/images/sobral-workwear-logo.svg" alt="SOBRAL Workwear" class="brand-logo-img">
-      </a>
+  <!-- 1. Top Announcement Bar (sobral.ch style) -->
+  <div class="sobral-top-bar">
+    <div class="top-bar-left">
+      <span class="top-bar-highlight">GROSSE AUSWAHL - TOP MARKEN - PERSÖNLICHE BERATUNG</span>
     </div>
-
-    <!-- Center Tools: Undo/Redo, Theme & Language Switcher -->
-    <div class="header-center-tools">
-      <!-- Undo / Redo -->
-      <div class="history-btn-group">
-        <button class="history-btn" id="btn-undo" title="Rückgängig (Ctrl + Z)" disabled>
-          <span class="btn-icon" id="icon-undo"></span>
-          <span class="btn-text" id="undo-text">Rückgängig</span>
-          <span class="btn-kbd">Ctrl+Z</span>
-        </button>
-        <button class="history-btn" id="btn-redo" title="Wiederholen (Ctrl + Y)" disabled>
-          <span class="btn-icon" id="icon-redo"></span>
-          <span class="btn-text" id="redo-text">Wiederholen</span>
-          <span class="btn-kbd">Ctrl+Y</span>
-        </button>
-      </div>
-
-      <!-- Language Selector -->
+    <div class="top-bar-right">
+      <a href="https://sobral.ch/de/kundenportal" target="_blank" rel="noopener" class="top-link">Kundenportal</a>
+      <a href="https://sobral.ch/de/service" target="_blank" rel="noopener" class="top-link">Service</a>
+      <a href="https://sobral.ch/de/kataloge" target="_blank" rel="noopener" class="top-link">Kataloge</a>
+      <a href="https://sobral.ch/de/ueber-uns" target="_blank" rel="noopener" class="top-link">Über uns</a>
+      <a href="https://sobral.ch/de/kontakt" target="_blank" rel="noopener" class="top-link">Kontakt</a>
       <div class="lang-switch-group">
-        <button class="lang-btn active" data-lang="de" id="lang-btn-de" title="Deutsch (Standard)">
+        <button class="lang-btn active" data-lang="de" id="lang-btn-de" title="Deutsch">
           <span class="lang-flag" id="flag-de"></span>
           <span class="lang-code">DE</span>
         </button>
@@ -45,9 +31,36 @@
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- 2. Main Header Navigation -->
+  <header class="app-header">
+    <div class="brand-group">
+      <a href="https://sobral.ch" target="_blank" rel="noopener noreferrer" class="brand-logo-wrap" title="SOBRAL Workwear">
+        <img src="/images/sobral-workwear-logo.svg" alt="SOBRAL Workwear" class="brand-logo-img">
+      </a>
+    </div>
+
+    <!-- Search / Info Bar (sobral.ch style) -->
+    <div class="header-search-box">
+      <input type="text" class="search-input" placeholder="ICH SUCHE NACH ARBEITSKLEIDUNG..." readonly>
+      <span class="search-icon-svg">${ICONS.crosshair}</span>
+    </div>
 
     <!-- Right Header Actions -->
     <div class="header-actions">
+      <!-- Undo / Redo -->
+      <div class="history-btn-group">
+        <button class="history-btn" id="btn-undo" title="Rückgängig (Ctrl + Z)" disabled>
+          <span class="btn-icon" id="icon-undo"></span>
+          <span class="btn-text" id="undo-text">Rückgängig</span>
+        </button>
+        <button class="history-btn" id="btn-redo" title="Wiederholen (Ctrl + Y)" disabled>
+          <span class="btn-icon" id="icon-redo"></span>
+          <span class="btn-text" id="redo-text">Wiederholen</span>
+        </button>
+      </div>
+
       <button class="btn-primary-action btn-add-product-main" id="btn-open-add-product" title="Neues Produkt aus Fotos erstellen">
         <span class="btn-icon" id="icon-add-prod"></span>
         <span id="add-prod-label">+ Neues Produkt</span>
@@ -58,7 +71,7 @@
       </button>
       <button class="btn-secondary-action" id="btn-randomize" title="Zufälliges Design generieren">
         <span class="btn-icon" id="icon-shuffle"></span>
-        <span id="randomize-label">Zufälliges Design</span>
+        <span id="randomize-label">Zufall</span>
       </button>
       <button class="btn-primary-action" id="btn-open-export" title="Spezifikation ansehen & 3D-Mockup herunterladen">
         <span class="btn-icon" id="icon-download"></span>
@@ -66,6 +79,18 @@
       </button>
     </div>
   </header>
+
+  <!-- 3. Sobral Orange Category Navigation Bar -->
+  <nav class="sobral-category-bar">
+    <div class="cat-bar-container">
+      <a href="https://sobral.ch/de/arbeitskleidung" target="_blank" rel="noopener" class="cat-link active">Arbeitskleidung</a>
+      <a href="https://sobral.ch/de/arbeitsschuhe" target="_blank" rel="noopener" class="cat-link">Arbeitsschuhe</a>
+      <a href="https://sobral.ch/de/technische-produkte" target="_blank" rel="noopener" class="cat-link">Technische Produkte</a>
+      <a href="https://sobral.ch/de/fallschutz" target="_blank" rel="noopener" class="cat-link">Fallschutz</a>
+      <a href="https://sobral.ch/de/markenkompetenz" target="_blank" rel="noopener" class="cat-link">Markenkompetenz</a>
+      <span class="cat-link-highlight">3D Custom Studio</span>
+    </div>
+  </nav>
 
   <!-- On-Page Dedicated Product Creation Screen -->
   <div id="product-creation-view" class="creation-screen-container"></div>
