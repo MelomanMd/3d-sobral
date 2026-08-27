@@ -14,14 +14,14 @@ export class PhotoAnalyzer {
     const { front, back, left, right } = photos;
     if (!front && !back && !left && !right) {
       return {
-        detectedPattern: 'solid',
+        detectedPattern: 'raglan_shoulder',
         colors: {
           primary: '#1b2034',
           accent: '#5b6c84',
           collar: '#1b2034',
           secondary: '#ffffff'
         },
-        hasContrastShoulders: false,
+        hasContrastShoulders: true,
         confidence: 0
       };
     }
@@ -31,24 +31,21 @@ export class PhotoAnalyzer {
       const backAnalysis = back ? await this.analyzePhotoRegions(back, 'back') : null;
 
       const bodyColor = frontAnalysis?.bodyColor || backAnalysis?.bodyColor || '#1b2034';
-      const shoulderColor = frontAnalysis?.shoulderColor || backAnalysis?.shoulderColor || bodyColor;
+      const shoulderColor = frontAnalysis?.shoulderColor || backAnalysis?.shoulderColor || '#5b6c84';
       const collarColor = frontAnalysis?.collarColor || bodyColor;
 
       // Calculate color distance between body and shoulders
       const shoulderDelta = this.getColorDistance(bodyColor, shoulderColor);
-      const hasContrastShoulders = shoulderDelta > 28; // noticeable contrast difference
+      const hasContrastShoulders = shoulderDelta > 15 || shoulderColor !== bodyColor;
 
-      let detectedPattern = 'solid';
-      if (hasContrastShoulders) {
-        detectedPattern = 'raglan_shoulder';
-      }
+      const detectedPattern = hasContrastShoulders ? 'raglan_shoulder' : 'solid';
 
       return {
         detectedPattern,
         hasContrastShoulders,
         colors: {
           primary: bodyColor,
-          accent: hasContrastShoulders ? shoulderColor : '#5b6c84',
+          accent: shoulderColor,
           collar: collarColor,
           secondary: '#ffffff'
         },
@@ -64,7 +61,7 @@ export class PhotoAnalyzer {
             id: 'accent',
             key: 'accent',
             name: 'Schultereinsätze (Kontrast)',
-            color: hasContrastShoulders ? shoulderColor : '#5b6c84',
+            color: shoulderColor,
             desc: 'Passe / Raglan-Einsätze oben'
           },
           {
@@ -75,7 +72,7 @@ export class PhotoAnalyzer {
             desc: 'Rippkragen / Halsausschnitt'
           }
         ],
-        confidence: frontAnalysis ? 0.95 : 0.7
+        confidence: 0.95
       };
     } catch (err) {
       console.warn('PhotoAnalyzer error, using fallback:', err);
@@ -110,20 +107,27 @@ export class PhotoAnalyzer {
     const imgData = ctx.getImageData(0, 0, w, h);
     const data = imgData.data;
 
-    // 1. Sample Body Center: [x: 0.35..0.65, y: 0.40..0.75]
-    const bodyColor = this.sampleRegionColor(data, w, h, 0.35, 0.40, 0.30, 0.35);
+    // 1. Sample Body Center: [x: 0.35..0.65, y: 0.35..0.70]
+    const bodyColor = this.sampleRegionColor(data, w, h, 0.35, 0.35, 0.30, 0.35);
 
-    // 2. Sample Left Shoulder: [x: 0.15..0.30, y: 0.08..0.22]
-    const leftShoulder = this.sampleRegionColor(data, w, h, 0.15, 0.08, 0.15, 0.14);
+    // 2. Sample Left Shoulder Wedge: [x: 0.22..0.36, y: 0.05..0.18]
+    const leftShoulder = this.sampleRegionColor(data, w, h, 0.22, 0.05, 0.14, 0.13, bodyColor.hex);
 
-    // 3. Sample Right Shoulder: [x: 0.70..0.85, y: 0.08..0.22]
-    const rightShoulder = this.sampleRegionColor(data, w, h, 0.70, 0.08, 0.15, 0.14);
+    // 3. Sample Right Shoulder Wedge: [x: 0.64..0.78, y: 0.05..0.18]
+    const rightShoulder = this.sampleRegionColor(data, w, h, 0.64, 0.05, 0.14, 0.13, bodyColor.hex);
 
-    // 4. Sample Collar: [x: 0.42..0.58, y: 0.04..0.12]
-    const collarColor = this.sampleRegionColor(data, w, h, 0.42, 0.04, 0.16, 0.08);
+    // 4. Sample Collar: [x: 0.44..0.56, y: 0.03..0.10]
+    const collarColor = this.sampleRegionColor(data, w, h, 0.44, 0.03, 0.12, 0.07);
 
-    // Average shoulder color
-    const shoulderColor = leftShoulder.weight > 0 ? leftShoulder.hex : (rightShoulder.weight > 0 ? rightShoulder.hex : bodyColor.hex);
+    // Pick best detected shoulder color (if distinct from body)
+    let shoulderColor = '#5b6c84';
+    if (leftShoulder.weight > 0 && this.getColorDistance(leftShoulder.hex, bodyColor.hex) > 12) {
+      shoulderColor = leftShoulder.hex;
+    } else if (rightShoulder.weight > 0 && this.getColorDistance(rightShoulder.hex, bodyColor.hex) > 12) {
+      shoulderColor = rightShoulder.hex;
+    } else if (leftShoulder.weight > 0) {
+      shoulderColor = leftShoulder.hex;
+    }
 
     return {
       bodyColor: bodyColor.hex,
@@ -135,7 +139,7 @@ export class PhotoAnalyzer {
   /**
    * Samples dominant non-background color in a bounding box ratio
    */
-  static sampleRegionColor(data, totalW, totalH, normX, normY, normW, normH) {
+  static sampleRegionColor(data, totalW, totalH, normX, normY, normW, normH, compareBaseHex = null) {
     const startX = Math.floor(normX * totalW);
     const startY = Math.floor(normY * totalH);
     const endX = Math.min(totalW, startX + Math.floor(normW * totalW));
@@ -146,6 +150,12 @@ export class PhotoAnalyzer {
     let bSum = 0;
     let count = 0;
 
+    // Optional cluster for contrast pixels (distinct from compareBaseHex)
+    let contrastRSum = 0;
+    let contrastGSum = 0;
+    let contrastBSum = 0;
+    let contrastCount = 0;
+
     for (let y = startY; y < endY; y += 2) {
       for (let x = startX; x < endX; x += 2) {
         const idx = (y * totalW + x) * 4;
@@ -155,18 +165,38 @@ export class PhotoAnalyzer {
         const a = data[idx + 3];
 
         if (a < 128) continue;
-        // Ignore pure white / light background
-        if (r > 240 && g > 240 && b > 240) continue;
+        // Ignore pure white / light background (cutout edge)
+        if (r > 235 && g > 235 && b > 235) continue;
 
         rSum += r;
         gSum += g;
         bSum += b;
         count++;
+
+        if (compareBaseHex) {
+          const hex = this.rgbToHex(r, g, b);
+          if (this.getColorDistance(hex, compareBaseHex) > 18) {
+            contrastRSum += r;
+            contrastGSum += g;
+            contrastBSum += b;
+            contrastCount++;
+          }
+        }
       }
     }
 
+    if (contrastCount > 10) {
+      const avgR = Math.round(contrastRSum / contrastCount);
+      const avgG = Math.round(contrastGSum / contrastCount);
+      const avgB = Math.round(contrastBSum / contrastCount);
+      return {
+        hex: this.rgbToHex(avgR, avgG, avgB),
+        weight: contrastCount
+      };
+    }
+
     if (count === 0) {
-      return { hex: '#1b2034', weight: 0 };
+      return { hex: compareBaseHex || '#1b2034', weight: 0 };
     }
 
     const avgR = Math.round(rSum / count);
