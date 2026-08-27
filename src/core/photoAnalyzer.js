@@ -14,14 +14,16 @@ export class PhotoAnalyzer {
     const { front, back, left, right } = photos;
     if (!front && !back && !left && !right) {
       return {
-        detectedPattern: 'raglan_shoulder',
+        detectedPattern: 'solid',
+        detectedSilhouette: 'tshirt',
+        isSleeveless: false,
         colors: {
-          primary: '#1b2034',
-          accent: '#5b6c84',
-          collar: '#1b2034',
-          secondary: '#ffffff'
+          primary: '#ffffff',
+          accent: '#ffffff',
+          collar: '#ffffff',
+          secondary: '#181818'
         },
-        hasContrastShoulders: true,
+        hasContrastShoulders: false,
         confidence: 0
       };
     }
@@ -30,16 +32,21 @@ export class PhotoAnalyzer {
       const frontAnalysis = front ? await this.analyzePhotoRegions(front, 'front') : null;
       const backAnalysis = back ? await this.analyzePhotoRegions(back, 'back') : null;
 
-      const bodyColor = frontAnalysis?.bodyColor || backAnalysis?.bodyColor || '#1b2034';
-      const shoulderColor = frontAnalysis?.shoulderColor || backAnalysis?.shoulderColor || '#5b6c84';
+      const bodyColor = frontAnalysis?.bodyColor || backAnalysis?.bodyColor || '#ffffff';
+      let shoulderColor = frontAnalysis?.shoulderColor || backAnalysis?.shoulderColor || bodyColor;
       const collarColor = frontAnalysis?.collarColor || bodyColor;
-
-      // Calculate color distance between body and shoulders
-      const shoulderDelta = this.getColorDistance(bodyColor, shoulderColor);
-      const hasContrastShoulders = shoulderDelta > 15 || shoulderColor !== bodyColor;
 
       const isSleeveless = frontAnalysis?.isSleeveless || backAnalysis?.isSleeveless || false;
       const detectedSilhouette = isSleeveless ? 'tanktop' : 'tshirt';
+
+      // Calculate color distance between body and shoulders (require strong contrast delta > 28)
+      const shoulderDelta = this.getColorDistance(bodyColor, shoulderColor);
+      const hasContrastShoulders = !isSleeveless && shoulderDelta > 28;
+
+      if (!hasContrastShoulders) {
+        shoulderColor = bodyColor;
+      }
+
       const detectedPattern = hasContrastShoulders ? 'raglan_shoulder' : 'solid';
 
       return {

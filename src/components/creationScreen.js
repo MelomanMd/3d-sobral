@@ -22,9 +22,9 @@ export class CreationScreen {
       leftPreview: null,
       rightPreview: null,
       textureUrl: null,
-      baseColor: '#1b2034',
-      accentColor: '#5b6c84',
-      patternId: 'raglan_shoulder'
+      baseColor: '#ffffff',
+      accentColor: '#ffffff',
+      patternId: 'solid'
     };
   }
 
@@ -168,8 +168,8 @@ export class CreationScreen {
             <div class="form-group">
               <label class="form-label">Schnitt & Design-Muster</label>
               <select class="select-glass" id="screen-prod-pattern">
-                <option value="raglan_shoulder" selected>Kontrast-Schultern (Blåkläder / Raglan)</option>
-                <option value="solid">Klassisch Einfarbig (Solid)</option>
+                <option value="solid" selected>Klassisch Einfarbig (Solid)</option>
+                <option value="raglan_shoulder">Kontrast-Schultern (Raglan / 2-Farbig)</option>
                 <option value="vexa">Vexa Sport (Dynamisch)</option>
                 <option value="racing">Speed Racing (Streifen)</option>
                 <option value="cyber_hex">Cyber Mesh / Waben</option>
@@ -180,16 +180,16 @@ export class CreationScreen {
             <div class="form-group">
               <label class="form-label">Hauptfarbe (Körper)</label>
               <div class="color-picker-inline">
-                <input type="color" class="color-swatch-input" id="screen-prod-color" value="${this.formData.baseColor || '#1b2034'}">
-                <input type="text" class="input-glass" id="screen-prod-color-hex" value="${this.formData.baseColor || '#1b2034'}" style="width: 90px; text-transform: uppercase;">
+                <input type="color" class="color-swatch-input" id="screen-prod-color" value="${this.formData.baseColor || '#ffffff'}">
+                <input type="text" class="input-glass" id="screen-prod-color-hex" value="${this.formData.baseColor || '#ffffff'}" style="width: 90px; text-transform: uppercase;">
               </div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Akzentfarbe (Schultern)</label>
+              <label class="form-label">Akzentfarbe (Schultern / Details)</label>
               <div class="color-picker-inline">
-                <input type="color" class="color-swatch-input" id="screen-prod-accent-color" value="${this.formData.accentColor || '#5b6c84'}">
-                <input type="text" class="input-glass" id="screen-prod-accent-color-hex" value="${this.formData.accentColor || '#5b6c84'}" style="width: 90px; text-transform: uppercase;">
+                <input type="color" class="color-swatch-input" id="screen-prod-accent-color" value="${this.formData.accentColor || '#ffffff'}">
+                <input type="text" class="input-glass" id="screen-prod-accent-color-hex" value="${this.formData.accentColor || '#ffffff'}" style="width: 90px; text-transform: uppercase;">
               </div>
             </div>
           </div>

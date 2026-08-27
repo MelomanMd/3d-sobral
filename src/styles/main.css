@@ -1368,25 +1368,27 @@ body {
 
 .input-glass, .select-glass {
   width: 100%;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-glass);
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-sm);
-  color: var(--text-primary);
+  color: #ffffff;
   font-family: inherit;
   font-size: 13px;
-  padding: 8px 12px;
+  font-weight: 600;
+  padding: 10px 12px;
   outline: none;
   transition: all 0.2s;
 }
 
 .input-glass:focus, .select-glass:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.25);
+  border-color: #ff4400;
+  box-shadow: 0 0 10px rgba(255, 68, 0, 0.35);
 }
 
 .select-glass option {
-  background: var(--bg-surface);
-  color: var(--text-primary);
+  background: #181818;
+  color: #ffffff;
+  padding: 10px;
 }
 
 /* Range Sliders */
