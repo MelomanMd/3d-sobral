@@ -49,9 +49,9 @@ export class CreationScreen {
           <!-- Top Header -->
           <div class="creation-header">
             <div class="creation-title-group">
-              <span class="creation-badge">✨ 3D-Rekonstruktion</span>
-              <h2 class="creation-title">Neues Produkt erstellen</h2>
-              <p class="creation-subtitle">Laden Sie 4 Fotos hoch – das System generiert automatisch die exakte 3D-Kopie mit allen Elementen.</p>
+              <span class="creation-badge">${t('creation_badge')}</span>
+              <h2 class="creation-title">${t('creation_title')}</h2>
+              <p class="creation-subtitle">${t('creation_subtitle')}</p>
             </div>
             ${this.canClose ? `<button class="creation-close-btn" id="btn-close-creation">${ICONS.close}</button>` : ''}
           </div>
@@ -59,8 +59,8 @@ export class CreationScreen {
           <!-- Live Auto-Reconstruction Preview Badge -->
           <div class="analysis-live-card" id="screen-analysis-live-card" style="display: none;">
             <div class="analysis-card-top">
-              <span class="analysis-live-tag">✨ Elemente & Farben erkannt</span>
-              <span id="screen-analysis-pattern-badge" class="analysis-pattern-tag">Kontrast-Schultern erkannt</span>
+              <span class="analysis-live-tag">${t('analysis_elements_detected')}</span>
+              <span id="screen-analysis-pattern-badge" class="analysis-pattern-tag">${t('analysis_solid_detected')}</span>
             </div>
             <div id="screen-analysis-pills-wrap" class="analysis-pills-row"></div>
           </div>
@@ -68,15 +68,15 @@ export class CreationScreen {
           <!-- 4 Photos Upload Section -->
           <div class="creation-slots-section">
             <h3 class="creation-section-heading">
-              <span>Produktfotos für 3D-Rekonstruktion (4 Ansichten)</span>
+              <span>${t('creation_photos_heading')}</span>
             </h3>
 
             <div class="creation-slots-grid">
               <!-- Slot 1: Front -->
               <div class="upload-slot-card" id="screen-card-slot-front">
                 <div class="slot-header">
-                  <span class="slot-badge optional">Vorderseite</span>
-                  <span class="slot-title">1. Vorne (Front)</span>
+                  <span class="slot-badge optional">${t('badge_front')}</span>
+                  <span class="slot-title">${t('slot_front')}</span>
                 </div>
                 <div class="slot-dropzone" id="screen-drop-slot-front">
                   <input type="file" id="screen-file-slot-front" accept="image/*" style="display:none">
@@ -91,8 +91,8 @@ export class CreationScreen {
               <!-- Slot 2: Back -->
               <div class="upload-slot-card" id="screen-card-slot-back">
                 <div class="slot-header">
-                  <span class="slot-badge optional">Rückseite</span>
-                  <span class="slot-title">2. Hinten (Back)</span>
+                  <span class="slot-badge optional">${t('badge_back')}</span>
+                  <span class="slot-title">${t('slot_back')}</span>
                 </div>
                 <div class="slot-dropzone" id="screen-drop-slot-back">
                   <input type="file" id="screen-file-slot-back" accept="image/*" style="display:none">
@@ -107,8 +107,8 @@ export class CreationScreen {
               <!-- Slot 3: Left -->
               <div class="upload-slot-card" id="screen-card-slot-left">
                 <div class="slot-header">
-                  <span class="slot-badge optional">Linke Seite</span>
-                  <span class="slot-title">3. Links (Left)</span>
+                  <span class="slot-badge optional">${t('badge_left')}</span>
+                  <span class="slot-title">${t('slot_left')}</span>
                 </div>
                 <div class="slot-dropzone" id="screen-drop-slot-left">
                   <input type="file" id="screen-file-slot-left" accept="image/*" style="display:none">
@@ -123,8 +123,8 @@ export class CreationScreen {
               <!-- Slot 4: Right -->
               <div class="upload-slot-card" id="screen-card-slot-right">
                 <div class="slot-header">
-                  <span class="slot-badge optional">Rechte Seite</span>
-                  <span class="slot-title">4. Rechts (Right)</span>
+                  <span class="slot-badge optional">${t('badge_right')}</span>
+                  <span class="slot-title">${t('slot_right')}</span>
                 </div>
                 <div class="slot-dropzone" id="screen-drop-slot-right">
                   <input type="file" id="screen-file-slot-right" accept="image/*" style="display:none">
@@ -158,27 +158,27 @@ export class CreationScreen {
             <div class="form-group">
               <label class="form-label">${t('label_product_silhouette')}</label>
               <select class="select-glass" id="screen-prod-sil">
-                <option value="tshirt" selected>${t('sil_tshirt')}</option>
-                <option value="tanktop">Ärmelloses Shirt / Tank Top (Sleeveless)</option>
-                <option value="shorts">${t('sil_shorts')}</option>
-                <option value="hoodie">${t('sil_hoodie')}</option>
+                <option value="tshirt" ${this.formData.silhouette === 'tshirt' ? 'selected' : ''}>${t('sil_tshirt')}</option>
+                <option value="tanktop" ${this.formData.silhouette === 'tanktop' ? 'selected' : ''}>${t('sil_tanktop')}</option>
+                <option value="shorts" ${this.formData.silhouette === 'shorts' ? 'selected' : ''}>${t('sil_shorts')}</option>
+                <option value="hoodie" ${this.formData.silhouette === 'hoodie' ? 'selected' : ''}>${t('sil_hoodie')}</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Schnitt & Design-Muster</label>
+              <label class="form-label">${t('label_pattern')}</label>
               <select class="select-glass" id="screen-prod-pattern">
-                <option value="solid" selected>Klassisch Einfarbig (Solid)</option>
-                <option value="raglan_shoulder">Kontrast-Schultern (Raglan / 2-Farbig)</option>
-                <option value="vexa">Vexa Sport (Dynamisch)</option>
-                <option value="racing">Speed Racing (Streifen)</option>
-                <option value="cyber_hex">Cyber Mesh / Waben</option>
-                <option value="gradient">Farbverlauf Flow (Ombre)</option>
+                <option value="solid" ${this.formData.patternId === 'solid' ? 'selected' : ''}>${t('pattern_solid')}</option>
+                <option value="raglan_shoulder" ${this.formData.patternId === 'raglan_shoulder' ? 'selected' : ''}>${t('pattern_raglan_shoulder')}</option>
+                <option value="vexa" ${this.formData.patternId === 'vexa' ? 'selected' : ''}>${t('pattern_vexa')}</option>
+                <option value="racing" ${this.formData.patternId === 'racing' ? 'selected' : ''}>${t('pattern_racing')}</option>
+                <option value="cyber_hex" ${this.formData.patternId === 'cyber_hex' ? 'selected' : ''}>${t('pattern_cyber_hex')}</option>
+                <option value="gradient" ${this.formData.patternId === 'gradient' ? 'selected' : ''}>${t('pattern_gradient')}</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Hauptfarbe (Körper)</label>
+              <label class="form-label">${t('label_body_color')}</label>
               <div class="color-picker-inline">
                 <input type="color" class="color-swatch-input" id="screen-prod-color" value="${this.formData.baseColor || '#ffffff'}">
                 <input type="text" class="input-glass" id="screen-prod-color-hex" value="${this.formData.baseColor || '#ffffff'}" style="width: 90px; text-transform: uppercase;">
@@ -186,7 +186,7 @@ export class CreationScreen {
             </div>
 
             <div class="form-group">
-              <label class="form-label">Akzentfarbe (Schultern / Details)</label>
+              <label class="form-label">${t('label_accent_color')}</label>
               <div class="color-picker-inline">
                 <input type="color" class="color-swatch-input" id="screen-prod-accent-color" value="${this.formData.accentColor || '#ffffff'}">
                 <input type="text" class="input-glass" id="screen-prod-accent-color-hex" value="${this.formData.accentColor || '#ffffff'}" style="width: 90px; text-transform: uppercase;">
@@ -198,12 +198,12 @@ export class CreationScreen {
           <div class="creation-footer">
             ${this.canClose ? `
               <button class="btn-secondary-action" id="btn-cancel-creation" style="padding: 12px 24px;">
-                Abbrechen
+                ${t('btn_cancel')}
               </button>
             ` : ''}
             <button class="btn-primary-action btn-submit-creation" id="btn-submit-creation">
               <span class="btn-icon">${ICONS.sparkles}</span>
-              <span>3D-Modell generieren & Studio starten</span>
+              <span>${t('btn_generate_studio')}</span>
             </button>
           </div>
         </div>

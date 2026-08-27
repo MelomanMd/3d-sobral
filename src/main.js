@@ -150,6 +150,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 2. Language Setup (German default, English option)
   const updateStaticTexts = () => {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (key) el.textContent = t(key);
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (key) el.placeholder = t(key);
+    });
+
     const undoText = document.getElementById('undo-text');
     if (undoText) undoText.textContent = t('undo');
 
@@ -191,15 +201,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.classList.toggle('active', btn.dataset.lang === lang);
     });
     updateStaticTexts();
+    renderActivePanel();
+    if (viewControls) viewControls.render();
+    if (floatingGizmo) floatingGizmo.update();
+    if (productSwitcher) productSwitcher.render();
+    if (creationScreen && creationScreen.isOpen) {
+      creationScreen.render();
+    }
   };
 
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       applyLang(btn.dataset.lang);
-      renderActivePanel();
-      if (viewControls) viewControls.render();
-      if (floatingGizmo) floatingGizmo.update();
-      if (productSwitcher) productSwitcher.render();
     });
   });
 
