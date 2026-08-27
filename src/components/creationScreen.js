@@ -26,6 +26,11 @@ export class CreationScreen {
       accentColor: '#ffffff',
       patternId: 'solid'
     };
+
+    if (this.container) {
+      this.container.classList.add('hidden');
+      this.container.style.display = 'none';
+    }
   }
 
   open(canClose = false) {
