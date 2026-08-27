@@ -84,10 +84,7 @@ export class CreationScreen {
                     <span class="slot-icon-svg">${ICONS.shirt}</span>
                     <span class="slot-action-text">${t('btn_choose_file')}</span>
                   </div>
-                  <div class="slot-preview-box hidden" id="screen-prev-box-front">
-                    <img src="" id="screen-prev-img-front" alt="Front Preview">
-                    <button class="btn-remove-slot-img" data-slot="front">${ICONS.trash}</button>
-                  </div>
+                  <div class="slot-preview-box hidden" id="screen-prev-box-front"></div>
                 </div>
               </div>
 
@@ -103,10 +100,7 @@ export class CreationScreen {
                     <span class="slot-icon-svg">${ICONS.refresh}</span>
                     <span class="slot-action-text">${t('btn_choose_file')}</span>
                   </div>
-                  <div class="slot-preview-box hidden" id="screen-prev-box-back">
-                    <img src="" id="screen-prev-img-back" alt="Back Preview">
-                    <button class="btn-remove-slot-img" data-slot="back">${ICONS.trash}</button>
-                  </div>
+                  <div class="slot-preview-box hidden" id="screen-prev-box-back"></div>
                 </div>
               </div>
 
@@ -122,10 +116,7 @@ export class CreationScreen {
                     <span class="slot-icon-svg">${ICONS.layers}</span>
                     <span class="slot-action-text">${t('btn_choose_file')}</span>
                   </div>
-                  <div class="slot-preview-box hidden" id="screen-prev-box-left">
-                    <img src="" id="screen-prev-img-left" alt="Left Preview">
-                    <button class="btn-remove-slot-img" data-slot="left">${ICONS.trash}</button>
-                  </div>
+                  <div class="slot-preview-box hidden" id="screen-prev-box-left"></div>
                 </div>
               </div>
 
@@ -141,10 +132,7 @@ export class CreationScreen {
                     <span class="slot-icon-svg">${ICONS.layers}</span>
                     <span class="slot-action-text">${t('btn_choose_file')}</span>
                   </div>
-                  <div class="slot-preview-box hidden" id="screen-prev-box-right">
-                    <img src="" id="screen-prev-img-right" alt="Right Preview">
-                    <button class="btn-remove-slot-img" data-slot="right">${ICONS.trash}</button>
-                  </div>
+                  <div class="slot-preview-box hidden" id="screen-prev-box-right"></div>
                 </div>
               </div>
             </div>
@@ -341,7 +329,6 @@ export class CreationScreen {
     const fileInput = this.container.querySelector(`#screen-file-slot-${slotKey}`);
     const placeholder = this.container.querySelector(`#screen-ph-slot-${slotKey}`);
     const prevBox = this.container.querySelector(`#screen-prev-box-${slotKey}`);
-    const prevImg = this.container.querySelector(`#screen-prev-img-${slotKey}`);
 
     if (!dropzone || !fileInput) return;
 
@@ -364,39 +351,43 @@ export class CreationScreen {
       dropzone.classList.remove('dragover');
       const files = e.dataTransfer.files;
       if (files.length > 0) {
-        this.handleFileUpload(files[0], formKey, placeholder, prevBox, prevImg, dropzone);
+        this.handleFileUpload(files[0], formKey, placeholder, prevBox, dropzone, slotKey, fileInput);
       }
     });
 
     fileInput.addEventListener('change', (e) => {
       if (e.target.files.length > 0) {
-        this.handleFileUpload(e.target.files[0], formKey, placeholder, prevBox, prevImg, dropzone);
+        this.handleFileUpload(e.target.files[0], formKey, placeholder, prevBox, dropzone, slotKey, fileInput);
       }
     });
-
-    const removeBtn = prevBox?.querySelector('.btn-remove-slot-img');
-    if (removeBtn) {
-      removeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.formData[formKey] = null;
-        if (prevImg) prevImg.src = '';
-        prevBox.classList.add('hidden');
-        placeholder.classList.remove('hidden');
-        dropzone.classList.remove('has-image');
-        fileInput.value = '';
-      });
-    }
   }
 
-  handleFileUpload(file, formKey, placeholder, prevBox, prevImg, dropzone) {
+  handleFileUpload(file, formKey, placeholder, prevBox, dropzone, slotKey, fileInput) {
     const reader = new FileReader();
     reader.onload = async (e) => {
       const dataUrl = e.target.result;
       this.formData[formKey] = dataUrl;
-      if (prevImg) prevImg.src = dataUrl;
-      placeholder.classList.add('hidden');
+
+      prevBox.innerHTML = `
+        <img src="${dataUrl}" alt="${slotKey} Preview" style="max-width:100%; max-height:100%; object-fit:contain;">
+        <button class="btn-remove-slot-img" data-slot="${slotKey}" title="Bild entfernen">${ICONS.trash}</button>
+      `;
       prevBox.classList.remove('hidden');
+      placeholder.classList.add('hidden');
       dropzone.classList.add('has-image');
+
+      const removeBtn = prevBox.querySelector('.btn-remove-slot-img');
+      if (removeBtn) {
+        removeBtn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          this.formData[formKey] = null;
+          prevBox.innerHTML = '';
+          prevBox.classList.add('hidden');
+          placeholder.classList.remove('hidden');
+          dropzone.classList.remove('has-image');
+          if (fileInput) fileInput.value = '';
+        });
+      }
 
       // Auto-analyze colors and cut pattern from uploaded photos
       try {
