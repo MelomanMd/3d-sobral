@@ -439,7 +439,11 @@ export class ShirtViewer {
         return;
       }
 
-      // Clicked on empty area of shirt
+      // 4. Clicked on garment element surface -> identify clicked part!
+      const clickedPart = this.identifyGarmentPartAtUV(uv.x, uv.y);
+      if (this.onPartClick) {
+        this.onPartClick(clickedPart);
+      }
       if (this.onDeselect) this.onDeselect();
     });
 
@@ -557,6 +561,21 @@ export class ShirtViewer {
     domEl.addEventListener('pointerup', endDrag);
     domEl.addEventListener('pointercancel', endDrag);
     domEl.addEventListener('pointerleave', endDrag);
+  }
+
+  identifyGarmentPartAtUV(u, v) {
+    // 1. Check Collar (around top center of front or back neckline)
+    if ((v < 0.12 && Math.abs(u - 0.25) < 0.08) || (v < 0.12 && Math.abs(u - 0.75) < 0.08)) {
+      return 'collar';
+    }
+    // 2. Check Contrast Shoulders (Front Left, Front Right, Back Left, Back Right)
+    const isFrontShoulder = v >= 0.07 && v <= 0.25 && ((u >= 0.03 && u <= 0.20) || (u >= 0.30 && u <= 0.47));
+    const isBackShoulder = v >= 0.07 && v <= 0.25 && ((u >= 0.53 && u <= 0.70) || (u >= 0.80 && u <= 0.97));
+    if (isFrontShoulder || isBackShoulder) {
+      return 'accent';
+    }
+    // 3. Default: Main Body
+    return 'primary';
   }
 
   setTheme(theme) {

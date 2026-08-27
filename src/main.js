@@ -465,6 +465,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
+  // 11.5. Direct 3D Part Picking (Click on shirt elements)
+  viewer.onPartClick = (partId) => {
+    if (activeTab !== 'colors') {
+      setActiveTab('colors');
+    }
+    if (colorPanel) {
+      colorPanel.setActiveZone(partId);
+    }
+  };
+
   viewer.onItemDrag = (type, itemId, offsetX, offsetY) => {
     onStateUpdate();
     if (type === 'text' && textPanel) {

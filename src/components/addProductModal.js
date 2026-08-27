@@ -3,6 +3,7 @@ import { t } from '../core/i18n.js';
 import { ICONS } from '../core/icons.js';
 import { DEFAULT_PRODUCTS } from '../core/products.js';
 import { ModelStorage } from '../core/modelStorage.js';
+import { PhotoAnalyzer } from '../core/photoAnalyzer.js';
 
 export class AddProductModal {
   constructor(catalog, onProductAdded) {
@@ -385,13 +386,46 @@ export class AddProductModal {
     }
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       const dataUrl = e.target.result;
       this.formData[formKey] = dataUrl;
       if (prevImg) prevImg.src = dataUrl;
       placeholder.classList.add('hidden');
       prevBox.classList.remove('hidden');
       dropzone.classList.add('has-image');
+
+      // Auto-analyze colors and cut pattern from uploaded photos
+      try {
+        const analysis = await PhotoAnalyzer.analyzeGarmentPhotos({
+          front: this.formData.frontPreview,
+          back: this.formData.backPreview,
+          left: this.formData.leftPreview,
+          right: this.formData.rightPreview
+        });
+
+        if (analysis && this.modalEl) {
+          if (analysis.colors?.primary) {
+            const primInput = this.modalEl.querySelector('#new-prod-color');
+            const primHex = this.modalEl.querySelector('#new-prod-color-hex');
+            if (primInput) primInput.value = analysis.colors.primary;
+            if (primHex) primHex.value = analysis.colors.primary.toUpperCase();
+            this.formData.baseColor = analysis.colors.primary;
+          }
+          if (analysis.colors?.accent) {
+            const accInput = this.modalEl.querySelector('#new-prod-accent-color');
+            const accHex = this.modalEl.querySelector('#new-prod-accent-color-hex');
+            if (accInput) accInput.value = analysis.colors.accent;
+            if (accHex) accHex.value = analysis.colors.accent.toUpperCase();
+            this.formData.accentColor = analysis.colors.accent;
+          }
+          if (analysis.detectedPattern) {
+            const patSelect = this.modalEl.querySelector('#new-prod-pattern');
+            if (patSelect) patSelect.value = analysis.detectedPattern;
+          }
+        }
+      } catch (err) {
+        console.warn('Auto-analysis error:', err);
+      }
     };
     reader.readAsDataURL(file);
   }
