@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';
+import { FabricTextureGenerator } from './fabricTexture.js';
 import { t } from './i18n.js';
 
 export class ShirtViewer {
@@ -186,12 +187,23 @@ export class ShirtViewer {
 
             const textureMap = isAiModel ? origMat.map : dynamicTexture;
 
+            let normalMap = origMat?.normalMap || null;
+            if (!normalMap) {
+              const normalCanvas = FabricTextureGenerator.getFabricNormalMapCanvas();
+              const fabricNormalTex = new THREE.CanvasTexture(normalCanvas);
+              fabricNormalTex.wrapS = THREE.RepeatWrapping;
+              fabricNormalTex.wrapT = THREE.RepeatWrapping;
+              fabricNormalTex.repeat.set(24, 24);
+              fabricNormalTex.needsUpdate = true;
+              normalMap = fabricNormalTex;
+            }
+
             this.shirtMaterial = new THREE.MeshStandardMaterial({
               map: textureMap,
-              normalMap: origMat ? origMat.normalMap : null,
-              normalScale: new THREE.Vector2(0.6, 0.6),
-              roughness: 0.85,
-              metalness: 0.0,
+              normalMap: normalMap,
+              normalScale: new THREE.Vector2(0.4, 0.4),
+              roughness: 0.9,
+              metalness: 0.02,
               aoMap: origMat?.aoMap || null,
               aoMapIntensity: 0.7,
               side: THREE.DoubleSide

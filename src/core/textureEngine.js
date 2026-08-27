@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { PATTERNS } from './patterns.js';
+import { FabricTextureGenerator } from './fabricTexture.js';
 import { t } from './i18n.js';
 
 export const PLACEMENT_ZONES = {
@@ -139,6 +140,44 @@ export class TextureEngine {
     // 1. Draw Pattern & Colors (Solid, Raglan, Vexa, Racing, Gradient)
     const pattern = PATTERNS.find(p => p.id === patternId) || PATTERNS[0];
     pattern.render(ctx, w, h, colors);
+
+    // 1.5. Apply Realistic Fabric Texture Layer (from Photo or Procedural Knit)
+    if (state.productFrontPhoto) {
+      const fabricTile = await FabricTextureGenerator.extractFabricTileFromPhoto(state.productFrontPhoto);
+      if (fabricTile) {
+        ctx.save();
+        const pat = ctx.createPattern(fabricTile, 'repeat');
+        if (pat) {
+          ctx.fillStyle = pat;
+          ctx.globalCompositeOperation = 'soft-light';
+          ctx.globalAlpha = 0.92;
+          ctx.fillRect(0, 0, w, h);
+
+          ctx.globalCompositeOperation = 'multiply';
+          ctx.globalAlpha = 0.38;
+          ctx.fillRect(0, 0, w, h);
+        }
+        ctx.restore();
+      }
+    } else {
+      const proceduralFabric = FabricTextureGenerator.createProceduralFabricCanvas(colors?.primary || '#1b2034', true);
+      ctx.save();
+      const pat = ctx.createPattern(proceduralFabric, 'repeat');
+      if (pat) {
+        ctx.fillStyle = pat;
+        ctx.globalCompositeOperation = 'soft-light';
+        ctx.globalAlpha = 0.75;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.globalAlpha = 0.22;
+        ctx.fillRect(0, 0, w, h);
+      }
+      ctx.restore();
+    }
+
+    // 1.6. Draw Realistic Garment Construction Details (Seams, Collar Ribbing, AO Depth)
+    FabricTextureGenerator.drawGarmentDetails(ctx, w, h, colors);
 
     // 2. Draw Custom Logos
     for (const logo of logos) {
