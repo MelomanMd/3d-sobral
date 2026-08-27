@@ -87,14 +87,8 @@ function renderRaglanShoulderPattern(ctx, width, height, colors) {
   ctx.closePath();
   ctx.fill();
 
-  // Sleeve top cap inserts
-  ctx.beginPath();
-  ctx.rect(width * 0.05, height * 0.54, width * 0.14, height * 0.14);
-  ctx.rect(width * 0.48, height * 0.54, width * 0.14, height * 0.14);
-  ctx.fill();
-
   // 3. Subtle realistic seam stitching lines
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.18)';
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
   ctx.lineWidth = 4;
   // Front left seam
   ctx.beginPath();
