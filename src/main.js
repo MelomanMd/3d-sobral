@@ -18,56 +18,22 @@ import { ICONS } from './core/icons.js';
 // Initial App State
 let state = {
   selectedItemId: null,
-  patternId: 'vexa',
+  patternId: 'raglan_shoulder',
   colors: {
     primary: '#121316',
-    accent: '#dc2626',
-    collar: '#f8fafc',
+    accent: '#ff4400',
+    collar: '#121316',
     secondary: '#ffffff'
   },
   texts: [
     {
-      id: 'text_1',
+      id: 'text_sobral_back',
       text: 'SOBRAL',
-      zone: 'chest_center',
-      fontFamily: "'Impact', 'Arial Black', sans-serif",
-      fontSize: 56,
-      fontWeight: '900',
-      color: '#ffffff',
-      strokeColor: '#000000',
-      strokeWidth: 4,
-      curve: 0,
-      rotation: 0,
-      offsetX: 0,
-      offsetY: 0,
-      visible: true,
-      uppercase: true
-    },
-    {
-      id: 'text_2',
-      text: '10',
-      zone: 'back_number',
-      fontFamily: "'Impact', 'Arial Black', sans-serif",
-      fontSize: 90,
-      fontWeight: '900',
-      color: '#ffffff',
-      strokeColor: '#dc2626',
-      strokeWidth: 6,
-      curve: 0,
-      rotation: 0,
-      offsetX: 0,
-      offsetY: 0,
-      visible: true,
-      uppercase: true
-    },
-    {
-      id: 'text_3',
-      text: 'CHAMPION',
       zone: 'back_top',
       fontFamily: "'Impact', 'Arial Black', sans-serif",
-      fontSize: 42,
+      fontSize: 46,
       fontWeight: '900',
-      color: '#f8fafc',
+      color: '#ffffff',
       strokeColor: '#000000',
       strokeWidth: 3,
       curve: 0,
@@ -80,11 +46,11 @@ let state = {
   ],
   logos: [
     {
-      id: 'logo_1',
-      name: 'Royal Lion Crest',
+      id: 'logo_sobral_main',
+      name: 'SOBRAL Workwear',
       src: getLogoDataUrl(DEFAULT_LOGOS[0]),
       zone: 'chest_left',
-      scale: 1.0,
+      scale: 0.9,
       rotation: 0,
       opacity: 1.0,
       tint: 'original',
@@ -620,7 +586,4 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
   });
-
-  // 19. Open Dedicated Creation Screen on page on startup
-  creationScreen.open(false);
 });

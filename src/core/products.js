@@ -2,21 +2,21 @@ import { ModelStorage } from './modelStorage.js';
 
 export const DEFAULT_PRODUCTS = [
   {
-    id: 'blaklader_tshirt_contrast',
-    name: 'Blåkläder Workwear (Contrast Shoulders)',
+    id: 'sobral_workwear_tshirt',
+    name: 'SOBRAL Workwear T-Shirt',
     category: 'tops',
     categoryName: 'T-Shirts & Trikots',
-    price: '34.90 €',
-    sku: 'BLK-TS-3379',
+    price: '39.00 CHF',
+    sku: 'SOB-TS-101',
     silhouette: 'tshirt',
     modelUrl: '/shirt_baked.glb',
     patternId: 'raglan_shoulder',
-    baseColor: '#1b2034',
-    accentColor: '#5b6c84',
+    baseColor: '#121316',
+    accentColor: '#ff4400',
     colors: {
-      primary: '#1b2034',
-      accent: '#5b6c84',
-      collar: '#1b2034',
+      primary: '#121316',
+      accent: '#ff4400',
+      collar: '#121316',
       secondary: '#ffffff'
     },
     frontPreview: '/images/blaklader_front.jpg',
