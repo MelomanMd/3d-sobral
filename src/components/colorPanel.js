@@ -14,34 +14,32 @@ export const SPORT_PALETTES = [
   { name: 'Sunset Gold', hex: '#f59e0b' },
   { name: 'Racing Orange', hex: '#ea580c' },
   { name: 'Aqua Cyan', hex: '#06b6d4' },
-  { name: 'Titanium Grey', hex: '#475569' },
-  { name: 'Emerald Green', hex: '#059669' },
-  { name: 'Electric Pink', hex: '#db2777' }
+  { name: 'Titanium Grey', hex: '#475569' }
 ];
 
 export const GARMENT_ELEMENTS = [
   {
     id: 'primary',
     name: 'Hauptkörper (Body)',
-    sub: 'Brust, Rücken & Rumpf',
+    sub: 'Brust & Rücken',
     icon: 'shirt'
   },
   {
     id: 'accent',
     name: 'Schultereinsätze (Passe)',
-    sub: 'Kontrast-Schultern & Raglan',
+    sub: 'Kontrast-Schultern',
     icon: 'layers'
   },
   {
     id: 'collar',
     name: 'Kragen (Bündchen)',
-    sub: 'Halsausschnitt & Rippe',
+    sub: 'Halsausschnitt',
     icon: 'sparkles'
   },
   {
     id: 'secondary',
     name: 'Sekundärakzente',
-    sub: 'Zierstreifen & Paspeln',
+    sub: 'Zierlinien',
     icon: 'palette'
   }
 ];
@@ -51,7 +49,7 @@ export class ColorPanel {
     this.container = containerElement;
     this.state = state;
     this.onUpdate = onUpdate;
-    this.activeZone = 'primary'; // 'primary', 'accent', 'collar', 'secondary'
+    this.activeZone = 'primary';
 
     this.render();
   }
@@ -62,55 +60,47 @@ export class ColorPanel {
   }
 
   render() {
-    const activeColor = this.state.colors[this.activeZone] || '#1b2034';
-
     this.container.innerHTML = `
-      <!-- 1. Garment Parts & Elements List -->
-      <div class="panel-section">
+      <!-- 1. Compact Garment Parts List with Inline Pickers -->
+      <div class="panel-section" style="padding-bottom: 8px;">
         <div class="section-title">
           <span class="title-icon-svg">${ICONS.layers}</span>
-          <span>Elemente des Kleidungsstücks</span>
+          <span>Elemente & Farben</span>
         </div>
-        <p class="section-hint" style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-          Wählen Sie ein Element aus oder klicken Sie direkt auf das 3D-Modell:
-        </p>
 
-        <div class="element-cards-grid">
+        <div class="compact-elements-list">
           ${GARMENT_ELEMENTS.map(el => {
             const isSelected = this.activeZone === el.id;
             const elColor = this.state.colors[el.id] || '#1b2034';
             return `
-              <div class="element-part-card ${isSelected ? 'active' : ''}" data-zone="${el.id}">
-                <div class="part-card-left">
-                  <span class="part-color-dot" style="background-color: ${elColor};"></span>
-                  <div class="part-text-wrap">
-                    <span class="part-title">${el.name}</span>
-                    <span class="part-sub">${el.sub}</span>
-                  </div>
+              <div class="compact-part-card ${isSelected ? 'active' : ''}" data-zone="${el.id}">
+                <div class="compact-part-info">
+                  <span class="part-title">${el.name}</span>
+                  <span class="part-sub">${el.sub}</span>
                 </div>
-                <div class="part-hex-tag">${elColor.toUpperCase()}</div>
+                
+                <div class="compact-color-ctrl">
+                  <div class="mini-picker-wrap" style="background-color: ${elColor};" title="Farbe wählen">
+                    <input type="color" class="mini-native-picker" data-picker-zone="${el.id}" value="${elColor}">
+                  </div>
+                  <span class="compact-hex-tag">${elColor.toUpperCase()}</span>
+                </div>
               </div>
             `;
           }).join('')}
         </div>
       </div>
 
-      <!-- 2. Active Element Color Customizer -->
-      <div class="panel-section">
-        <div class="section-header-row">
-          <span class="section-title">
-            <span class="title-icon-svg">${ICONS.palette}</span>
-            <span>Farbe für ${this.getActiveZoneName()}</span>
+      <!-- 2. Quick Sport Palette Swatches Strip -->
+      <div class="panel-section" style="padding-top: 8px; padding-bottom: 12px;">
+        <div class="section-header-row" style="margin-bottom: 8px;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
+            Schnellauswahl (${this.getActiveZoneName()})
           </span>
-          <div class="custom-color-wrapper">
-            <span class="hex-label">${activeColor.toUpperCase()}</span>
-            <input type="color" class="native-color-picker" id="active-color-input" value="${activeColor}">
-          </div>
         </div>
-
-        <div class="palette-swatches-grid" style="margin-top: 12px;">
+        <div class="compact-swatches-row">
           ${SPORT_PALETTES.map(p => `
-            <button class="swatch-btn ${activeColor.toLowerCase() === p.hex.toLowerCase() ? 'active' : ''}" 
+            <button class="mini-swatch-btn ${(this.state.colors[this.activeZone] || '').toLowerCase() === p.hex.toLowerCase() ? 'active' : ''}" 
                     data-hex="${p.hex}" 
                     title="${p.name} (${p.hex})" 
                     style="background-color: ${p.hex}">
@@ -120,14 +110,14 @@ export class ColorPanel {
       </div>
 
       <!-- 3. Pattern / Cut Selector -->
-      <div class="panel-section">
+      <div class="panel-section" style="padding-top: 8px;">
         <div class="section-title">
           <span class="title-icon-svg">${ICONS.sparkles}</span>
           <span>${t('section_pattern')}</span>
         </div>
-        <div class="pattern-grid">
+        <div class="compact-pattern-grid">
           ${PATTERNS.map(p => `
-            <button class="pattern-card ${this.state.patternId === p.id ? 'active' : ''}" data-pattern="${p.id}">
+            <button class="compact-pattern-card ${this.state.patternId === p.id ? 'active' : ''}" data-pattern="${p.id}">
               <div class="pattern-preview pattern-${p.id}"></div>
               <span class="pattern-name">${p.getName ? p.getName() : p.name}</span>
             </button>
@@ -141,20 +131,38 @@ export class ColorPanel {
 
   getActiveZoneName() {
     const el = GARMENT_ELEMENTS.find(e => e.id === this.activeZone);
-    return el ? el.name : 'Element';
+    return el ? el.name.split(' ')[0] : 'Element';
   }
 
   bindEvents() {
     // Select Element Part Card
-    this.container.querySelectorAll('.element-part-card').forEach(card => {
-      card.addEventListener('click', () => {
+    this.container.querySelectorAll('.compact-part-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.mini-picker-wrap')) return;
         this.activeZone = card.dataset.zone;
         this.render();
       });
     });
 
-    // Color Swatch Selection
-    this.container.querySelectorAll('.swatch-btn').forEach(btn => {
+    // Inline Color Picker for each part
+    this.container.querySelectorAll('.mini-native-picker').forEach(picker => {
+      picker.addEventListener('input', (e) => {
+        const zone = picker.dataset.pickerZone;
+        const hex = e.target.value;
+        this.state.colors[zone] = hex;
+        this.activeZone = zone;
+
+        const wrap = picker.closest('.mini-picker-wrap');
+        if (wrap) wrap.style.backgroundColor = hex;
+        const hexTag = picker.closest('.compact-part-card')?.querySelector('.compact-hex-tag');
+        if (hexTag) hexTag.textContent = hex.toUpperCase();
+
+        this.onUpdate();
+      });
+    });
+
+    // Quick Swatches
+    this.container.querySelectorAll('.mini-swatch-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const hex = btn.dataset.hex;
         this.state.colors[this.activeZone] = hex;
@@ -163,24 +171,8 @@ export class ColorPanel {
       });
     });
 
-    // Native Color Input
-    const colorInput = this.container.querySelector('#active-color-input');
-    if (colorInput) {
-      colorInput.addEventListener('input', (e) => {
-        const hex = e.target.value;
-        this.state.colors[this.activeZone] = hex;
-        const hexLabel = this.container.querySelector('.hex-label');
-        if (hexLabel) hexLabel.textContent = hex.toUpperCase();
-        const activeDot = this.container.querySelector(`.element-part-card.active .part-color-dot`);
-        if (activeDot) activeDot.style.backgroundColor = hex;
-        const activeTag = this.container.querySelector(`.element-part-card.active .part-hex-tag`);
-        if (activeTag) activeTag.textContent = hex.toUpperCase();
-        this.onUpdate();
-      });
-    }
-
     // Pattern Selection
-    this.container.querySelectorAll('.pattern-card').forEach(btn => {
+    this.container.querySelectorAll('.compact-pattern-card').forEach(btn => {
       btn.addEventListener('click', () => {
         const patternId = btn.dataset.pattern;
         this.state.patternId = patternId;

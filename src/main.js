@@ -6,8 +6,7 @@ import { TextPanel } from './components/textPanel.js';
 import { LogoPanel } from './components/logoPanel.js';
 import { ViewControls } from './components/viewControls.js';
 import { ExportModal } from './components/exportModal.js';
-import { ImportModal } from './components/importModal.js';
-import { AddProductModal } from './components/addProductModal.js';
+import { CreationScreen } from './components/creationScreen.js';
 import { ProductCatalog } from './core/products.js';
 import { FloatingGizmo } from './components/floatingGizmo.js';
 import { HistoryManager } from './core/history.js';
@@ -301,18 +300,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   );
 
-  // 9. Add Product Modal Manager
-  const openAddProductModal = () => {
-    const modal = new AddProductModal(catalog, (newProd) => {
+  // 9. On-Page Product Creation Screen Manager
+  const creationScreen = new CreationScreen(
+    document.getElementById('product-creation-view'),
+    catalog,
+    (newProd) => {
       onProductSwitched(newProd);
-    });
-    modal.open();
-  };
+    }
+  );
 
   const btnOpenAddProduct = document.getElementById('btn-open-add-product');
   if (btnOpenAddProduct) {
     btnOpenAddProduct.addEventListener('click', () => {
-      openAddProductModal();
+      creationScreen.open(true);
     });
   }
 
@@ -609,8 +609,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 19. Auto-open Add Product Wizard on startup to prompt creation
-  setTimeout(() => {
-    openAddProductModal();
-  }, 350);
+  // 19. Open Dedicated Creation Screen on page on startup
+  creationScreen.open(false);
 });
