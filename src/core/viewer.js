@@ -694,8 +694,8 @@ export class ShirtViewer {
     const savedSize = new THREE.Vector2();
     this.renderer.getSize(savedSize);
 
-    const radius = 0.88;
-    const targetY = 0.04;
+    const radius = 1.62;
+    const targetY = 0.0;
 
     switch (presetName) {
       case 'front':
@@ -712,7 +712,7 @@ export class ShirtViewer {
         break;
       case 'perspective':
       default:
-        this.camera.position.set(radius * 0.65, targetY + 0.2, radius * 0.75);
+        this.camera.position.set(radius * 0.65, targetY + 0.18, radius * 0.75);
         break;
     }
 
@@ -766,48 +766,42 @@ export class ShirtViewer {
     canvas.height = height;
     const ctx = canvas.getContext('2d');
 
-    const isLight = this.currentTheme === 'light';
     const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-    if (isLight) {
-      bgGrad.addColorStop(0, '#f8fafc');
-      bgGrad.addColorStop(1, '#e2e8f0');
-    } else {
-      bgGrad.addColorStop(0, '#0f172a');
-      bgGrad.addColorStop(1, '#020617');
-    }
+    bgGrad.addColorStop(0, '#121316');
+    bgGrad.addColorStop(1, '#08080a');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, width, height);
 
-    ctx.fillStyle = isLight ? '#0f172a' : '#ffffff';
-    ctx.font = "bold 44px 'Montserrat', sans-serif";
+    ctx.fillStyle = '#ffffff';
+    ctx.font = "bold 44px 'Space Grotesk', 'Montserrat', sans-serif";
     ctx.textAlign = 'center';
-    ctx.fillText(t('mockup_header') || 'SOBRAL 3D TRIKOT-MOCKUP', width / 2, 90);
+    ctx.fillText(t('mockup_header') || 'SOBRAL 3D WORKWEAR SPECIFICATION', width / 2, 85);
 
-    ctx.font = "600 22px 'Montserrat', sans-serif";
-    ctx.fillStyle = isLight ? '#64748b' : '#94a3b8';
-    ctx.fillText(t('mockup_subheader') || 'Spezifikation und Produktionsmuster', width / 2, 130);
+    ctx.font = "600 20px 'Space Grotesk', 'Montserrat', sans-serif";
+    ctx.fillStyle = '#ff4400';
+    ctx.fillText(t('mockup_subheader') || 'Offizielles SOBRAL.CH Produktions- und Freigabemuster', width / 2, 122);
 
-    ctx.strokeStyle = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)';
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(120, 160);
-    ctx.lineTo(width - 120, 160);
+    ctx.moveTo(120, 150);
+    ctx.lineTo(width - 120, 150);
     ctx.stroke();
 
-    const imgSize = 1050;
-    const posY = 180;
+    const imgSize = 1060;
+    const posY = 170;
     ctx.drawImage(frontImg, width * 0.25 - imgSize / 2, posY, imgSize, imgSize);
     ctx.drawImage(backImg, width * 0.75 - imgSize / 2, posY, imgSize, imgSize);
 
-    ctx.fillStyle = '#3b82f6';
-    ctx.font = "bold 32px 'Montserrat', sans-serif";
-    ctx.fillText((t('front_view') || 'Vorderseite').toUpperCase(), width * 0.25, posY + imgSize + 30);
-    ctx.fillText((t('back_view') || 'Rückseite').toUpperCase(), width * 0.75, posY + imgSize + 30);
+    ctx.fillStyle = '#ff4400';
+    ctx.font = "bold 28px 'Space Grotesk', 'Montserrat', sans-serif";
+    ctx.fillText((t('front_view') || 'VORDERSEITE (FRONT)').toUpperCase(), width * 0.25, posY + imgSize + 10);
+    ctx.fillText((t('back_view') || 'RÜCKSEITE (BACK)').toUpperCase(), width * 0.75, posY + imgSize + 10);
 
-    ctx.fillStyle = isLight ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)';
-    ctx.font = "bold 18px monospace";
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.font = "bold 16px monospace";
     ctx.textAlign = 'right';
-    ctx.fillText(`GENERATED: ${new Date().toLocaleDateString()} • SOBRAL 3D STUDIO`, width - 80, height - 30);
+    ctx.fillText(`SOBRAL.CH • 3D CUSTOM STUDIO • GENERATED: ${new Date().toLocaleDateString()}`, width - 80, height - 30);
 
     return canvas.toDataURL('image/png', 1.0);
   }
