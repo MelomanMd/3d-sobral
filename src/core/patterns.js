@@ -49,56 +49,56 @@ function renderRaglanShoulderPattern(ctx, width, height, colors) {
 
   // Front Left Shoulder Wedge (Raglan cut from collar to armhole)
   ctx.beginPath();
-  ctx.moveTo(width * 0.20, height * 0.085);
+  ctx.moveTo(width * 0.19, height * 0.085);
   ctx.lineTo(width * 0.12, height * 0.085);
-  ctx.lineTo(width * 0.035, height * 0.20);
-  ctx.lineTo(width * 0.09, height * 0.24);
-  ctx.lineTo(width * 0.17, height * 0.17);
+  ctx.lineTo(width * 0.035, height * 0.19);
+  ctx.lineTo(width * 0.09, height * 0.23);
+  ctx.lineTo(width * 0.17, height * 0.16);
   ctx.closePath();
   ctx.fill();
 
   // Front Right Shoulder Wedge (Raglan cut from collar to armhole)
   ctx.beginPath();
-  ctx.moveTo(width * 0.30, height * 0.085);
+  ctx.moveTo(width * 0.31, height * 0.085);
   ctx.lineTo(width * 0.38, height * 0.085);
-  ctx.lineTo(width * 0.465, height * 0.20);
-  ctx.lineTo(width * 0.41, height * 0.24);
-  ctx.lineTo(width * 0.33, height * 0.17);
+  ctx.lineTo(width * 0.465, height * 0.19);
+  ctx.lineTo(width * 0.41, height * 0.23);
+  ctx.lineTo(width * 0.33, height * 0.16);
   ctx.closePath();
   ctx.fill();
 
   // Back Left Shoulder Wedge
   ctx.beginPath();
-  ctx.moveTo(width * 0.70, height * 0.085);
+  ctx.moveTo(width * 0.69, height * 0.085);
   ctx.lineTo(width * 0.62, height * 0.085);
-  ctx.lineTo(width * 0.535, height * 0.20);
-  ctx.lineTo(width * 0.59, height * 0.24);
-  ctx.lineTo(width * 0.67, height * 0.17);
+  ctx.lineTo(width * 0.535, height * 0.19);
+  ctx.lineTo(width * 0.59, height * 0.23);
+  ctx.lineTo(width * 0.67, height * 0.16);
   ctx.closePath();
   ctx.fill();
 
   // Back Right Shoulder Wedge
   ctx.beginPath();
-  ctx.moveTo(width * 0.80, height * 0.085);
+  ctx.moveTo(width * 0.81, height * 0.085);
   ctx.lineTo(width * 0.88, height * 0.085);
-  ctx.lineTo(width * 0.965, height * 0.20);
-  ctx.lineTo(width * 0.91, height * 0.24);
-  ctx.lineTo(width * 0.83, height * 0.17);
+  ctx.lineTo(width * 0.965, height * 0.19);
+  ctx.lineTo(width * 0.91, height * 0.23);
+  ctx.lineTo(width * 0.83, height * 0.16);
   ctx.closePath();
   ctx.fill();
 
   // 3. Subtle realistic seam stitching lines
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-  ctx.lineWidth = 4;
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
+  ctx.lineWidth = 3;
   // Front left seam
   ctx.beginPath();
-  ctx.moveTo(width * 0.20, height * 0.085);
-  ctx.lineTo(width * 0.09, height * 0.24);
+  ctx.moveTo(width * 0.19, height * 0.085);
+  ctx.lineTo(width * 0.09, height * 0.23);
   ctx.stroke();
   // Front right seam
   ctx.beginPath();
-  ctx.moveTo(width * 0.30, height * 0.085);
-  ctx.lineTo(width * 0.41, height * 0.24);
+  ctx.moveTo(width * 0.31, height * 0.085);
+  ctx.lineTo(width * 0.41, height * 0.23);
   ctx.stroke();
 
   // 4. Collar rib
@@ -106,22 +106,12 @@ function renderRaglanShoulderPattern(ctx, width, height, colors) {
   ctx.fillRect(0, height * 0.94, width * 0.5, height * 0.05);
 }
 
-// Helper to fill front UV area (u: 0..0.5) and back UV area (u: 0.5..1.0)
-// Texture resolution: width=2048, height=2048
-
 function renderSolidPattern(ctx, width, height, colors) {
-  // 1. Base solid primary fills entire 2048x2048 canvas
-  ctx.fillStyle = colors.primary || '#741b2c';
+  // 1. Base solid primary fills entire canvas cleanly
+  ctx.fillStyle = colors.primary || '#1b2034';
   ctx.fillRect(0, 0, width, height);
 
-  // 2. Sleeve regions & accents (only if explicitly different from primary)
-  if (colors.accent && colors.accent !== colors.primary) {
-    ctx.fillStyle = colors.accent;
-    ctx.fillRect(width * 0.46, height * 0.55, width * 0.22, height * 0.4);
-    ctx.fillRect(width * 0.03, height * 0.55, width * 0.22, height * 0.4);
-  }
-
-  // 3. Collar band (only if explicitly different from primary)
+  // 2. Collar band (if explicitly set)
   if (colors.collar && colors.collar !== colors.primary) {
     ctx.fillStyle = colors.collar;
     ctx.fillRect(0, height * 0.94, width * 0.5, height * 0.05);
