@@ -159,6 +159,7 @@ export class CreationScreen {
               <label class="form-label">${t('label_product_silhouette')}</label>
               <select class="select-glass" id="screen-prod-sil">
                 <option value="tshirt" selected>${t('sil_tshirt')}</option>
+                <option value="tanktop">Ärmelloses Shirt / Tank Top (Sleeveless)</option>
                 <option value="shorts">${t('sil_shorts')}</option>
                 <option value="hoodie">${t('sil_hoodie')}</option>
               </select>
@@ -282,6 +283,7 @@ export class CreationScreen {
           category: cat,
           categoryName: t(`cat_${cat}`),
           silhouette: sil,
+          isSleeveless: (sil === 'tanktop'),
           modelUrl: this.formData.modelUrl || baseTpl.modelUrl || '/shirt_baked.glb',
           patternId,
           baseColor,
@@ -406,9 +408,13 @@ export class CreationScreen {
           if (liveCard && pillsWrap) {
             liveCard.style.display = 'block';
             if (patternBadge) {
-              patternBadge.textContent = analysis.hasContrastShoulders 
-                ? 'Schnitt: Kontrast-Schultern (Raglan)' 
-                : 'Schnitt: Klassisch Einfarbig (Solid)';
+              if (analysis.isSleeveless) {
+                patternBadge.textContent = 'Modell: Ärmelloses Shirt / Tank Top erkannt';
+              } else {
+                patternBadge.textContent = analysis.hasContrastShoulders 
+                  ? 'Schnitt: Kontrast-Schultern (Raglan)' 
+                  : 'Schnitt: Klassisch Einfarbig (Solid)';
+              }
             }
             pillsWrap.innerHTML = `
               <span class="analysis-pill">
@@ -424,6 +430,11 @@ export class CreationScreen {
                 Kragen
               </span>
             `;
+          }
+
+          if (analysis.detectedSilhouette) {
+            const silSelect = this.container.querySelector('#screen-prod-sil');
+            if (silSelect) silSelect.value = analysis.detectedSilhouette;
           }
 
           if (analysis.colors?.primary) {

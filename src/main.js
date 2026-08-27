@@ -321,6 +321,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.texts = [];
     state.logos = [];
     state.selectedItemId = null;
+    state.silhouette = prod.silhouette || 'tshirt';
+    state.isSleeveless = prod.silhouette === 'tanktop' || !!prod.isSleeveless;
     // Pattern & Colors
     state.patternId = prod.patternId || (prod.colors?.accent && prod.colors.accent !== prod.colors.primary ? 'raglan_shoulder' : 'solid');
 

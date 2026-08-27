@@ -38,10 +38,14 @@ export class PhotoAnalyzer {
       const shoulderDelta = this.getColorDistance(bodyColor, shoulderColor);
       const hasContrastShoulders = shoulderDelta > 15 || shoulderColor !== bodyColor;
 
+      const isSleeveless = frontAnalysis?.isSleeveless || backAnalysis?.isSleeveless || false;
+      const detectedSilhouette = isSleeveless ? 'tanktop' : 'tshirt';
       const detectedPattern = hasContrastShoulders ? 'raglan_shoulder' : 'solid';
 
       return {
         detectedPattern,
+        detectedSilhouette,
+        isSleeveless,
         hasContrastShoulders,
         colors: {
           primary: bodyColor,
@@ -119,21 +123,58 @@ export class PhotoAnalyzer {
     // 4. Sample Collar: [x: 0.44..0.56, y: 0.03..0.10]
     const collarColor = this.sampleRegionColor(data, w, h, 0.44, 0.03, 0.12, 0.07);
 
+    // 5. Check if Sleeveless (Armhole area is background / transparent)
+    const isSleeveless = this.checkIfSleeveless(data, w, h);
+
     // Pick best detected shoulder color (if distinct from body)
-    let shoulderColor = '#5b6c84';
-    if (leftShoulder.weight > 0 && this.getColorDistance(leftShoulder.hex, bodyColor.hex) > 12) {
+    let shoulderColor = bodyColor.hex;
+    if (leftShoulder.weight > 0 && this.getColorDistance(leftShoulder.hex, bodyColor.hex) > 15) {
       shoulderColor = leftShoulder.hex;
-    } else if (rightShoulder.weight > 0 && this.getColorDistance(rightShoulder.hex, bodyColor.hex) > 12) {
+    } else if (rightShoulder.weight > 0 && this.getColorDistance(rightShoulder.hex, bodyColor.hex) > 15) {
       shoulderColor = rightShoulder.hex;
-    } else if (leftShoulder.weight > 0) {
-      shoulderColor = leftShoulder.hex;
     }
 
     return {
       bodyColor: bodyColor.hex,
       shoulderColor: shoulderColor,
-      collarColor: collarColor.hex
+      collarColor: collarColor.hex,
+      isSleeveless
     };
+  }
+
+  /**
+   * Checks if garment is sleeveless by inspecting outer sleeve regions
+   */
+  static checkIfSleeveless(data, totalW, totalH) {
+    let bgPixels = 0;
+    let totalSampled = 0;
+
+    const sampleBox = (startXNorm, endXNorm, startYNorm, endYNorm) => {
+      const startX = Math.floor(startXNorm * totalW);
+      const endX = Math.floor(endXNorm * totalW);
+      const startY = Math.floor(startYNorm * totalH);
+      const endY = Math.floor(endYNorm * totalH);
+
+      for (let y = startY; y < endY; y += 2) {
+        for (let x = startX; x < endX; x += 2) {
+          const idx = (y * totalW + x) * 4;
+          const r = data[idx];
+          const g = data[idx + 1];
+          const b = data[idx + 2];
+          const a = data[idx + 3];
+
+          totalSampled++;
+          if (a < 64 || (r > 235 && g > 235 && b > 235)) {
+            bgPixels++;
+          }
+        }
+      }
+    };
+
+    sampleBox(0.05, 0.20, 0.25, 0.45);
+    sampleBox(0.80, 0.95, 0.25, 0.45);
+
+    return totalSampled > 0 && (bgPixels / totalSampled) > 0.65;
   }
 
   /**

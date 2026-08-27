@@ -206,7 +206,9 @@ export class ShirtViewer {
               metalness: 0.02,
               aoMap: origMat?.aoMap || null,
               aoMapIntensity: 0.7,
-              side: THREE.DoubleSide
+              side: THREE.DoubleSide,
+              transparent: true,
+              alphaTest: 0.5
             });
 
             child.material = this.shirtMaterial;

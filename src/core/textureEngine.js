@@ -177,7 +177,8 @@ export class TextureEngine {
     }
 
     // 1.6. Draw Realistic Garment Construction Details (Seams, Collar Ribbing, AO Depth)
-    FabricTextureGenerator.drawGarmentDetails(ctx, w, h, colors);
+    const isSleeveless = state.silhouette === 'tanktop' || state.activeProduct?.silhouette === 'tanktop' || !!state.isSleeveless;
+    FabricTextureGenerator.drawGarmentDetails(ctx, w, h, colors, isSleeveless);
 
     // 2. Draw Custom Logos
     for (const logo of logos) {

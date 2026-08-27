@@ -177,54 +177,17 @@ export class FabricTextureGenerator {
    * - Double-needle hem and sleeve seams
    * - Subtle fabric depth / ambient shading
    */
-  static drawGarmentDetails(ctx, width, height, colors) {
+  static drawGarmentDetails(ctx, width, height, colors, isSleeveless = false) {
     ctx.save();
 
-    // 1. Draw Double-Needle Seam Stitches (Shoulders, Hem, Sleeves)
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.28)';
-    ctx.lineWidth = 1.8;
-    ctx.setLineDash([4, 3]);
+    // 1. If sleeveless, clear the sleeve UV region to transparent so 3D model renders without sleeves!
+    if (isSleeveless) {
+      ctx.clearRect(0, height * 0.5, width, height * 0.5);
+    }
 
-    // Front Chest / Shoulder Seams
-    ctx.beginPath();
-    ctx.moveTo(width * 0.11, height * 0.088);
-    ctx.lineTo(width * 0.04, height * 0.21);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(width * 0.39, height * 0.088);
-    ctx.lineTo(width * 0.46, height * 0.21);
-    ctx.stroke();
-
-    // Bottom Hem double seam (Front: y ~ 0.485, Back: y ~ 0.485)
-    ctx.beginPath();
-    ctx.moveTo(width * 0.04, height * 0.485);
-    ctx.lineTo(width * 0.46, height * 0.485);
-    ctx.moveTo(width * 0.54, height * 0.485);
-    ctx.lineTo(width * 0.96, height * 0.485);
-    ctx.stroke();
-
-    // Secondary parallel stitch line
-    ctx.beginPath();
-    ctx.moveTo(width * 0.04, height * 0.492);
-    ctx.lineTo(width * 0.46, height * 0.492);
-    ctx.moveTo(width * 0.54, height * 0.492);
-    ctx.lineTo(width * 0.96, height * 0.492);
-    ctx.stroke();
-
-    // Sleeve Cuff seams (y ~ 0.88)
-    ctx.beginPath();
-    ctx.moveTo(width * 0.05, height * 0.88);
-    ctx.lineTo(width * 0.25, height * 0.88);
-    ctx.moveTo(width * 0.48, height * 0.88);
-    ctx.lineTo(width * 0.68, height * 0.88);
-    ctx.stroke();
-
-    ctx.setLineDash([]); // Reset line dash
-
-    // 2. Collar Ribbing (fine vertical lines on collar region u: 0.22..0.28, v: 0.07..0.09)
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.18)';
-    ctx.lineWidth = 1.2;
+    // 2. Collar Ribbing (fine vertical lines on collar region u: 0.21..0.29, v: 0.07..0.09)
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
+    ctx.lineWidth = 1.0;
     for (let x = width * 0.21; x < width * 0.29; x += 3.5) {
       ctx.beginPath();
       ctx.moveTo(x, height * 0.072);
@@ -234,13 +197,13 @@ export class FabricTextureGenerator {
 
     // 3. Subtle ambient occlusion & side shadow depth
     const leftShadow = ctx.createLinearGradient(width * 0.02, 0, width * 0.08, 0);
-    leftShadow.addColorStop(0, 'rgba(0, 0, 0, 0.15)');
+    leftShadow.addColorStop(0, 'rgba(0, 0, 0, 0.12)');
     leftShadow.addColorStop(1, 'rgba(0, 0, 0, 0)');
     ctx.fillStyle = leftShadow;
     ctx.fillRect(width * 0.02, height * 0.1, width * 0.06, height * 0.38);
 
     const rightShadow = ctx.createLinearGradient(width * 0.48, 0, width * 0.42, 0);
-    rightShadow.addColorStop(0, 'rgba(0, 0, 0, 0.15)');
+    rightShadow.addColorStop(0, 'rgba(0, 0, 0, 0.12)');
     rightShadow.addColorStop(1, 'rgba(0, 0, 0, 0)');
     ctx.fillStyle = rightShadow;
     ctx.fillRect(width * 0.42, height * 0.1, width * 0.06, height * 0.38);
