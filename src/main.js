@@ -8,7 +8,6 @@ import { ViewControls } from './components/viewControls.js';
 import { ExportModal } from './components/exportModal.js';
 import { ImportModal } from './components/importModal.js';
 import { AddProductModal } from './components/addProductModal.js';
-import { ProductSwitcher } from './components/productSwitcher.js';
 import { ProductCatalog } from './core/products.js';
 import { FloatingGizmo } from './components/floatingGizmo.js';
 import { HistoryManager } from './core/history.js';
@@ -152,9 +151,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 2. Language Setup (German default, English option)
   const updateStaticTexts = () => {
-    const brandBadge = document.getElementById('brand-badge');
-    if (brandBadge) brandBadge.textContent = t('prototype_badge');
-
     const undoText = document.getElementById('undo-text');
     if (undoText) undoText.textContent = t('undo');
 
@@ -305,23 +301,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   );
 
-  // 9. Create Product Switcher Dropdown
-  const productSwitcher = new ProductSwitcher(
-    productSwitcherRoot,
-    catalog,
-    (selectedProduct) => {
-      // Product switched
-      onProductSwitched(selectedProduct);
-    },
-    () => {
-      // Open Add Product Wizard
-      openAddProductModal();
-    }
-  );
-
+  // 9. Add Product Modal Manager
   const openAddProductModal = () => {
     const modal = new AddProductModal(catalog, (newProd) => {
-      if (productSwitcher) productSwitcher.render();
       onProductSwitched(newProd);
     });
     modal.open();
@@ -626,4 +608,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
   });
+
+  // 19. Auto-open Add Product Wizard on startup to prompt creation
+  setTimeout(() => {
+    openAddProductModal();
+  }, 350);
 });

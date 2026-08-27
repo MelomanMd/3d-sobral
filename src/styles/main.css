@@ -32,20 +32,20 @@
 
 /* Dark Theme */
 [data-theme="dark"] {
-  --bg-dark: #090a0f;
-  --bg-surface: rgba(18, 20, 29, 0.85);
-  --bg-card: rgba(28, 32, 46, 0.7);
-  --bg-card-hover: rgba(38, 44, 64, 0.9);
+  --bg-dark: #0a0d14;
+  --bg-surface: rgba(16, 20, 31, 0.9);
+  --bg-card: rgba(24, 30, 46, 0.75);
+  --bg-card-hover: rgba(35, 43, 66, 0.95);
   --border-glass: rgba(255, 255, 255, 0.1);
   --border-glass-active: rgba(59, 130, 246, 0.6);
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
-  --viewport-bg: radial-gradient(circle at center, #171b26 0%, #090a0f 80%);
-  --header-bg: rgba(13, 15, 22, 0.85);
-  --floating-bar-bg: rgba(18, 22, 34, 0.85);
-  --modal-bg: #111420;
-  --modal-card-bg: rgba(28, 32, 46, 0.7);
+  --viewport-bg: radial-gradient(circle at center, #182030 0%, #0a0d14 85%);
+  --header-bg: rgba(10, 13, 20, 0.92);
+  --floating-bar-bg: rgba(16, 22, 36, 0.9);
+  --modal-bg: #101420;
+  --modal-card-bg: rgba(24, 30, 46, 0.75);
 }
 
 * {
@@ -87,23 +87,28 @@ body {
   gap: 12px;
 }
 
-.brand-badge {
-  background: var(--accent-gradient);
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  text-transform: uppercase;
-  box-shadow: var(--accent-glow);
+.brand-logo-wrap {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 6px 14px;
+  background: #0f1422;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.brand-title {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  color: var(--text-primary);
+.brand-logo-wrap:hover {
+  transform: scale(1.02);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.brand-logo-img {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 /* Product Selector Dropdown */
