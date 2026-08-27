@@ -46,7 +46,17 @@ export class AddProductModal {
         <div class="modal-body">
           <div class="add-product-instruction-banner">
             <span class="instruction-icon">${ICONS.sparkles}</span>
-            <span class="instruction-text">${t('add_product_subtitle')}</span>
+            <span class="instruction-text">Laden Sie 4 Fotos hoch – das System generiert automatisch die exakte 3D-Kopie mit allen Elementen (Körper, Schultern, Kragen).</span>
+          </div>
+
+          <!-- Live Auto-Reconstruction Preview Badge -->
+          <div class="analysis-live-card" id="analysis-live-card" style="display: none; margin-bottom: 16px; padding: 12px 16px; border-radius: var(--radius-md); background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <span style="font-size: 11px; font-weight: 700; color: #2563eb; text-transform: uppercase; letter-spacing: 0.5px;">✨ 3D-Modell aus 4 Fotos rekonstruiert</span>
+              <span id="analysis-pattern-badge" style="font-size: 11px; font-weight: 700; color: var(--text-primary);">Kontrast-Schultern erkannt</span>
+            </div>
+            <div id="analysis-pills-wrap" style="display: flex; gap: 8px; flex-wrap: wrap;">
+            </div>
           </div>
 
           <!-- Product Details Form -->
@@ -404,6 +414,33 @@ export class AddProductModal {
         });
 
         if (analysis && this.modalEl) {
+          const liveCard = this.modalEl.querySelector('#analysis-live-card');
+          const pillsWrap = this.modalEl.querySelector('#analysis-pills-wrap');
+          const patternBadge = this.modalEl.querySelector('#analysis-pattern-badge');
+
+          if (liveCard && pillsWrap) {
+            liveCard.style.display = 'block';
+            if (patternBadge) {
+              patternBadge.textContent = analysis.hasContrastShoulders 
+                ? 'Schnitt: Kontrast-Schultern (Raglan)' 
+                : 'Schnitt: Klassisch Einfarbig (Solid)';
+            }
+            pillsWrap.innerHTML = `
+              <span style="font-size: 11px; font-weight: 600; background: var(--bg-card); padding: 4px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-glass); display: inline-flex; align-items: center; gap: 6px;">
+                <span style="width: 12px; height: 12px; border-radius: 3px; background-color: ${analysis.colors.primary}; border: 1px solid rgba(0,0,0,0.2);"></span>
+                Körper: ${analysis.colors.primary.toUpperCase()}
+              </span>
+              <span style="font-size: 11px; font-weight: 600; background: var(--bg-card); padding: 4px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-glass); display: inline-flex; align-items: center; gap: 6px;">
+                <span style="width: 12px; height: 12px; border-radius: 3px; background-color: ${analysis.colors.accent}; border: 1px solid rgba(0,0,0,0.2);"></span>
+                Schultern: ${analysis.colors.accent.toUpperCase()}
+              </span>
+              <span style="font-size: 11px; font-weight: 600; background: var(--bg-card); padding: 4px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-glass); display: inline-flex; align-items: center; gap: 6px;">
+                <span style="width: 12px; height: 12px; border-radius: 3px; background-color: ${analysis.colors.collar}; border: 1px solid rgba(0,0,0,0.2);"></span>
+                Kragen
+              </span>
+            `;
+          }
+
           if (analysis.colors?.primary) {
             const primInput = this.modalEl.querySelector('#new-prod-color');
             const primHex = this.modalEl.querySelector('#new-prod-color-hex');
