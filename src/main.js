@@ -336,6 +336,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.activeProduct = prod;
     state.productFrontPhoto = prod.frontPreview || null;
     state.productBackPhoto = prod.backPreview || null;
+    state.productLeftPhoto = prod.leftPreview || null;
+    state.productRightPhoto = prod.rightPreview || null;
     state.productTextureUrl = prod.textureUrl || null;
 
     // Reset design to be completely clean & blank for the new product
@@ -354,17 +356,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.colors.collar = collarCol;
     state.colors.secondary = prod.colors?.secondary || '#ffffff';
 
+    await textureEngine.render(state);
+
     if (viewer) {
       viewer.loadModel(prod.modelUrl || '/shirt_baked.glb');
       if (viewer.shirtMaterial && viewer.shirtMaterial.map) {
         viewer.shirtMaterial.map.needsUpdate = true;
       }
+      viewer.updateDecals();
     }
     if (photoMockupViewer) {
       photoMockupViewer.render();
     }
     if (viewControls) {
-      viewControls.setHasPhotos(!!(prod.frontPreview || prod.backPreview));
+      viewControls.setHasPhotos(!!(prod.frontPreview || prod.backPreview || prod.leftPreview || prod.rightPreview));
       viewControls.setMode('3d');
     }
     if (floatingGizmo) floatingGizmo.update();

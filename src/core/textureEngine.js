@@ -140,6 +140,35 @@ export class TextureEngine {
     const pattern = PATTERNS.find(p => p.id === patternId) || PATTERNS[0];
     pattern.render(ctx, w, h, colors);
 
+    // 1.5. Project authentic product photos onto 3D model if uploaded
+    if (state.productFrontPhoto) {
+      const frontPhotoCanvas = await this.getProcessedPhotoCanvas(state.productFrontPhoto);
+      if (frontPhotoCanvas) {
+        ctx.drawImage(frontPhotoCanvas, w * 0.04, h * 0.07, w * 0.42, h * 0.42);
+      }
+    }
+
+    if (state.productBackPhoto) {
+      const backPhotoCanvas = await this.getProcessedPhotoCanvas(state.productBackPhoto);
+      if (backPhotoCanvas) {
+        ctx.drawImage(backPhotoCanvas, w * 0.54, h * 0.07, w * 0.42, h * 0.42);
+      }
+    }
+
+    if (state.productLeftPhoto) {
+      const leftPhotoCanvas = await this.getProcessedPhotoCanvas(state.productLeftPhoto);
+      if (leftPhotoCanvas) {
+        ctx.drawImage(leftPhotoCanvas, w * 0.04, h * 0.53, w * 0.18, h * 0.18);
+      }
+    }
+
+    if (state.productRightPhoto) {
+      const rightPhotoCanvas = await this.getProcessedPhotoCanvas(state.productRightPhoto);
+      if (rightPhotoCanvas) {
+        ctx.drawImage(rightPhotoCanvas, w * 0.47, h * 0.53, w * 0.18, h * 0.18);
+      }
+    }
+
     // 2. Draw Custom Logos
     for (const logo of logos) {
       if (!logo.visible) continue;
