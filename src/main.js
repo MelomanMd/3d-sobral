@@ -108,16 +108,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 1. Initialize Product Catalog
   const catalog = new ProductCatalog();
-  const initialProd = catalog.getActiveProduct();
-  if (initialProd && !initialProd.id.startsWith('sobral_tshirt')) {
-    state.activeProduct = initialProd;
-    state.texts = [];
-    state.logos = [];
-    state.selectedItemId = null;
-    state.patternId = 'solid';
-    const col = initialProd.baseColor || '#741b2c';
-    state.colors = { primary: col, accent: col, collar: col, secondary: col };
-  }
 
   // Insert Static SVG Icons
   const initStaticIcons = () => {
@@ -254,7 +244,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 4. Hydrate offline 3D models and photos from IndexedDB
   await catalog.hydrateOfflineModels();
-  state.activeProduct = catalog.getActiveProduct();
+  const initialProd = catalog.getActiveProduct() || DEFAULT_PRODUCTS[0];
+  state.activeProduct = initialProd;
+  state.patternId = initialProd.patternId || 'raglan_shoulder';
+  state.colors = {
+    primary: initialProd.colors?.primary || initialProd.baseColor || '#1b2034',
+    accent: initialProd.colors?.accent || initialProd.accentColor || '#5b6c84',
+    collar: initialProd.colors?.collar || '#1b2034',
+    secondary: initialProd.colors?.secondary || '#ffffff'
+  };
+  state.productFrontPhoto = initialProd.frontPreview || null;
+  state.productBackPhoto = initialProd.backPreview || null;
+  state.productLeftPhoto = initialProd.leftPreview || null;
+  state.productRightPhoto = initialProd.rightPreview || null;
 
   // 5. Create 2D Texture Engine
   const textureEngine = new TextureEngine(2048);
