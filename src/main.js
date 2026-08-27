@@ -223,19 +223,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (viewer) {
-      viewer.setTheme(theme);
+      viewer.setTheme('dark');
     }
   };
 
-  applyTheme(currentTheme);
+  applyTheme('dark');
   applyLang(getLang());
-
-  const btnThemeToggle = document.getElementById('btn-theme-toggle');
-  if (btnThemeToggle) {
-    btnThemeToggle.addEventListener('click', () => {
-      applyTheme(currentTheme === 'light' ? 'dark' : 'light');
-    });
-  }
 
   // 4. Hydrate offline 3D models and photos from IndexedDB
   await catalog.hydrateOfflineModels();
