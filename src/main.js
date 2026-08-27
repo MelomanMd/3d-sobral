@@ -194,6 +194,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (tabLogos) tabLogos.textContent = t('tab_logos');
   };
 
+  let isAppReady = false;
+
   const applyLang = (lang) => {
     setLang(lang);
     document.documentElement.setAttribute('lang', lang);
@@ -201,6 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.classList.toggle('active', btn.dataset.lang === lang);
     });
     updateStaticTexts();
+    if (!isAppReady) return;
     renderActivePanel();
     if (viewControls) viewControls.render();
     if (floatingGizmo) floatingGizmo.update();
@@ -434,6 +437,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   renderActivePanel();
+  isAppReady = true;
 
   // 11. Wire up 3D Mouse Drag, Selection, and Corner Scaling
   viewer.onItemSelect = (type, itemId) => {
