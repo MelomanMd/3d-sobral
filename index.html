@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Trikot Konfigurator | SOBRAL Custom Studio</title>
+  <meta name="description" content="Interaktiver 3D-Trikot- und T-Shirt-Konfigurator. Farben, Schriften, Nummern und Logos in Echtzeit anpassen.">
+  <link rel="stylesheet" href="./src/styles/main.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z'/></svg>">
+</head>
+<body>
+  <!-- Header Navigation -->
+  <header class="app-header">
+    <div class="brand-group">
+      <span class="brand-badge" id="brand-badge">PROTOTYP</span>
+      <h1 class="brand-title">SOBRAL 3D STUDIO</h1>
+      <div id="product-switcher-root"></div>
+    </div>
+
+    <!-- Center Tools: Undo/Redo, Theme & Language Switcher -->
+    <div class="header-center-tools">
+      <!-- Undo / Redo -->
+      <div class="history-btn-group">
+        <button class="history-btn" id="btn-undo" title="Rückgängig (Ctrl + Z)" disabled>
+          <span class="btn-icon" id="icon-undo"></span>
+          <span class="btn-text" id="undo-text">Rückgängig</span>
+          <span class="btn-kbd">Ctrl+Z</span>
+        </button>
+        <button class="history-btn" id="btn-redo" title="Wiederholen (Ctrl + Y)" disabled>
+          <span class="btn-icon" id="icon-redo"></span>
+          <span class="btn-text" id="redo-text">Wiederholen</span>
+          <span class="btn-kbd">Ctrl+Y</span>
+        </button>
+      </div>
+
+      <!-- Language Selector -->
+      <div class="lang-switch-group">
+        <button class="lang-btn active" data-lang="de" id="lang-btn-de" title="Deutsch (Standard)">
+          <span class="lang-flag" id="flag-de"></span>
+          <span class="lang-code">DE</span>
+        </button>
+        <button class="lang-btn" data-lang="en" id="lang-btn-en" title="English">
+          <span class="lang-flag" id="flag-en"></span>
+          <span class="lang-code">EN</span>
+        </button>
+      </div>
+
+      <!-- Theme Toggle -->
+      <button class="theme-toggle-btn" id="btn-theme-toggle" title="Design-Modus umschalten">
+        <span class="theme-icon" id="theme-icon"></span>
+        <span class="theme-label" id="theme-label">Dunkel</span>
+      </button>
+    </div>
+
+    <!-- Right Header Actions -->
+    <div class="header-actions">
+      <button class="btn-primary-action btn-add-product-main" id="btn-open-add-product" title="Neues Produkt aus Fotos erstellen">
+        <span class="btn-icon" id="icon-add-prod"></span>
+        <span id="add-prod-label">+ Neues Produkt</span>
+      </button>
+      <button class="btn-secondary-action" id="btn-open-import" title="Projekt laden / Vorlage wählen">
+        <span class="btn-icon" id="icon-import"></span>
+        <span id="import-label">Laden</span>
+      </button>
+      <button class="btn-secondary-action" id="btn-randomize" title="Zufälliges Design generieren">
+        <span class="btn-icon" id="icon-shuffle"></span>
+        <span id="randomize-label">Zufälliges Design</span>
+      </button>
+      <button class="btn-primary-action" id="btn-open-export" title="Spezifikation ansehen & 3D-Mockup herunterladen">
+        <span class="btn-icon" id="icon-download"></span>
+        <span id="export-label">3D-Mockup</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="app-layout">
+    <!-- 3D Scene Viewport -->
+    <section class="viewport-area">
+      <div id="canvas-container"></div>
+      
+      <div class="view-instructions-hint">
+        <span class="hint-icon-svg" id="icon-crosshair"></span>
+        <span id="viewport-hint-text">Linksklick: 360° Drehen • Texte & Logos mit der Maus ziehen • Mausrad: Zoom</span>
+      </div>
+
+      <div id="view-controls-root"></div>
+    </section>
+
+    <!-- Configurator Sidebar -->
+    <aside class="sidebar-panel">
+      <!-- Tabs Nav -->
+      <nav class="config-tabs">
+        <button class="tab-btn active" data-tab="colors" id="tab-btn-colors">
+          <span class="tab-icon" id="tab-icon-colors"></span>
+          <span id="tab-label-colors">Farben & Stil</span>
+        </button>
+        <button class="tab-btn" data-tab="text" id="tab-btn-text">
+          <span class="tab-icon" id="tab-icon-text"></span>
+          <span id="tab-label-text">Text & Nummer</span>
+        </button>
+        <button class="tab-btn" data-tab="logos" id="tab-btn-logos">
+          <span class="tab-icon" id="tab-icon-logos"></span>
+          <span id="tab-label-logos">Logos</span>
+        </button>
+      </nav>
+
+      <!-- Active Tab Container -->
+      <div class="tab-content-container" id="tab-content-root"></div>
+    </aside>
+  </main>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
