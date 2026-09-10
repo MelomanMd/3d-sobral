@@ -54,12 +54,57 @@ export class ColorPanel {
     this.render();
   }
 
+  getGarmentElements() {
+    const prod = this.state.activeProduct || {};
+    const sil = prod.silhouette || '';
+    const art = prod.articleNumber || '';
+
+    if (sil === 'helmet' || art === 'WHE00113') {
+      return [
+        { id: 'primary', name: 'Helmschale (Shell)', sub: 'Hauptfarbe', icon: 'shield' },
+        { id: 'accent', name: 'Belüftung / Krone', sub: 'Einsätze', icon: 'layers' },
+        { id: 'collar', name: 'Kinnriemen & Polster', sub: 'Befestigung', icon: 'sparkles' }
+      ];
+    }
+    if (sil === 'trousers' || art === '1750') {
+      return [
+        { id: 'primary', name: 'Hauptstoff (Hose)', sub: 'Beine & Gesäss', icon: 'scissors' },
+        { id: 'accent', name: 'Kniepolster & Stretch', sub: 'Verstärkungen', icon: 'layers' },
+        { id: 'collar', name: 'Bund & Bündchen', sub: 'Details', icon: 'sparkles' }
+      ];
+    }
+    if (sil === 'hoodie' || sil === 'jacket' || art === '3362' || art === '3366' || art === '4890') {
+      return [
+        { id: 'primary', name: 'Hauptstoff (Body)', sub: 'Vorder- & Rückseite', icon: 'shirt' },
+        { id: 'accent', name: 'Kapuzenfutter & Einsätze', sub: 'Kontraste', icon: 'layers' },
+        { id: 'collar', name: 'Bündchen & Kragen', sub: 'Rippstrick', icon: 'sparkles' }
+      ];
+    }
+    if (sil === 'beanie' || art === '2003') {
+      return [
+        { id: 'primary', name: 'Strickmütze (Shell)', sub: 'Aussenstoff', icon: 'shirt' },
+        { id: 'accent', name: 'Label & Akzent', sub: 'Details', icon: 'layers' },
+        { id: 'collar', name: 'Fleece-Innenfutter', sub: 'Innenseite', icon: 'sparkles' }
+      ];
+    }
+    if (sil === 'person' || art === 'PERSON-01') {
+      return [
+        { id: 'primary', name: 'T-Shirt (Oberteil)', sub: 'Hauptfarbe', icon: 'shirt' },
+        { id: 'accent', name: 'Arbeitshose (Hose)', sub: 'Hosenfarbe', icon: 'scissors' },
+        { id: 'collar', name: 'Kragen & Bündchen', sub: 'Akzente', icon: 'sparkles' }
+      ];
+    }
+
+    return GARMENT_ELEMENTS;
+  }
+
   setActiveZone(zone) {
     this.activeZone = zone;
     this.render();
   }
 
   render() {
+    const elements = this.getGarmentElements();
     this.container.innerHTML = `
       <!-- 1. Compact Garment Parts List with Inline Pickers -->
       <div class="panel-section" style="padding-bottom: 8px;">
@@ -69,7 +114,7 @@ export class ColorPanel {
         </div>
 
         <div class="compact-elements-list">
-          ${GARMENT_ELEMENTS.map(el => {
+          ${elements.map(el => {
             const isSelected = this.activeZone === el.id;
             const elColor = this.state.colors[el.id] || '#1b2034';
             return `

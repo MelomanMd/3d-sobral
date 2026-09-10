@@ -18,7 +18,16 @@ export class ShirtViewer {
     this.shirtMesh = null;
     this.shirtMaterial = null;
     this.shirtGroup = null;
+    this.productMeshes = [];
+    this.materialGroups = new Map();
+    this.clonedMaterials = new Map();
+    this.isMultiMesh = false;
     this.decalGroup = new THREE.Group();
+    this.garmentGroup = null;
+    this.isPersonMode = false;
+    this._loadId = 0;
+    this._wearId = 0;
+    this.shadowMesh = null;
 
     this.isAutoRotating = false;
     this.isTransitioningCamera = false;
@@ -155,92 +164,227 @@ export class ShirtViewer {
     const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
     shadowMesh.rotation.x = -Math.PI / 2;
     shadowMesh.position.y = -0.32;
+    this.shadowMesh = shadowMesh;
     this.scene.add(shadowMesh);
   }
 
-  loadModel(modelUrl = '/shirt_baked.glb') {
+  loadModel(modelUrl = '/shirt_baked.glb', garmentUrl = null) {
+    this._loadId = (this._loadId || 0) + 1;
+    const currentLoadId = this._loadId;
+
     if (this.shirtGroup) {
       this.scene.remove(this.shirtGroup);
+      this.shirtGroup.traverse((node) => {
+        if (node.isMesh) {
+          if (node.geometry) node.geometry.dispose();
+          if (node.material) {
+            const mats = Array.isArray(node.material) ? node.material : [node.material];
+            mats.forEach(m => m.dispose());
+          }
+        }
+      });
       this.shirtGroup = null;
       this.shirtMesh = null;
     }
+    if (this.garmentGroup) {
+      if (this.garmentGroup.parent) {
+        this.garmentGroup.parent.remove(this.garmentGroup);
+      }
+      this.garmentGroup = null;
+    }
+    this.productMeshes = [];
+    this.materialGroups.clear();
+    this.clonedMaterials.clear();
+
+    const isPerson = modelUrl.includes('person-01');
+    this.isPersonMode = isPerson;
 
     const loader = new GLTFLoader();
     loader.load(
       modelUrl,
       (gltf) => {
+        if (this._loadId !== currentLoadId) return;
+
         const root = gltf.scene;
-        this.shirtGroup = root;
 
-        root.traverse((child) => {
-          if (child.isMesh) {
-            this.shirtMesh = child;
+        const meshesInGltf = [];
+        root.traverse((node) => {
+          if (node.isMesh) meshesInGltf.push(node);
+        });
 
-            const origMat = child.material;
-            const isAiModel = modelUrl !== '/shirt_baked.glb' && !!(origMat && origMat.map);
-            this.isAiModel = isAiModel;
+        const isSobralSortiment = modelUrl.includes('/models/sobral-') || meshesInGltf.length > 1;
+        this.isMultiMesh = isSobralSortiment;
 
-            const dynamicTexture = this.textureEngine.getTexture();
-            if (this.renderer) {
-              dynamicTexture.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
-            }
+        if (isSobralSortiment) {
+          this.isAiModel = true;
+          meshesInGltf.forEach((node) => {
+            this.productMeshes.push(node);
+            node.castShadow = true;
+            node.receiveShadow = true;
 
-            const textureMap = isAiModel ? origMat.map : dynamicTexture;
-
-            let normalMap = origMat?.normalMap || null;
-            if (!normalMap) {
-              const normalCanvas = FabricTextureGenerator.getFabricNormalMapCanvas();
-              const fabricNormalTex = new THREE.CanvasTexture(normalCanvas);
-              fabricNormalTex.wrapS = THREE.RepeatWrapping;
-              fabricNormalTex.wrapT = THREE.RepeatWrapping;
-              fabricNormalTex.repeat.set(24, 24);
-              fabricNormalTex.needsUpdate = true;
-              normalMap = fabricNormalTex;
-            }
-
-            this.shirtMaterial = new THREE.MeshStandardMaterial({
-              map: textureMap,
-              normalMap: normalMap,
-              normalScale: new THREE.Vector2(0.4, 0.4),
-              roughness: 0.9,
-              metalness: 0.02,
-              aoMap: origMat?.aoMap || null,
-              aoMapIntensity: 0.7,
-              side: THREE.DoubleSide,
-              transparent: true,
-              alphaTest: 0.5
+            const sourceMaterials = Array.isArray(node.material) ? node.material : [node.material];
+            const materials = sourceMaterials.map((source) => {
+              let material = this.clonedMaterials.get(source.uuid);
+              if (!material) {
+                material = source.clone();
+                this.clonedMaterials.set(source.uuid, material);
+                const role = material.userData?.sobralRole || material.name;
+                if (!this.materialGroups.has(role)) {
+                  this.materialGroups.set(role, new Set());
+                }
+                this.materialGroups.get(role).add(material);
+              }
+              return material;
             });
+            node.material = Array.isArray(node.material) ? materials : materials[0];
+          });
 
-            child.material = this.shirtMaterial;
-            child.castShadow = true;
-            child.receiveShadow = true;
+          // Set primary mesh reference for raycasting fallback
+          this.shirtMesh = meshesInGltf[0] || null;
 
-            if (!isAiModel) {
+          if (isPerson) {
+            // Full human mannequin mode (1.76m height, natural 1:1 scale)
+            const container = new THREE.Group();
+            root.position.set(0, 0, 0);
+            container.add(root);
+
+            // Position container so feet rest on shadow at Y = -1.15m and chest is at Y = +0.10m
+            container.position.set(0, -1.15, 0);
+            this.scene.add(container);
+            this.shirtGroup = container;
+
+            if (this.shadowMesh) {
+              this.shadowMesh.position.y = -1.15;
+              this.shadowMesh.scale.set(1.5, 1.5, 1.5);
+            }
+
+            if (this.controls) {
+              this.controls.minDistance = 0.45;
+              this.controls.maxDistance = 4.5;
+              this.controls.target.set(0, 0.05, 0);
+              this.camera.position.set(0, 0.05, 2.75);
+              this.controls.update();
+            }
+
+            // If a garment is specified, attach it cleanly to the mannequin
+            if (garmentUrl && !garmentUrl.includes('person-01')) {
+              this.wearGarmentOnMannequin(garmentUrl);
+            }
+          } else {
+            // Standalone single garment mode
+            root.updateMatrixWorld(true);
+            const bounds = new THREE.Box3().setFromObject(root);
+            const size = bounds.getSize(new THREE.Vector3());
+            const maxSize = Math.max(size.x, size.y, size.z);
+            if (maxSize > 0) {
+              const displayHeight = 0.85;
+              root.scale.multiplyScalar(displayHeight / maxSize);
+              root.updateMatrixWorld(true);
+            }
+            const center = new THREE.Box3().setFromObject(root).getCenter(new THREE.Vector3());
+            root.position.sub(center);
+            root.position.y += 0.05;
+            root.updateMatrixWorld(true);
+
+            this.scene.add(root);
+            this.shirtGroup = root;
+
+            if (this.shadowMesh) {
+              this.shadowMesh.position.y = -0.32;
+              this.shadowMesh.scale.set(1.0, 1.0, 1.0);
+            }
+
+            if (this.controls) {
+              this.controls.minDistance = 0.45;
+              this.controls.maxDistance = 2.0;
+              this.controls.target.set(0, 0.05, 0);
+              this.camera.position.set(0, 0.05, 0.92);
+              this.controls.update();
+            }
+          }
+
+          // Apply product colors from state
+          this.updateMaterialColor(this.getState().colors);
+          this.updateDecals();
+        } else {
+          // Legacy single mesh mode (/shirt_baked.glb)
+          this.isAiModel = false;
+          root.traverse((child) => {
+            if (child.isMesh) {
+              this.shirtMesh = child;
+              this.productMeshes.push(child);
+
+              const origMat = child.material;
+              const dynamicTexture = this.textureEngine.getTexture();
+              if (this.renderer) {
+                dynamicTexture.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
+              }
+
+              let normalMap = origMat?.normalMap || null;
+              if (!normalMap) {
+                const normalCanvas = FabricTextureGenerator.getFabricNormalMapCanvas();
+                const fabricNormalTex = new THREE.CanvasTexture(normalCanvas);
+                fabricNormalTex.wrapS = THREE.RepeatWrapping;
+                fabricNormalTex.wrapT = THREE.RepeatWrapping;
+                fabricNormalTex.repeat.set(24, 24);
+                fabricNormalTex.needsUpdate = true;
+                normalMap = fabricNormalTex;
+              }
+
+              this.shirtMaterial = new THREE.MeshStandardMaterial({
+                map: dynamicTexture,
+                normalMap: normalMap,
+                normalScale: new THREE.Vector2(0.4, 0.4),
+                roughness: 0.9,
+                metalness: 0.02,
+                aoMap: origMat?.aoMap || null,
+                aoMapIntensity: 0.7,
+                side: THREE.DoubleSide,
+                transparent: true,
+                alphaTest: 0.5
+              });
+
+              child.material = this.shirtMaterial;
+              child.castShadow = true;
+              child.receiveShadow = true;
+
               this.textureEngine.render(this.getState()).then(() => {
                 dynamicTexture.needsUpdate = true;
               });
-            } else {
-              this.updateDecals();
             }
+          });
+
+          // Compute Bounding Box and scale/center dynamically
+          const box = new THREE.Box3().setFromObject(root);
+          const size = box.getSize(new THREE.Vector3());
+          const maxDim = Math.max(size.x, size.y, size.z);
+          if (maxDim > 0.001) {
+            const targetDim = 0.85;
+            const scaleFactor = targetDim / maxDim;
+            root.scale.set(scaleFactor, scaleFactor, scaleFactor);
           }
-        });
 
-        // Compute Bounding Box and scale/center dynamically
-        const box = new THREE.Box3().setFromObject(root);
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        if (maxDim > 0.001) {
-          const targetDim = 0.85;
-          const scaleFactor = targetDim / maxDim;
-          root.scale.set(scaleFactor, scaleFactor, scaleFactor);
+          const updatedBox = new THREE.Box3().setFromObject(root);
+          const center = updatedBox.getCenter(new THREE.Vector3());
+          root.position.sub(center);
+          root.position.y += 0.05;
+
+          this.scene.add(root);
+          this.shirtGroup = root;
+
+          if (this.shadowMesh) {
+            this.shadowMesh.position.y = -0.32;
+            this.shadowMesh.scale.set(1.0, 1.0, 1.0);
+          }
+
+          if (this.controls) {
+            this.controls.minDistance = 0.45;
+            this.controls.maxDistance = 2.0;
+            this.controls.target.set(0, 0.05, 0);
+            this.camera.position.set(0, 0.05, 0.92);
+            this.controls.update();
+          }
         }
-
-        const updatedBox = new THREE.Box3().setFromObject(root);
-        const center = updatedBox.getCenter(new THREE.Vector3());
-        root.position.sub(center);
-        root.position.y += 0.05;
-
-        this.scene.add(root);
       },
       undefined,
       (error) => {
@@ -249,16 +393,170 @@ export class ShirtViewer {
     );
   }
 
+  wearGarmentOnMannequin(garmentUrl) {
+    if (!this.shirtGroup || !this.isPersonMode) return;
+    this._wearId = (this._wearId || 0) + 1;
+    const currentWearId = this._wearId;
+
+    // Remove previously worn garment if any
+    if (this.garmentGroup) {
+      if (this.garmentGroup.parent) {
+        this.garmentGroup.parent.remove(this.garmentGroup);
+      }
+      this.garmentGroup.traverse((node) => {
+        if (node.isMesh) {
+          if (node.geometry) node.geometry.dispose();
+          if (node.material) {
+            const mats = Array.isArray(node.material) ? node.material : [node.material];
+            mats.forEach(m => m.dispose());
+          }
+        }
+      });
+      this.garmentGroup = null;
+    }
+
+    // Cleanly strip old garment meshes from productMeshes
+    this.productMeshes = this.productMeshes.filter(m => !m.userData?.fromGarment);
+
+    const isTopGarment = garmentUrl.includes('3300') || garmentUrl.includes('3340') || garmentUrl.includes('3362') || garmentUrl.includes('3366') || garmentUrl.includes('4890');
+    const isTrousers = garmentUrl.includes('1750');
+    const isHeadwear = garmentUrl.includes('whe00113') || garmentUrl.includes('2003');
+
+    // Visibility of mannequin body parts
+    this.shirtGroup.traverse((child) => {
+      if (child.name === 'ReferenceShirt' || child.name === 'CollarBack') {
+        child.visible = !isTopGarment;
+      }
+      if (child.name === 'ReferenceTrousers' || child.name === 'BackPocket_L') {
+        child.visible = !isTrousers;
+      }
+      if (child.name === 'Hair' || child.name === 'BunFibre_0') {
+        child.visible = !isHeadwear;
+      }
+    });
+
+    const loader = new GLTFLoader();
+    loader.load(garmentUrl, (gltf) => {
+      if (this._wearId !== currentWearId) return;
+      if (!this.shirtGroup || !this.isPersonMode) return;
+
+      const garment = gltf.scene;
+      garment.userData.isWornGarment = true;
+      this.garmentGroup = garment;
+
+      let firstGarmentMesh = null;
+
+      // Filter productMeshes to remove any old garment meshes
+      this.productMeshes = this.productMeshes.filter(m => !m.userData?.fromGarment);
+
+      // Collect meshes and setup materials for custom recoloring
+      garment.traverse((node) => {
+        if (node.isMesh) {
+          node.userData.fromGarment = true;
+          if (!firstGarmentMesh) firstGarmentMesh = node;
+          this.productMeshes.push(node);
+          node.castShadow = true;
+          node.receiveShadow = true;
+
+          const sourceMaterials = Array.isArray(node.material) ? node.material : [node.material];
+          const materials = sourceMaterials.map((source) => {
+            let material = this.clonedMaterials.get(source.uuid);
+            if (!material) {
+              material = source.clone();
+              this.clonedMaterials.set(source.uuid, material);
+              const role = material.userData?.sobralRole || material.name;
+              if (!this.materialGroups.has(role)) {
+                this.materialGroups.set(role, new Set());
+              }
+              this.materialGroups.get(role).add(material);
+            }
+            return material;
+          });
+          node.material = Array.isArray(node.material) ? materials : materials[0];
+        }
+      });
+
+      if (firstGarmentMesh) {
+        this.shirtMesh = firstGarmentMesh;
+      }
+
+      // Sobral original GLBs are in natural 1:1 metric scale.
+      // Offset so the collar aligns with the mannequin shoulder/neck (Y = 1.430m).
+      if (isTopGarment) {
+        let offY = 0.667;
+        let offZ = 0.001;
+        let scale = 1.015;
+
+        if (garmentUrl.includes('3340')) {
+          offY = 0.695;
+        } else if (garmentUrl.includes('3362')) {
+          offY = 0.695;
+        } else if (garmentUrl.includes('3366')) {
+          offY = 0.695;
+        } else if (garmentUrl.includes('4890')) {
+          offY = 0.660;
+          scale = 1.02;
+          offZ = 0.002;
+        }
+
+        garment.scale.set(scale, scale, scale);
+        garment.position.set(0, offY, offZ);
+      } else if (isTrousers) {
+        garment.scale.set(1.01, 1.01, 1.01);
+        garment.position.set(0, 0, 0);
+      } else if (isHeadwear) {
+        garment.scale.set(1.02, 1.02, 1.02);
+        garment.position.set(0, 1.52, 0.01);
+      }
+
+      // Add garment inside this.shirtGroup (container)
+      this.shirtGroup.add(garment);
+      this.shirtGroup.updateMatrixWorld(true);
+
+      // Re-apply colors and decals to the new garment
+      this.updateMaterialColor(this.getState().colors);
+      this.updateDecals();
+    }, undefined, (err) => {
+      console.warn('Could not wear garment on mannequin:', err);
+    });
+  }
+
   updateMaterialColor(colors) {
-    if (this.shirtMaterial) {
+    if (!colors) return;
+    if (this.isMultiMesh) {
+      const primaryColor = colors.primary || '#1b2034';
+      const accentColor = colors.accent || primaryColor;
+      const collarColor = colors.collar || colors.accent || primaryColor;
+
+      // Primary Body / Shell Roles
+      ['fabric_primary', 'shell_primary', 'knit_shell', 'trousers_mainshell', 'shirt', 'person01__shirt'].forEach(role => {
+        const group = this.materialGroups.get(role);
+        if (group) group.forEach(mat => mat.color.set(primaryColor));
+      });
+
+      // Accent / Secondary / Hood Roles
+      ['fabric_secondary', 'shell_secondary', 'hood_lining', 'stretch_panels', 'reinforcement'].forEach(role => {
+        const group = this.materialGroups.get(role);
+        if (group) group.forEach(mat => mat.color.set(accentColor));
+      });
+
+      const trousersCol = colors.trousers || '#1a2232';
+      ['trousers', 'person01__trousers'].forEach(role => {
+        const group = this.materialGroups.get(role);
+        if (group) group.forEach(mat => mat.color.set(trousersCol));
+      });
+
+      // Collar / Rib trim Roles
+      ['rib_trim', 'collar', 'lining', 'shirt_trim', 'person01__shirt_trim'].forEach(role => {
+        const group = this.materialGroups.get(role);
+        if (group) group.forEach(mat => mat.color.set(collarColor));
+      });
+    } else if (this.shirtMaterial) {
       this.shirtMaterial.color.set(0xffffff);
     }
   }
 
   async updateDecals() {
-    if (!this.shirtMesh) return;
-    const state = this.getState();
-
     // Clear previous decals
     while (this.decalGroup.children.length > 0) {
       const obj = this.decalGroup.children[0];
@@ -270,7 +568,20 @@ export class ShirtViewer {
       this.decalGroup.remove(obj);
     }
 
-    if (!this.isAiModel) return;
+    if (!this.isAiModel && !this.isMultiMesh) return;
+
+    const state = this.getState();
+    const activeProduct = state.activeProduct;
+    const targetMeshes = this.isMultiMesh ? this.productMeshes : (this.shirtMesh ? [this.shirtMesh] : []);
+    if (!targetMeshes.length) return;
+
+    const raycastSurface = (origin, direction) => {
+      const ray = new THREE.Raycaster(origin, direction.normalize());
+      const intersects = ray.intersectObjects(targetMeshes, false);
+      if (!intersects.length) return null;
+      const candidate = intersects.find(hit => hit.object.userData?.decalTarget === true);
+      return candidate || intersects[0];
+    };
 
     // Project Logos onto 3D Mesh
     for (const logo of state.logos || []) {
@@ -281,29 +592,68 @@ export class ShirtViewer {
       const logoTex = new THREE.CanvasTexture(img);
       logoTex.colorSpace = THREE.SRGBColorSpace;
 
-      const isFront = !logo.zone?.includes('back');
-      const pos = new THREE.Vector3(
-        (logo.offsetX || 0) * 0.002,
-        0.05 - (logo.offsetY || 0) * 0.002,
-        isFront ? 0.14 : -0.14
-      );
-      const orient = new THREE.Euler(0, isFront ? 0 : Math.PI, -(logo.rotation || 0) * Math.PI / 180);
-      const size = new THREE.Vector3(0.20 * (logo.scale || 1.0), 0.20 * (logo.scale || 1.0), 0.20);
+      const zoneDef = activeProduct?.zones?.[logo.zone];
+      let hit = null;
 
-      try {
-        const decalGeo = new DecalGeometry(this.shirtMesh, pos, orient, size);
-        const decalMat = new THREE.MeshStandardMaterial({
-          map: logoTex,
-          transparent: true,
-          depthTest: true,
-          depthWrite: false,
-          polygonOffset: true,
-          polygonOffsetFactor: -4
-        });
-        const decalMesh = new THREE.Mesh(decalGeo, decalMat);
-        this.decalGroup.add(decalMesh);
-      } catch (e) {
-        console.warn('Decal generation failed:', e);
+      if (zoneDef?.rayOrigin) {
+        const [rx, ry, rz] = zoneDef.rayOrigin;
+        const origin = new THREE.Vector3(rx + (logo.offsetX || 0) * 0.001, ry - (logo.offsetY || 0) * 0.001, rz);
+        const dir = new THREE.Vector3(-rx * 0.5, 0, -rz * 0.5);
+        hit = raycastSurface(origin, dir.length() > 0 ? dir : new THREE.Vector3(0, 0, -1));
+      }
+
+      if (!hit) {
+        const isFront = !logo.zone?.includes('back');
+        const isLeft = logo.zone?.includes('left');
+        const isRight = logo.zone?.includes('right');
+
+        let origin, dir;
+        if (isLeft) {
+          origin = new THREE.Vector3(0.5, 0.10 - (logo.offsetY || 0) * 0.002, (logo.offsetX || 0) * 0.002);
+          dir = new THREE.Vector3(-1, 0, 0);
+        } else if (isRight) {
+          origin = new THREE.Vector3(-0.5, 0.10 - (logo.offsetY || 0) * 0.002, (logo.offsetX || 0) * 0.002);
+          dir = new THREE.Vector3(1, 0, 0);
+        } else if (isFront) {
+          origin = new THREE.Vector3((logo.offsetX || 0) * 0.002, 0.08 - (logo.offsetY || 0) * 0.002, 0.6);
+          dir = new THREE.Vector3(0, 0, -1);
+        } else {
+          origin = new THREE.Vector3(-(logo.offsetX || 0) * 0.002, 0.08 - (logo.offsetY || 0) * 0.002, -0.6);
+          dir = new THREE.Vector3(0, 0, 1);
+        }
+        hit = raycastSurface(origin, dir);
+      }
+
+      if (hit && hit.face) {
+        try {
+          const normal = hit.face.normal.clone().applyNormalMatrix(
+            new THREE.Matrix3().getNormalMatrix(hit.object.matrixWorld)
+          ).normalize();
+          const zAxis = new THREE.Vector3(0, 0, 1);
+          const q = new THREE.Quaternion().setFromUnitVectors(zAxis, normal);
+          q.multiply(new THREE.Quaternion().setFromAxisAngle(zAxis, THREE.MathUtils.degToRad(logo.rotation || 0)));
+          const orient = new THREE.Euler().setFromQuaternion(q);
+
+          const baseScale = (zoneDef?.defaultScale || 1.0) * (logo.scale || 1.0);
+          const size = new THREE.Vector3(0.18 * baseScale, 0.18 * baseScale, 0.15);
+
+          const decalGeo = new DecalGeometry(hit.object, hit.point, orient, size);
+          const decalMat = new THREE.MeshStandardMaterial({
+            map: logoTex,
+            transparent: true,
+            depthTest: true,
+            depthWrite: false,
+            polygonOffset: true,
+            polygonOffsetFactor: -4,
+            roughness: 0.9,
+            metalness: 0
+          });
+          const decalMesh = new THREE.Mesh(decalGeo, decalMat);
+          decalMesh.userData = { type: 'logo', id: logo.id };
+          this.decalGroup.add(decalMesh);
+        } catch (e) {
+          console.warn('Decal generation failed:', e);
+        }
       }
     }
 
@@ -329,29 +679,55 @@ export class ShirtViewer {
       const textTex = new THREE.CanvasTexture(textCanvas);
       textTex.colorSpace = THREE.SRGBColorSpace;
 
-      const isFront = !textItem.zone?.includes('back');
-      const pos = new THREE.Vector3(
-        (textItem.offsetX || 0) * 0.002,
-        0.08 - (textItem.offsetY || 0) * 0.002,
-        isFront ? 0.14 : -0.14
-      );
-      const orient = new THREE.Euler(0, isFront ? 0 : Math.PI, -(textItem.rotation || 0) * Math.PI / 180);
-      const size = new THREE.Vector3(0.28, 0.14, 0.20);
+      const zoneDef = activeProduct?.zones?.[textItem.zone];
+      let hit = null;
 
-      try {
-        const decalGeo = new DecalGeometry(this.shirtMesh, pos, orient, size);
-        const decalMat = new THREE.MeshStandardMaterial({
-          map: textTex,
-          transparent: true,
-          depthTest: true,
-          depthWrite: false,
-          polygonOffset: true,
-          polygonOffsetFactor: -4
-        });
-        const decalMesh = new THREE.Mesh(decalGeo, decalMat);
-        this.decalGroup.add(decalMesh);
-      } catch (e) {
-        console.warn('Text Decal generation failed:', e);
+      if (zoneDef?.rayOrigin) {
+        const [rx, ry, rz] = zoneDef.rayOrigin;
+        const origin = new THREE.Vector3(rx + (textItem.offsetX || 0) * 0.001, ry - (textItem.offsetY || 0) * 0.001, rz);
+        const dir = new THREE.Vector3(-rx * 0.5, 0, -rz * 0.5);
+        hit = raycastSurface(origin, dir.length() > 0 ? dir : new THREE.Vector3(0, 0, -1));
+      }
+
+      if (!hit) {
+        const isFront = !textItem.zone?.includes('back');
+        const origin = new THREE.Vector3(
+          (textItem.offsetX || 0) * 0.002,
+          0.10 - (textItem.offsetY || 0) * 0.002,
+          isFront ? 0.6 : -0.6
+        );
+        const dir = new THREE.Vector3(0, 0, isFront ? -1 : 1);
+        hit = raycastSurface(origin, dir);
+      }
+
+      if (hit && hit.face) {
+        try {
+          const normal = hit.face.normal.clone().applyNormalMatrix(
+            new THREE.Matrix3().getNormalMatrix(hit.object.matrixWorld)
+          ).normalize();
+          const zAxis = new THREE.Vector3(0, 0, 1);
+          const q = new THREE.Quaternion().setFromUnitVectors(zAxis, normal);
+          q.multiply(new THREE.Quaternion().setFromAxisAngle(zAxis, THREE.MathUtils.degToRad(textItem.rotation || 0)));
+          const orient = new THREE.Euler().setFromQuaternion(q);
+
+          const size = new THREE.Vector3(0.28, 0.14, 0.15);
+          const decalGeo = new DecalGeometry(hit.object, hit.point, orient, size);
+          const decalMat = new THREE.MeshStandardMaterial({
+            map: textTex,
+            transparent: true,
+            depthTest: true,
+            depthWrite: false,
+            polygonOffset: true,
+            polygonOffsetFactor: -4,
+            roughness: 0.9,
+            metalness: 0
+          });
+          const decalMesh = new THREE.Mesh(decalGeo, decalMat);
+          decalMesh.userData = { type: 'text', id: textItem.id };
+          this.decalGroup.add(decalMesh);
+        } catch (e) {
+          console.warn('Text Decal generation failed:', e);
+        }
       }
     }
   }
@@ -367,27 +743,71 @@ export class ShirtViewer {
     };
 
     const getRaycastHit = (e) => {
-      if (!this.shirtMesh) return null;
+      const meshes = this.isMultiMesh ? this.productMeshes : (this.shirtMesh ? [this.shirtMesh] : []);
+      if (!meshes.length) return null;
       const { x, y } = getPointerCoords(e);
       this.pointer.set(x, y);
       this.raycaster.setFromCamera(this.pointer, this.camera);
-      const intersects = this.raycaster.intersectObject(this.shirtMesh);
+      const intersects = this.raycaster.intersectObjects(meshes, false);
       return intersects.length > 0 ? intersects[0] : null;
     };
+
+    let pointerDownPos = { x: 0, y: 0 };
+    let pointerDownTime = 0;
 
     // Pointer Down
     domEl.addEventListener('pointerdown', (e) => {
       if (e.button !== 0) return;
 
+      pointerDownPos = { x: e.clientX, y: e.clientY };
+      pointerDownTime = Date.now();
+
+      const state = this.getState();
+      const { x, y } = getPointerCoords(e);
+      this.pointer.set(x, y);
+      this.raycaster.setFromCamera(this.pointer, this.camera);
+
+      // 0. Check if clicked directly on a Decal in decalGroup
+      if (this.decalGroup && this.decalGroup.children.length > 0) {
+        const decalHits = this.raycaster.intersectObjects(this.decalGroup.children, false);
+        if (decalHits.length > 0) {
+          const clickedDecal = decalHits[0].object;
+          const meta = clickedDecal.userData;
+          if (meta && meta.id) {
+            const isText = meta.type === 'text';
+            const item = isText
+              ? state.texts?.find(t => t.id === meta.id)
+              : state.logos?.find(l => l.id === meta.id);
+            if (item) {
+              this.dragMode = 'move';
+              this.draggedItem = item;
+              this.draggedType = meta.type;
+              this.dragStartOffset = { x: item.offsetX || 0, y: item.offsetY || 0 };
+              this.controls.enabled = false;
+              domEl.style.cursor = 'grabbing';
+              if (this.onItemSelect) {
+                this.onItemSelect(meta.type, item.id);
+              }
+              return;
+            }
+          }
+        }
+      }
+
       const hit = getRaycastHit(e);
-      if (!hit || !hit.uv) {
-        // Clicked outside on background -> deselect
+      if (!hit) {
         if (this.onDeselect) this.onDeselect();
         return;
       }
 
+      // In mannequin mode, do not handle 2D UV text/logo selection or part clicks on pointerdown
+      if (this.isPersonMode) {
+        return;
+      }
+
       const uv = hit.uv;
-      const state = this.getState();
+      if (!uv) return;
+
       const selectedId = state.selectedItemId;
 
       // 1. Check if clicked on a corner handle of the currently selected item
@@ -452,19 +872,23 @@ export class ShirtViewer {
         }
         return;
       }
-
-      // 4. Clicked on garment element surface -> identify clicked part!
-      const clickedPart = this.identifyGarmentPartAtUV(uv.x, uv.y);
-      if (this.onPartClick) {
-        this.onPartClick(clickedPart);
-      }
-      if (this.onDeselect) this.onDeselect();
     });
 
     // Pointer Move
     domEl.addEventListener('pointermove', (e) => {
       // 1. Handling active dragging modes
       if (this.dragMode === 'move' && this.draggedItem) {
+        if (this.isMultiMesh) {
+          const dx = Math.round((e.movementX || 0) * 1.5);
+          const dy = Math.round((e.movementY || 0) * 1.5);
+          this.draggedItem.offsetX = Math.max(-180, Math.min(180, (this.draggedItem.offsetX || 0) + dx));
+          this.draggedItem.offsetY = Math.max(-180, Math.min(180, (this.draggedItem.offsetY || 0) + dy));
+          if (this.onItemDrag) {
+            this.onItemDrag(this.draggedType, this.draggedItem.id, this.draggedItem.offsetX, this.draggedItem.offsetY);
+          }
+          return;
+        }
+
         const hit = getRaycastHit(e);
         if (hit && hit.uv) {
           const deltaU = hit.uv.x - this.dragStartUV.u;
@@ -558,7 +982,9 @@ export class ShirtViewer {
     });
 
     // Pointer Up
-    const endDrag = () => {
+    const endDrag = (e) => {
+      const isQuickClick = e && e.clientX !== undefined && (Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y) < 6) && (Date.now() - pointerDownTime < 400);
+
       if (this.dragMode !== 'idle') {
         this.dragMode = 'idle';
         this.draggedItem = null;
@@ -569,12 +995,37 @@ export class ShirtViewer {
         if (this.onItemDragEnd) {
           this.onItemDragEnd();
         }
+        return;
+      }
+
+      // If it was a quick stationary click and NOT in mannequin mode, handle part picking
+      if (isQuickClick && !this.isPersonMode) {
+        const hit = getRaycastHit(e);
+        if (hit) {
+          if (this.isMultiMesh && hit.object?.material) {
+            const role = (hit.object.material.userData?.sobralRole || hit.object.material.name || '').toLowerCase();
+            let clickedPart = 'primary';
+            if (role.includes('rib') || role.includes('collar') || role.includes('lining') || role.includes('zipper')) {
+              clickedPart = 'collar';
+            } else if (role.includes('secondary') || role.includes('hood') || role.includes('stretch') || role.includes('reinforcement')) {
+              clickedPart = 'accent';
+            }
+            if (this.onPartClick) {
+              this.onPartClick(clickedPart);
+            }
+          } else if (hit.uv) {
+            const clickedPart = this.identifyGarmentPartAtUV(hit.uv.x, hit.uv.y);
+            if (this.onPartClick) {
+              this.onPartClick(clickedPart);
+            }
+          }
+        }
       }
     };
 
-    domEl.addEventListener('pointerup', endDrag);
-    domEl.addEventListener('pointercancel', endDrag);
-    domEl.addEventListener('pointerleave', endDrag);
+    domEl.addEventListener('pointerup', (e) => endDrag(e));
+    domEl.addEventListener('pointercancel', () => endDrag(null));
+    domEl.addEventListener('pointerleave', () => endDrag(null));
   }
 
   identifyGarmentPartAtUV(u, v) {
@@ -824,5 +1275,30 @@ export class ShirtViewer {
     this.renderer.render(this.scene, this.camera);
 
     return dataUrl;
+  }
+
+  setView(viewName) {
+    const isPerson = this.isPersonMode;
+    const dist = isPerson ? 2.75 : 0.92;
+    const targetY = 0.05;
+
+    let targetPos = new THREE.Vector3(0, targetY, dist);
+    if (viewName === 'front') {
+      targetPos.set(0, targetY, dist);
+    } else if (viewName === 'back') {
+      targetPos.set(0, targetY, -dist);
+    } else if (viewName === 'left') {
+      targetPos.set(-dist, targetY, 0);
+    } else if (viewName === 'right') {
+      targetPos.set(dist, targetY, 0);
+    }
+
+    if (this.controls) {
+      this.controls.minDistance = 0.45;
+      this.controls.maxDistance = isPerson ? 4.5 : 2.0;
+      this.controls.target.set(0, targetY, 0);
+      this.camera.position.copy(targetPos);
+      this.controls.update();
+    }
   }
 }
