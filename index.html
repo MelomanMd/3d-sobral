@@ -9,48 +9,17 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z'/></svg>">
 </head>
 <body>
-  <!-- 1. Top Announcement Bar (sobral.ch style) -->
-  <div class="sobral-top-bar">
-    <div class="top-bar-left">
-      <span class="top-bar-highlight" data-i18n="top_announcement">GROSSE AUSWAHL - TOP MARKEN - PERSÖNLICHE BERATUNG</span>
-    </div>
-    <div class="top-bar-right">
-      <a href="https://sobral.ch/de/kundenportal" target="_blank" rel="noopener" class="top-link" data-i18n="top_portal">Kundenportal</a>
-      <a href="https://sobral.ch/de/service" target="_blank" rel="noopener" class="top-link" data-i18n="top_service">Service</a>
-      <a href="https://sobral.ch/de/kataloge" target="_blank" rel="noopener" class="top-link" data-i18n="top_catalogs">Kataloge</a>
-      <a href="https://sobral.ch/de/ueber-uns" target="_blank" rel="noopener" class="top-link" data-i18n="top_about">Über uns</a>
-      <a href="https://sobral.ch/de/kontakt" target="_blank" rel="noopener" class="top-link" data-i18n="top_contact">Kontakt</a>
-      <div class="lang-switch-group">
-        <button class="lang-btn active" data-lang="de" id="lang-btn-de" title="Deutsch">
-          <span class="lang-flag" id="flag-de"></span>
-          <span class="lang-code">DE</span>
-        </button>
-        <button class="lang-btn" data-lang="en" id="lang-btn-en" title="English">
-          <span class="lang-flag" id="flag-en"></span>
-          <span class="lang-code">EN</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 2. Main Header Navigation -->
+  <!-- Clean Studio Main Header -->
   <header class="app-header">
     <div class="brand-group">
       <a href="https://sobral.ch" target="_blank" rel="noopener noreferrer" class="brand-logo-wrap" title="SOBRAL Workwear">
         <img src="/images/sobral-workwear-logo.svg" alt="SOBRAL Workwear" class="brand-logo-img">
       </a>
+      <span class="brand-sub-badge">3D STUDIO</span>
     </div>
 
     <!-- 3D Product Catalog Dropdown Switcher -->
     <div id="product-switcher-root"></div>
-
-    <!-- Search / Info Bar (sobral.ch style) -->
-    <div class="header-search-box">
-      <input type="text" class="search-input" placeholder="ICH SUCHE NACH..." data-i18n-placeholder="search_placeholder" readonly>
-      <span class="search-icon-svg">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      </span>
-    </div>
 
     <!-- Right Header Actions -->
     <div class="header-actions">
@@ -66,36 +35,28 @@
         </button>
       </div>
 
-      <button class="btn-primary-action btn-add-product-main" id="btn-open-add-product" title="Neues Produkt aus Fotos erstellen">
-        <span class="btn-icon" id="icon-add-prod"></span>
-        <span id="add-prod-label">+ Neues Produkt</span>
-      </button>
+      <!-- Language Selector -->
+      <div class="lang-switch-group">
+        <button class="lang-btn active" data-lang="de" id="lang-btn-de" title="Deutsch">
+          <span class="lang-flag" id="flag-de"></span>
+          <span class="lang-code">DE</span>
+        </button>
+        <button class="lang-btn" data-lang="en" id="lang-btn-en" title="English">
+          <span class="lang-flag" id="flag-en"></span>
+          <span class="lang-code">EN</span>
+        </button>
+      </div>
+
       <button class="btn-secondary-action" id="btn-open-import" title="Projekt laden / Vorlage wählen">
         <span class="btn-icon" id="icon-import"></span>
         <span id="import-label">Laden</span>
       </button>
-      <button class="btn-secondary-action" id="btn-randomize" title="Zufälliges Design generieren">
-        <span class="btn-icon" id="icon-shuffle"></span>
-        <span id="randomize-label">Zufall</span>
-      </button>
       <button class="btn-primary-action" id="btn-open-export" title="Spezifikation ansehen & 3D-Mockup herunterladen">
         <span class="btn-icon" id="icon-download"></span>
-        <span id="export-label">3D-Mockup</span>
+        <span id="export-label">Export / 3D-Mockup</span>
       </button>
     </div>
   </header>
-
-  <!-- 3. Sobral Orange Category Navigation Bar -->
-  <nav class="sobral-category-bar">
-    <div class="cat-bar-container">
-      <a href="https://sobral.ch/de/arbeitskleidung" target="_blank" rel="noopener" class="cat-link active" data-i18n="nav_workwear">Arbeitskleidung</a>
-      <a href="https://sobral.ch/de/arbeitsschuhe" target="_blank" rel="noopener" class="cat-link" data-i18n="nav_shoes">Arbeitsschuhe</a>
-      <a href="https://sobral.ch/de/technische-produkte" target="_blank" rel="noopener" class="cat-link" data-i18n="nav_tech">Technische Produkte</a>
-      <a href="https://sobral.ch/de/fallschutz" target="_blank" rel="noopener" class="cat-link" data-i18n="nav_fall">Fallschutz</a>
-      <a href="https://sobral.ch/de/markenkompetenz" target="_blank" rel="noopener" class="cat-link" data-i18n="nav_brands">Markenkompetenz</a>
-      <span class="cat-link-highlight" data-i18n="nav_studio">3D Custom Studio</span>
-    </div>
-  </nav>
 
   <!-- On-Page Dedicated Product Creation Screen (Modal/Overlay) -->
   <div id="product-creation-view" class="creation-screen-container hidden" style="display: none;"></div>
@@ -108,7 +69,7 @@
       
       <div class="view-instructions-hint">
         <span class="hint-icon-svg" id="icon-crosshair"></span>
-        <span id="viewport-hint-text">Linksklick: 360° Drehen • Texte & Logos mit der Maus ziehen • Mausrad: Zoom</span>
+        <span id="viewport-hint-text">360° Drehen • Zoom mit Mausrad</span>
       </div>
 
       <div id="view-controls-root"></div>

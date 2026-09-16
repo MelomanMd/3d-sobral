@@ -202,7 +202,7 @@ export class ColorPanel {
         </div>
       `}
 
-      <!-- Darstellung & Studio (Background, Wireframe, Export & Reset) -->
+      <!-- Darstellung & Studio (Background, Wireframe & Reset) -->
       <div class="panel-section" style="padding-top: 8px;">
         <div class="section-title">
           <span class="title-icon-svg">${ICONS.sun}</span>
@@ -220,16 +220,6 @@ export class ColorPanel {
           <div class="display-row">
             <label class="display-label" for="switch-panel-wireframe">Drahtgitter / Wireframe</label>
             <input type="checkbox" id="switch-panel-wireframe" class="custom-toggle" ${this.viewer?.isWireframe ? 'checked' : ''}>
-          </div>
-          <div class="display-actions-row">
-            <button class="btn-sm btn-outline-glass" id="btn-panel-screenshot" title="${t('save_screenshot')}">
-              <span class="btn-icon-svg">${ICONS.camera}</span>
-              <span>${t('save_screenshot')}</span>
-            </button>
-            <button class="btn-sm btn-outline-glass" id="btn-panel-download-glb" title="${t('download_glb')}">
-              <span class="btn-icon-svg">${ICONS.cube}</span>
-              <span>${t('download_glb_short')}</span>
-            </button>
           </div>
           <button class="reset-link-btn" id="btn-panel-reset">
             ${t('reset_view')}
@@ -319,30 +309,6 @@ export class ColorPanel {
       switchWireframe.addEventListener('change', (e) => {
         if (this.viewer) {
           this.viewer.setWireframe(e.target.checked);
-        }
-      });
-    }
-
-    // Panel Screenshot
-    const btnScreenshot = this.container.querySelector('#btn-panel-screenshot');
-    if (btnScreenshot) {
-      btnScreenshot.addEventListener('click', async () => {
-        if (this.viewer) {
-          btnScreenshot.disabled = true;
-          await this.viewer.captureCurrentView();
-          btnScreenshot.disabled = false;
-        }
-      });
-    }
-
-    // Panel Download GLB
-    const btnGlb = this.container.querySelector('#btn-panel-download-glb');
-    if (btnGlb) {
-      btnGlb.addEventListener('click', async () => {
-        if (this.viewer) {
-          btnGlb.disabled = true;
-          await this.viewer.downloadActiveModelGlb();
-          btnGlb.disabled = false;
         }
       });
     }
