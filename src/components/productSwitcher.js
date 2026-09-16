@@ -32,10 +32,6 @@ export class ProductSwitcher {
         <div class="product-dropdown-menu ${this.isOpen ? 'open' : ''}" id="product-dropdown-menu">
           <div class="dropdown-header">
             <span class="dropdown-title">${t('product_catalog')}</span>
-            <button class="btn-xs btn-primary-action" id="btn-add-prod-dropdown">
-              <span class="btn-icon-svg">${ICONS.plus}</span>
-              <span>${t('add_product_btn')}</span>
-            </button>
           </div>
 
           <div class="dropdown-products-list">
@@ -71,16 +67,6 @@ export class ProductSwitcher {
         e.stopPropagation();
         this.isOpen = !this.isOpen;
         this.render();
-      });
-    }
-
-    const btnAdd = this.container.querySelector('#btn-add-prod-dropdown');
-    if (btnAdd) {
-      btnAdd.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.isOpen = false;
-        this.render();
-        this.onOpenAddModal();
       });
     }
 
