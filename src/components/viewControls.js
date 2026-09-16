@@ -2,12 +2,10 @@ import { t } from '../core/i18n.js';
 import { ICONS } from '../core/icons.js';
 
 export class ViewControls {
-  constructor(containerElement, viewer, onModeChange, onToggleMannequin) {
+  constructor(containerElement, viewer, onModeChange) {
     this.container = containerElement;
     this.viewer = viewer;
     this.onModeChange = onModeChange;
-    this.onToggleMannequin = onToggleMannequin;
-    this.isMannequinActive = false;
     this.currentView = 'front';
     this.isFullscreen = !!document.fullscreenElement;
 
@@ -20,9 +18,7 @@ export class ViewControls {
   }
 
   setMannequinActive(active) {
-    this.isMannequinActive = active;
-    const btn = this.container.querySelector('#btn-toggle-mannequin');
-    if (btn) btn.classList.toggle('active', active);
+    // Deprecated: mannequin removed
   }
 
   setMode(mode) {
@@ -54,9 +50,6 @@ export class ViewControls {
         <div class="view-divider"></div>
 
         <div class="view-action-group">
-          <button class="action-toggle-btn ${this.isMannequinActive ? 'active' : ''}" id="btn-toggle-mannequin" title="Auf 3D-Mannequin / Einzelstück wechseln">
-            <span class="btn-icon-svg">${ICONS.user}</span>
-          </button>
           <button class="action-toggle-btn" id="btn-toggle-spin" title="${t('view_spin')}">
             <span class="btn-icon-svg">${ICONS.spin}</span>
           </button>
@@ -84,16 +77,6 @@ export class ViewControls {
         }
       });
     });
-
-    // Mannequin toggle
-    const btnMannequin = this.container.querySelector('#btn-toggle-mannequin');
-    if (btnMannequin) {
-      btnMannequin.addEventListener('click', () => {
-        if (this.onToggleMannequin) {
-          this.onToggleMannequin();
-        }
-      });
-    }
 
     // Auto-spin toggle
     const btnSpin = this.container.querySelector('#btn-toggle-spin');

@@ -87,13 +87,6 @@ export class ColorPanel {
         { id: 'collar', name: 'Fleece-Innenfutter', sub: 'Innenseite', icon: 'sparkles' }
       ];
     }
-    if (sil === 'person' || art === 'PERSON-01') {
-      return [
-        { id: 'primary', name: 'T-Shirt (Oberteil)', sub: 'Hauptfarbe', icon: 'shirt' },
-        { id: 'accent', name: 'Arbeitshose (Hose)', sub: 'Hosenfarbe', icon: 'scissors' },
-        { id: 'collar', name: 'Kragen & Bündchen', sub: 'Akzente', icon: 'sparkles' }
-      ];
-    }
 
     return GARMENT_ELEMENTS;
   }

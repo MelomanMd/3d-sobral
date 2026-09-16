@@ -4,7 +4,6 @@ import { PhotoMockupViewer } from './components/photoMockupViewer.js';
 import { ColorPanel, SPORT_PALETTES } from './components/colorPanel.js';
 import { TextPanel } from './components/textPanel.js';
 import { LogoPanel } from './components/logoPanel.js';
-import { FittingPanel } from './components/fittingPanel.js';
 import { ViewControls } from './components/viewControls.js';
 import { ExportModal } from './components/exportModal.js';
 import { CreationScreen } from './components/creationScreen.js';
@@ -112,9 +111,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const elTabLogos = document.getElementById('tab-icon-logos');
     if (elTabLogos) elTabLogos.innerHTML = ICONS.shield;
-
-    const elTabFitting = document.getElementById('tab-icon-fitting');
-    if (elTabFitting) elTabFitting.innerHTML = ICONS.user;
   };
 
   initStaticIcons();
@@ -163,9 +159,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const tabLogos = document.getElementById('tab-label-logos');
     if (tabLogos) tabLogos.textContent = t('tab_logos');
-
-    const tabFitting = document.getElementById('tab-label-fitting');
-    if (tabFitting) tabFitting.textContent = t('tab_fitting');
   };
 
   let isAppReady = false;
@@ -273,15 +266,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         canvasContainer.style.display = 'none';
       }
       if (floatingGizmo) floatingGizmo.update();
-    },
-    () => {
-      const currentProd = state.activeProduct;
-      const isCurrentlyMannequin = currentProd?.id === 'sobral_person_01' || activeTab === 'fitting';
-      if (isCurrentlyMannequin) {
-        setActiveTab('colors');
-      } else {
-        setActiveTab('fitting');
-      }
     }
   );
 
@@ -358,63 +342,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await textureEngine.render(state);
 
-    if (activeTab === 'fitting') {
-      garmentProductBeforeFitting = prod;
-      const mannequinProd = catalog.getProducts().find(p => p.id === 'sobral_person_01');
-      if (mannequinProd && viewer) {
-        if (viewer.isPersonMode && viewer.shirtGroup) {
-          viewer.wearGarmentOnMannequin(prod.modelUrl);
-        } else {
-          viewer.loadModel(mannequinProd.modelUrl || '/models/sobral-person-01.glb', prod.modelUrl);
-        }
-        viewer.updateMaterialColor({
-          ...state.colors,
-          trousers: outfitState.trousersColor
-        });
-        viewer.updateDecals();
+    if (viewer) {
+      viewer.loadModel(prod.modelUrl || '/shirt_baked.glb');
+      if (viewer.shirtMaterial && viewer.shirtMaterial.map) {
+        viewer.shirtMaterial.map.needsUpdate = true;
       }
-      if (viewControls) {
-        viewControls.setHasPhotos(false);
-        viewControls.setMode('3d');
-        viewControls.setMannequinActive(true);
-      }
-      if (productSwitcher) productSwitcher.render();
-      renderActivePanel();
-    } else {
-      if (viewer) {
-        viewer.loadModel(prod.modelUrl || '/shirt_baked.glb');
-        if (viewer.shirtMaterial && viewer.shirtMaterial.map) {
-          viewer.shirtMaterial.map.needsUpdate = true;
-        }
-        viewer.updateDecals();
-      }
-      if (photoMockupViewer) {
-        photoMockupViewer.render();
-      }
-      if (viewControls) {
-        viewControls.setHasPhotos(!!(prod.frontPreview || prod.backPreview || prod.leftPreview || prod.rightPreview));
-        viewControls.setMode('3d');
-        viewControls.setMannequinActive(false);
-      }
-      if (productSwitcher) productSwitcher.render();
-      setActiveTab('colors');
+      viewer.updateDecals();
     }
+    if (photoMockupViewer) {
+      photoMockupViewer.render();
+    }
+    if (viewControls) {
+      viewControls.setHasPhotos(!!(prod.frontPreview || prod.backPreview || prod.leftPreview || prod.rightPreview));
+      viewControls.setMode('3d');
+    }
+    if (productSwitcher) productSwitcher.render();
+    setActiveTab('colors');
     historyManager.push(state);
   };
 
-  // 9. Setup History Manager (Ctrl+Z / Ctrl+Y) & Outfit Fitting State
+  // 9. Setup History Manager (Ctrl+Z / Ctrl+Y)
   let activeTab = 'colors';
   let colorPanel = null;
   let textPanel = null;
   let logoPanel = null;
-  let fittingPanel = null;
-
-  let garmentProductBeforeFitting = null;
-  let outfitState = {
-    trousersColor: '#1a2232',
-    shoesColor: '#121418',
-    headwear: 'none'
-  };
 
   function renderActivePanel() {
     if (!tabContentRoot) return;
@@ -425,38 +376,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       textPanel = new TextPanel(tabContentRoot, state, onStateChange);
     } else if (activeTab === 'logos') {
       logoPanel = new LogoPanel(tabContentRoot, state, onStateChange);
-    } else if (activeTab === 'fitting') {
-      fittingPanel = new FittingPanel(
-        tabContentRoot,
-        state,
-        outfitState,
-        (newOutfit) => {
-          outfitState = { ...newOutfit };
-          if (viewer) {
-            viewer.updateMaterialColor({
-              ...state.colors,
-              trousers: outfitState.trousersColor
-            });
-          }
-        },
-        () => {
-          setActiveTab('colors');
-        },
-        async () => {
-          if (viewer) {
-            const compositeUrl = await viewer.captureComposite(2400, 1350);
-            const a = document.createElement('a');
-            a.href = compositeUrl;
-            a.download = `sobral_anprobe_${(garmentProductBeforeFitting || state.activeProduct)?.name?.toLowerCase().replace(/\s+/g, '_') || 'outfit'}.png`;
-            a.click();
-          }
-        },
-        garmentProductBeforeFitting || state.activeProduct,
-        catalog,
-        (selectedProd) => {
-          onProductSwitched(selectedProd);
-        }
-      );
     }
   }
 
@@ -479,10 +398,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateTimeout = requestAnimationFrame(async () => {
       await textureEngine.render(state);
       if (viewer) {
-        viewer.updateMaterialColor({
-          ...state.colors,
-          trousers: outfitState.trousersColor
-        });
+        viewer.updateMaterialColor(state.colors);
         viewer.updateDecals();
       }
       if (photoMockupViewer) {
@@ -502,45 +418,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   const setActiveTab = async (tabName) => {
-    if (tabName === 'fitting') {
-      if (state.activeProduct?.id !== 'sobral_person_01') {
-        garmentProductBeforeFitting = state.activeProduct;
-      }
-      const mannequinProd = catalog.getProducts().find(p => p.id === 'sobral_person_01');
-      if (mannequinProd) {
-        if (viewer) {
-          const currentGarment = garmentProductBeforeFitting || state.activeProduct;
-          const garmentUrl = currentGarment?.modelUrl || null;
-          if (viewer.isPersonMode && viewer.shirtGroup) {
-            if (garmentUrl) viewer.wearGarmentOnMannequin(garmentUrl);
-          } else {
-            viewer.loadModel(mannequinProd.modelUrl || '/models/sobral-person-01.glb', garmentUrl);
-          }
-          viewer.updateMaterialColor({
-            ...state.colors,
-            trousers: outfitState.trousersColor
-          });
-          viewer.updateDecals();
-        }
-        if (viewControls) {
-          viewControls.setMannequinActive(true);
-        }
-      }
-    } else if (activeTab === 'fitting' && tabName !== 'fitting') {
-      const targetProd = garmentProductBeforeFitting || state.activeProduct;
-      if (targetProd && targetProd.id !== 'sobral_person_01') {
-        state.activeProduct = targetProd;
-        if (viewer) {
-          viewer.loadModel(targetProd.modelUrl || '/shirt_baked.glb');
-          viewer.updateMaterialColor(state.colors);
-          viewer.updateDecals();
-        }
-        if (viewControls) {
-          viewControls.setMannequinActive(false);
-        }
-      }
-    }
-
     activeTab = tabName;
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.tab === tabName);
@@ -556,8 +433,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.selectedItemId = itemId;
     onStateUpdate();
     floatingGizmo.update();
-
-    if (activeTab === 'fitting') return;
 
     if (type === 'text') {
       setActiveTab('text');
@@ -578,7 +453,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 11.5. Direct 3D Part Picking (Click on shirt elements)
   viewer.onPartClick = (partId) => {
-    if (activeTab === 'fitting') return;
     if (activeTab !== 'colors') {
       setActiveTab('colors');
     }

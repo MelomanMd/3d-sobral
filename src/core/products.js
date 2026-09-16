@@ -276,50 +276,12 @@ export const DEFAULT_PRODUCTS = [
     backPreview: '/previews/WHE00113-back.png',
     leftPreview: '/previews/WHE00113-angle.png',
     rightPreview: '/previews/WHE00113-angle.png',
-    materialRoles: ['shell_primary', 'shell_secondary', 'harness', 'buckle_orange'],
+    materialRoles: ['shell_primary', 'emboss_white', 'hardware_black', 'hardware_orange', 'strap_webbing', 'liner_eps', 'clips_nylon'],
     zones: {
       crown: { name: 'Front Stirnplatte', isFront: true, defaultScale: 0.8, rayOrigin: [0.0, 0.05, 0.35] },
       side_left: { name: 'Linke Seite', isFront: true, defaultScale: 0.6, rayOrigin: [0.18, 0.04, 0.0] },
       side_right: { name: 'Rechte Seite', isFront: true, defaultScale: 0.6, rayOrigin: [-0.18, 0.04, 0.0] },
       back: { name: 'Hinterkopf', isFront: false, defaultScale: 0.7, rayOrigin: [0.0, 0.04, -0.35] }
-    }
-  },
-  {
-    id: 'sobral_person_01',
-    articleNumber: 'PERSON-01',
-    name: 'SOBRAL 3D-Mannequin (Vollmontur)',
-    category: 'outfits',
-    categoryName: 'Komplett-Outfits (Mannequin)',
-    price: 'Komplett-Outfit',
-    sku: 'SOB-MANNEQUIN-01',
-    silhouette: 'person',
-    modelUrl: '/models/sobral-person-01.glb',
-    isMultiMesh: true,
-    baseColor: '#243249',
-    accentColor: '#ff4400',
-    colors: {
-      primary: '#243249',
-      accent: '#1a2232',
-      collar: '#ff4400',
-      secondary: '#ffffff'
-    },
-    frontPreview: '/previews/catalog-front.png',
-    backPreview: '/previews/catalog-back.png',
-    leftPreview: '/previews/catalog-front.png',
-    rightPreview: '/previews/catalog-back.png',
-    materialRoles: [
-      'person01__shirt',
-      'person01__shirt_trim',
-      'person01__trousers',
-      'person01__shoe_upper',
-      'person01__skin',
-      'person01__hair'
-    ],
-    zones: {
-      chest_center: { name: 'Brustmitte (Shirt)', isFront: true, defaultScale: 1.0, rayOrigin: [0.0, 0.16, 0.4] },
-      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.08, 0.18, 0.4] },
-      back_center: { name: 'Rückenprint', isFront: false, defaultScale: 1.0, rayOrigin: [0.0, 0.16, -0.4] },
-      trousers_pocket: { name: 'Hose (Beintasche)', isFront: true, defaultScale: 0.7, rayOrigin: [0.12, -0.05, 0.4] }
     }
   }
 ];
@@ -329,7 +291,8 @@ export class ProductCatalog {
     this.storageKey = 'sobral_custom_products';
     this.activeProductIdKey = 'sobral_active_product_id';
     this.products = this.loadProducts();
-    this.activeProductId = localStorage.getItem(this.activeProductIdKey) || this.products[0].id;
+    const storedActiveId = localStorage.getItem(this.activeProductIdKey);
+    this.activeProductId = (storedActiveId && storedActiveId !== 'sobral_person_01') ? storedActiveId : this.products[0].id;
     this.listeners = [];
   }
 
@@ -339,8 +302,8 @@ export class ProductCatalog {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Merge defaults with custom products
-          const customOnly = parsed.filter(p => !DEFAULT_PRODUCTS.some(d => d.id === p.id));
+          // Merge defaults with custom products, excluding any obsolete person mannequin
+          const customOnly = parsed.filter(p => p.id !== 'sobral_person_01' && !DEFAULT_PRODUCTS.some(d => d.id === p.id));
           return [...DEFAULT_PRODUCTS, ...customOnly];
         }
       }

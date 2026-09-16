@@ -23,10 +23,7 @@ export class ShirtViewer {
     this.clonedMaterials = new Map();
     this.isMultiMesh = false;
     this.decalGroup = new THREE.Group();
-    this.garmentGroup = null;
-    this.isPersonMode = false;
     this._loadId = 0;
-    this._wearId = 0;
     this.shadowMesh = null;
 
     this.isAutoRotating = false;
@@ -168,7 +165,7 @@ export class ShirtViewer {
     this.scene.add(shadowMesh);
   }
 
-  loadModel(modelUrl = '/shirt_baked.glb', garmentUrl = null) {
+  loadModel(modelUrl = '/shirt_baked.glb') {
     this._loadId = (this._loadId || 0) + 1;
     const currentLoadId = this._loadId;
 
@@ -186,18 +183,9 @@ export class ShirtViewer {
       this.shirtGroup = null;
       this.shirtMesh = null;
     }
-    if (this.garmentGroup) {
-      if (this.garmentGroup.parent) {
-        this.garmentGroup.parent.remove(this.garmentGroup);
-      }
-      this.garmentGroup = null;
-    }
     this.productMeshes = [];
     this.materialGroups.clear();
     this.clonedMaterials.clear();
-
-    const isPerson = modelUrl.includes('person-01');
-    this.isPersonMode = isPerson;
 
     const loader = new GLTFLoader();
     loader.load(
@@ -242,65 +230,35 @@ export class ShirtViewer {
           // Set primary mesh reference for raycasting fallback
           this.shirtMesh = meshesInGltf[0] || null;
 
-          if (isPerson) {
-            // Full human mannequin mode (1.76m height, natural 1:1 scale)
-            const container = new THREE.Group();
-            root.position.set(0, 0, 0);
-            container.add(root);
-
-            // Position container so feet rest on shadow at Y = -1.15m and chest is at Y = +0.10m
-            container.position.set(0, -1.15, 0);
-            this.scene.add(container);
-            this.shirtGroup = container;
-
-            if (this.shadowMesh) {
-              this.shadowMesh.position.y = -1.15;
-              this.shadowMesh.scale.set(1.5, 1.5, 1.5);
-            }
-
-            if (this.controls) {
-              this.controls.minDistance = 0.45;
-              this.controls.maxDistance = 4.5;
-              this.controls.target.set(0, 0.05, 0);
-              this.camera.position.set(0, 0.05, 2.75);
-              this.controls.update();
-            }
-
-            // If a garment is specified, attach it cleanly to the mannequin
-            if (garmentUrl && !garmentUrl.includes('person-01')) {
-              this.wearGarmentOnMannequin(garmentUrl);
-            }
-          } else {
-            // Standalone single garment mode
+          // Standalone single garment / helmet mode
+          root.updateMatrixWorld(true);
+          const bounds = new THREE.Box3().setFromObject(root);
+          const size = bounds.getSize(new THREE.Vector3());
+          const maxSize = Math.max(size.x, size.y, size.z);
+          if (maxSize > 0) {
+            const displayHeight = 0.85;
+            root.scale.multiplyScalar(displayHeight / maxSize);
             root.updateMatrixWorld(true);
-            const bounds = new THREE.Box3().setFromObject(root);
-            const size = bounds.getSize(new THREE.Vector3());
-            const maxSize = Math.max(size.x, size.y, size.z);
-            if (maxSize > 0) {
-              const displayHeight = 0.85;
-              root.scale.multiplyScalar(displayHeight / maxSize);
-              root.updateMatrixWorld(true);
-            }
-            const center = new THREE.Box3().setFromObject(root).getCenter(new THREE.Vector3());
-            root.position.sub(center);
-            root.position.y += 0.05;
-            root.updateMatrixWorld(true);
+          }
+          const center = new THREE.Box3().setFromObject(root).getCenter(new THREE.Vector3());
+          root.position.sub(center);
+          root.position.y += 0.05;
+          root.updateMatrixWorld(true);
 
-            this.scene.add(root);
-            this.shirtGroup = root;
+          this.scene.add(root);
+          this.shirtGroup = root;
 
-            if (this.shadowMesh) {
-              this.shadowMesh.position.y = -0.32;
-              this.shadowMesh.scale.set(1.0, 1.0, 1.0);
-            }
+          if (this.shadowMesh) {
+            this.shadowMesh.position.y = -0.32;
+            this.shadowMesh.scale.set(1.0, 1.0, 1.0);
+          }
 
-            if (this.controls) {
-              this.controls.minDistance = 0.45;
-              this.controls.maxDistance = 2.0;
-              this.controls.target.set(0, 0.05, 0);
-              this.camera.position.set(0, 0.05, 0.92);
-              this.controls.update();
-            }
+          if (this.controls) {
+            this.controls.minDistance = 0.45;
+            this.controls.maxDistance = 2.0;
+            this.controls.target.set(0, 0.05, 0);
+            this.camera.position.set(0, 0.05, 0.92);
+            this.controls.update();
           }
 
           // Apply product colors from state
@@ -393,134 +351,6 @@ export class ShirtViewer {
     );
   }
 
-  wearGarmentOnMannequin(garmentUrl) {
-    if (!this.shirtGroup || !this.isPersonMode) return;
-    this._wearId = (this._wearId || 0) + 1;
-    const currentWearId = this._wearId;
-
-    // Remove previously worn garment if any
-    if (this.garmentGroup) {
-      if (this.garmentGroup.parent) {
-        this.garmentGroup.parent.remove(this.garmentGroup);
-      }
-      this.garmentGroup.traverse((node) => {
-        if (node.isMesh) {
-          if (node.geometry) node.geometry.dispose();
-          if (node.material) {
-            const mats = Array.isArray(node.material) ? node.material : [node.material];
-            mats.forEach(m => m.dispose());
-          }
-        }
-      });
-      this.garmentGroup = null;
-    }
-
-    // Cleanly strip old garment meshes from productMeshes
-    this.productMeshes = this.productMeshes.filter(m => !m.userData?.fromGarment);
-
-    const isTopGarment = garmentUrl.includes('3300') || garmentUrl.includes('3340') || garmentUrl.includes('3362') || garmentUrl.includes('3366') || garmentUrl.includes('4890');
-    const isTrousers = garmentUrl.includes('1750');
-    const isHeadwear = garmentUrl.includes('whe00113') || garmentUrl.includes('2003');
-
-    // Visibility of mannequin body parts
-    this.shirtGroup.traverse((child) => {
-      if (child.name === 'ReferenceShirt' || child.name === 'CollarBack') {
-        child.visible = !isTopGarment;
-      }
-      if (child.name === 'ReferenceTrousers' || child.name === 'BackPocket_L') {
-        child.visible = !isTrousers;
-      }
-      if (child.name === 'Hair' || child.name === 'BunFibre_0') {
-        child.visible = !isHeadwear;
-      }
-    });
-
-    const loader = new GLTFLoader();
-    loader.load(garmentUrl, (gltf) => {
-      if (this._wearId !== currentWearId) return;
-      if (!this.shirtGroup || !this.isPersonMode) return;
-
-      const garment = gltf.scene;
-      garment.userData.isWornGarment = true;
-      this.garmentGroup = garment;
-
-      let firstGarmentMesh = null;
-
-      // Filter productMeshes to remove any old garment meshes
-      this.productMeshes = this.productMeshes.filter(m => !m.userData?.fromGarment);
-
-      // Collect meshes and setup materials for custom recoloring
-      garment.traverse((node) => {
-        if (node.isMesh) {
-          node.userData.fromGarment = true;
-          if (!firstGarmentMesh) firstGarmentMesh = node;
-          this.productMeshes.push(node);
-          node.castShadow = true;
-          node.receiveShadow = true;
-
-          const sourceMaterials = Array.isArray(node.material) ? node.material : [node.material];
-          const materials = sourceMaterials.map((source) => {
-            let material = this.clonedMaterials.get(source.uuid);
-            if (!material) {
-              material = source.clone();
-              this.clonedMaterials.set(source.uuid, material);
-              const role = material.userData?.sobralRole || material.name;
-              if (!this.materialGroups.has(role)) {
-                this.materialGroups.set(role, new Set());
-              }
-              this.materialGroups.get(role).add(material);
-            }
-            return material;
-          });
-          node.material = Array.isArray(node.material) ? materials : materials[0];
-        }
-      });
-
-      if (firstGarmentMesh) {
-        this.shirtMesh = firstGarmentMesh;
-      }
-
-      // Sobral original GLBs are in natural 1:1 metric scale.
-      // Offset so the collar aligns with the mannequin shoulder/neck (Y = 1.430m).
-      if (isTopGarment) {
-        let offY = 0.667;
-        let offZ = 0.001;
-        let scale = 1.015;
-
-        if (garmentUrl.includes('3340')) {
-          offY = 0.695;
-        } else if (garmentUrl.includes('3362')) {
-          offY = 0.695;
-        } else if (garmentUrl.includes('3366')) {
-          offY = 0.695;
-        } else if (garmentUrl.includes('4890')) {
-          offY = 0.660;
-          scale = 1.02;
-          offZ = 0.002;
-        }
-
-        garment.scale.set(scale, scale, scale);
-        garment.position.set(0, offY, offZ);
-      } else if (isTrousers) {
-        garment.scale.set(1.01, 1.01, 1.01);
-        garment.position.set(0, 0, 0);
-      } else if (isHeadwear) {
-        garment.scale.set(1.02, 1.02, 1.02);
-        garment.position.set(0, 1.52, 0.01);
-      }
-
-      // Add garment inside this.shirtGroup (container)
-      this.shirtGroup.add(garment);
-      this.shirtGroup.updateMatrixWorld(true);
-
-      // Re-apply colors and decals to the new garment
-      this.updateMaterialColor(this.getState().colors);
-      this.updateDecals();
-    }, undefined, (err) => {
-      console.warn('Could not wear garment on mannequin:', err);
-    });
-  }
-
   updateMaterialColor(colors) {
     if (!colors) return;
     if (this.isMultiMesh) {
@@ -528,26 +358,26 @@ export class ShirtViewer {
       const accentColor = colors.accent || primaryColor;
       const collarColor = colors.collar || colors.accent || primaryColor;
 
-      // Primary Body / Shell Roles
-      ['fabric_primary', 'shell_primary', 'knit_shell', 'trousers_mainshell', 'shirt', 'person01__shirt'].forEach(role => {
+      // Primary Body / Shell Roles (includes helmet shell)
+      ['fabric_primary', 'shell_primary', 'knit_shell', 'trousers_mainshell', 'shirt'].forEach(role => {
         const group = this.materialGroups.get(role);
         if (group) group.forEach(mat => mat.color.set(primaryColor));
       });
 
-      // Accent / Secondary / Hood Roles
-      ['fabric_secondary', 'shell_secondary', 'hood_lining', 'stretch_panels', 'reinforcement'].forEach(role => {
+      // Accent / Secondary / Hood / Hardware Roles
+      ['fabric_secondary', 'shell_secondary', 'hood_lining', 'stretch_panels', 'reinforcement', 'hardware_orange', 'emboss_white'].forEach(role => {
         const group = this.materialGroups.get(role);
         if (group) group.forEach(mat => mat.color.set(accentColor));
       });
 
       const trousersCol = colors.trousers || '#1a2232';
-      ['trousers', 'person01__trousers'].forEach(role => {
+      ['trousers'].forEach(role => {
         const group = this.materialGroups.get(role);
         if (group) group.forEach(mat => mat.color.set(trousersCol));
       });
 
-      // Collar / Rib trim Roles
-      ['rib_trim', 'collar', 'lining', 'shirt_trim', 'person01__shirt_trim'].forEach(role => {
+      // Collar / Rib trim / Straps / Headband Roles
+      ['rib_trim', 'collar', 'lining', 'shirt_trim', 'strap_webbing', 'headband', 'hardware_black'].forEach(role => {
         const group = this.materialGroups.get(role);
         if (group) group.forEach(mat => mat.color.set(collarColor));
       });
@@ -800,11 +630,6 @@ export class ShirtViewer {
         return;
       }
 
-      // In mannequin mode, do not handle 2D UV text/logo selection or part clicks on pointerdown
-      if (this.isPersonMode) {
-        return;
-      }
-
       const uv = hit.uv;
       if (!uv) return;
 
@@ -998,8 +823,8 @@ export class ShirtViewer {
         return;
       }
 
-      // If it was a quick stationary click and NOT in mannequin mode, handle part picking
-      if (isQuickClick && !this.isPersonMode) {
+      // If it was a quick stationary click, handle part picking
+      if (isQuickClick) {
         const hit = getRaycastHit(e);
         if (hit) {
           if (this.isMultiMesh && hit.object?.material) {
@@ -1278,8 +1103,7 @@ export class ShirtViewer {
   }
 
   setView(viewName) {
-    const isPerson = this.isPersonMode;
-    const dist = isPerson ? 2.75 : 0.92;
+    const dist = 0.92;
     const targetY = 0.05;
 
     let targetPos = new THREE.Vector3(0, targetY, dist);
@@ -1295,7 +1119,7 @@ export class ShirtViewer {
 
     if (this.controls) {
       this.controls.minDistance = 0.45;
-      this.controls.maxDistance = isPerson ? 4.5 : 2.0;
+      this.controls.maxDistance = 2.0;
       this.controls.target.set(0, targetY, 0);
       this.camera.position.copy(targetPos);
       this.controls.update();
