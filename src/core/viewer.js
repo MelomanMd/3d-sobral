@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';
 import { FabricTextureGenerator } from './fabricTexture.js';
+import { ModelStorage } from './modelStorage.js';
 import { t } from './i18n.js';
 
 export class ShirtViewer {
@@ -35,6 +36,7 @@ export class ShirtViewer {
     // Raycasting & Interaction Modes: 'idle', 'move', 'scale', 'rotate'
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2();
+    this.mouse = new THREE.Vector2();
     this.dragMode = 'idle';
     this.draggedItem = null;
     this.draggedType = null; // 'text' or 'logo'
@@ -46,6 +48,12 @@ export class ShirtViewer {
     this.dragStartDistance = 0;
     this.activeHandle = null;
 
+    // Gizmo & Decals State
+    this.gizmoGroup = null;
+    this.selectedDecalMesh = null;
+    this.isDragging = false;
+    this.isTransforming = false;
+
     // Callbacks
     this.onItemSelect = null;
     this.onItemDrag = null;
@@ -53,9 +61,15 @@ export class ShirtViewer {
     this.onItemRotate = null;
     this.onItemDragEnd = null;
     this.onDeselect = null;
+    this.onBackgroundChange = null;
 
     this.lights = {};
     this.currentTheme = 'light';
+    this.currentBackground = 'light';
+    try {
+      this.currentBackground = localStorage.getItem('sobral_viewer_bg') || 'light';
+    } catch (e) {}
+
     this.init();
   }
 
@@ -105,6 +119,7 @@ export class ShirtViewer {
     // 6. Ground Shadow & Decals
     this.setupGroundShadow();
     this.scene.add(this.decalGroup);
+    this.setBackground(this.currentBackground);
 
     // 7. Load GLB Model (Active product model or default)
     const initialModelUrl = this.getState()?.activeProduct?.modelUrl || '/shirt_baked.glb';
@@ -1213,5 +1228,103 @@ export class ShirtViewer {
         o.visible = inside;
       }
     });
+  }
+
+  setBackground(bgType = 'light') {
+    this.currentBackground = bgType;
+    try {
+      localStorage.setItem('sobral_viewer_bg', bgType);
+    } catch (e) {}
+
+    const vp = this.container.closest('.viewport-area') || this.container;
+    if (vp) {
+      vp.dataset.background = bgType;
+    }
+
+    if (this.shadowMesh) {
+      this.shadowMesh.visible = (bgType !== 'dark');
+    }
+
+    if (this.renderer && this.scene && this.camera) {
+      this.renderer.render(this.scene, this.camera);
+    }
+
+    if (typeof this.onBackgroundChange === 'function') {
+      this.onBackgroundChange(bgType);
+    }
+  }
+
+  async captureCurrentView(filename = null) {
+    const activeProd = this.getState()?.activeProduct;
+    const prodName = (activeProd?.articleNumber ? `sobral-${activeProd.articleNumber}` : (activeProd?.name || 'sobral-produkt')).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const name = filename || `${prodName}-ansicht.png`;
+
+    const wasGizmo = this.gizmoGroup?.visible;
+    if (this.gizmoGroup) this.gizmoGroup.visible = false;
+
+    this.renderer.render(this.scene, this.camera);
+
+    return new Promise((resolve) => {
+      this.renderer.domElement.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = name;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+        if (wasGizmo && this.gizmoGroup) this.gizmoGroup.visible = true;
+      }, 'image/png');
+    });
+  }
+
+  async downloadActiveModelGlb() {
+    const activeProd = this.getState()?.activeProduct;
+    const prodName = (activeProd?.articleNumber ? `sobral-${activeProd.articleNumber}` : (activeProd?.id || 'produkt')).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const filename = `${prodName}.glb`;
+
+    try {
+      let blob = null;
+      if (activeProd?.storageKey) {
+        const stored = await ModelStorage.getModel(activeProd.storageKey);
+        if (stored?.data) {
+          blob = stored.data instanceof Blob ? stored.data : new Blob([stored.data], { type: 'model/gltf-binary' });
+        }
+      }
+
+      if (!blob) {
+        const url = activeProd?.modelUrl || '/shirt_baked.glb';
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        blob = await res.blob();
+      }
+
+      const downloadUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = filename;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(downloadUrl), 60000);
+      return true;
+    } catch (err) {
+      console.error('Error downloading GLB model:', err);
+      alert('Fehler beim Herunterladen der GLB-Datei: ' + err.message);
+      return false;
+    }
+  }
+
+  resetView() {
+    this.setView('perspective');
+    if (this.isWireframe) {
+      this.toggleWireframe();
+    }
+    if (this.componentVisibility) {
+      this.setComponentVisibility({ prints: true, straps: true, inside: true });
+    }
+    this.setBackground('light');
   }
 }

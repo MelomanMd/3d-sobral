@@ -201,6 +201,41 @@ export class ColorPanel {
           </div>
         </div>
       `}
+
+      <!-- Darstellung & Studio (Background, Wireframe, Export & Reset) -->
+      <div class="panel-section" style="padding-top: 8px;">
+        <div class="section-title">
+          <span class="title-icon-svg">${ICONS.sun}</span>
+          <span>${t('display_settings')}</span>
+        </div>
+        <div class="display-settings-card">
+          <div class="display-row">
+            <label class="display-label" for="select-panel-bg">${t('bg_label')}</label>
+            <select id="select-panel-bg" class="custom-select-sm">
+              <option value="light" ${(this.viewer?.currentBackground || 'light') === 'light' ? 'selected' : ''}>☀️ ${t('bg_studio_light')}</option>
+              <option value="white" ${(this.viewer?.currentBackground) === 'white' ? 'selected' : ''}>⚪ ${t('bg_white')}</option>
+              <option value="dark" ${(this.viewer?.currentBackground) === 'dark' ? 'selected' : ''}>🌙 ${t('bg_studio_dark')}</option>
+            </select>
+          </div>
+          <div class="display-row">
+            <label class="display-label" for="switch-panel-wireframe">Drahtgitter / Wireframe</label>
+            <input type="checkbox" id="switch-panel-wireframe" class="custom-toggle" ${this.viewer?.isWireframe ? 'checked' : ''}>
+          </div>
+          <div class="display-actions-row">
+            <button class="btn-sm btn-outline-glass" id="btn-panel-screenshot" title="${t('save_screenshot')}">
+              <span class="btn-icon-svg">${ICONS.camera}</span>
+              <span>${t('save_screenshot')}</span>
+            </button>
+            <button class="btn-sm btn-outline-glass" id="btn-panel-download-glb" title="${t('download_glb')}">
+              <span class="btn-icon-svg">${ICONS.cube}</span>
+              <span>${t('download_glb_short')}</span>
+            </button>
+          </div>
+          <button class="reset-link-btn" id="btn-panel-reset">
+            ${t('reset_view')}
+          </button>
+        </div>
+      </div>
     `;
 
     this.bindEvents();
@@ -259,7 +294,7 @@ export class ColorPanel {
     });
 
     // Helmet Component Visibility Toggles
-    this.container.querySelectorAll('.custom-toggle').forEach(chk => {
+    this.container.querySelectorAll('.custom-toggle[data-comp]').forEach(chk => {
       chk.addEventListener('change', (e) => {
         const comp = e.target.dataset.comp;
         if (this.viewer && comp) {
@@ -267,6 +302,61 @@ export class ColorPanel {
         }
       });
     });
+
+    // Background selection
+    const selectBg = this.container.querySelector('#select-panel-bg');
+    if (selectBg) {
+      selectBg.addEventListener('change', (e) => {
+        if (this.viewer) {
+          this.viewer.setBackground(e.target.value);
+        }
+      });
+    }
+
+    // Wireframe toggle
+    const switchWireframe = this.container.querySelector('#switch-panel-wireframe');
+    if (switchWireframe) {
+      switchWireframe.addEventListener('change', (e) => {
+        if (this.viewer) {
+          this.viewer.setWireframe(e.target.checked);
+        }
+      });
+    }
+
+    // Panel Screenshot
+    const btnScreenshot = this.container.querySelector('#btn-panel-screenshot');
+    if (btnScreenshot) {
+      btnScreenshot.addEventListener('click', async () => {
+        if (this.viewer) {
+          btnScreenshot.disabled = true;
+          await this.viewer.captureCurrentView();
+          btnScreenshot.disabled = false;
+        }
+      });
+    }
+
+    // Panel Download GLB
+    const btnGlb = this.container.querySelector('#btn-panel-download-glb');
+    if (btnGlb) {
+      btnGlb.addEventListener('click', async () => {
+        if (this.viewer) {
+          btnGlb.disabled = true;
+          await this.viewer.downloadActiveModelGlb();
+          btnGlb.disabled = false;
+        }
+      });
+    }
+
+    // Panel Reset View
+    const btnReset = this.container.querySelector('#btn-panel-reset');
+    if (btnReset) {
+      btnReset.addEventListener('click', () => {
+        if (this.viewer) {
+          this.viewer.resetView();
+          this.render();
+        }
+      });
+    }
   }
 
   updateState(newState) {

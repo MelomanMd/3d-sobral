@@ -47,6 +47,16 @@ export const translations = {
     zoom_out: 'Verkleinern (−)',
     fullscreen_enter: 'Vollbildmodus',
     fullscreen_exit: 'Vollbild beenden',
+    bg_label: 'Hintergrund',
+    bg_studio_light: 'Helles Studio',
+    bg_white: 'Weiss',
+    bg_studio_dark: 'Dunkles Studio',
+    save_screenshot: 'Ansicht als PNG speichern',
+    screenshot_saved: 'Screenshot gespeichert!',
+    download_glb: '3D-Modell herunterladen (.GLB)',
+    download_glb_short: 'Original-GLB',
+    reset_view: 'Ansicht zurücksetzen',
+    display_settings: 'Darstellung & Studio',
 
     // Helmet Components
     helmet_components: 'Bauteile & Details',
@@ -271,6 +281,16 @@ export const translations = {
     zoom_out: 'Zoom Out (−)',
     fullscreen_enter: 'Fullscreen',
     fullscreen_exit: 'Exit Fullscreen',
+    bg_label: 'Background',
+    bg_studio_light: 'Light Studio',
+    bg_white: 'Pure White',
+    bg_studio_dark: 'Dark Studio',
+    save_screenshot: 'Save View as PNG',
+    screenshot_saved: 'Screenshot saved!',
+    download_glb: 'Download 3D Model (.GLB)',
+    download_glb_short: 'Original GLB',
+    reset_view: 'Reset View',
+    display_settings: 'Display & Studio',
 
     // Helmet Components
     helmet_components: 'Components & Details',

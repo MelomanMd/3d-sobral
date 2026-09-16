@@ -68,6 +68,16 @@ export class ViewControls {
           <button class="action-toggle-btn" id="btn-toggle-spin" title="${t('view_spin')}">
             <span class="btn-icon-svg">${ICONS.spin}</span>
           </button>
+          <button class="action-toggle-btn" id="btn-quick-screenshot" title="${t('save_screenshot')}">
+            <span class="btn-icon-svg">${ICONS.camera}</span>
+          </button>
+
+          <div class="bg-switcher-pill" id="bg-switcher-group" title="${t('bg_label')}">
+            <button class="bg-pill-btn ${(this.viewer?.currentBackground || 'light') === 'light' ? 'active' : ''}" data-bg="light" title="${t('bg_studio_light')}">☀️</button>
+            <button class="bg-pill-btn ${(this.viewer?.currentBackground) === 'white' ? 'active' : ''}" data-bg="white" title="${t('bg_white')}">⚪</button>
+            <button class="bg-pill-btn ${(this.viewer?.currentBackground) === 'dark' ? 'active' : ''}" data-bg="dark" title="${t('bg_studio_dark')}">🌙</button>
+          </div>
+
           <button class="action-toggle-btn ${this.isFullscreen ? 'active' : ''}" id="btn-toggle-fullscreen" title="${fsTitle}">
             <span class="btn-icon-svg" id="fs-icon-container">${fsIcon}</span>
           </button>
@@ -130,6 +140,37 @@ export class ViewControls {
       });
     }
 
+    // Quick Screenshot button
+    const btnScreenshot = this.container.querySelector('#btn-quick-screenshot');
+    if (btnScreenshot) {
+      btnScreenshot.addEventListener('click', async () => {
+        if (this.viewer) {
+          btnScreenshot.classList.add('active');
+          await this.viewer.captureCurrentView();
+          setTimeout(() => btnScreenshot.classList.remove('active'), 600);
+        }
+      });
+    }
+
+    // Background Switcher Pill
+    this.container.querySelectorAll('.bg-pill-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const bg = btn.dataset.bg;
+        if (this.viewer) {
+          this.viewer.setBackground(bg);
+        }
+        this.updateBackgroundPill(bg);
+      });
+    });
+
+    if (this.viewer) {
+      const origBgHandler = this.viewer.onBackgroundChange;
+      this.viewer.onBackgroundChange = (bg) => {
+        this.updateBackgroundPill(bg);
+        if (typeof origBgHandler === 'function') origBgHandler(bg);
+      };
+    }
+
     // Fullscreen toggle
     const btnFs = this.container.querySelector('#btn-toggle-fullscreen');
     if (btnFs) {
@@ -137,6 +178,12 @@ export class ViewControls {
         this.toggleFullscreen();
       });
     }
+  }
+
+  updateBackgroundPill(bg) {
+    this.container.querySelectorAll('.bg-pill-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.bg === bg);
+    });
   }
 
   bindGlobalEvents() {

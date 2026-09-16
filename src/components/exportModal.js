@@ -127,6 +127,14 @@ export class ExportModal {
         </div>
 
         <div class="modal-footer">
+          <button class="btn-outline-glass" id="btn-download-glb" title="${t('download_glb')}">
+            <span class="btn-icon-svg">${ICONS.cube}</span>
+            <span>3D-Modell (.GLB)</span>
+          </button>
+          <button class="btn-outline-glass" id="btn-quick-screenshot" title="${t('save_screenshot')}">
+            <span class="btn-icon-svg">${ICONS.camera}</span>
+            <span>Aktuelle Ansicht (PNG)</span>
+          </button>
           <button class="btn-outline-glass" id="btn-download-json" title="${t('download_project_json')}">
             <span class="btn-icon-svg">${ICONS.fileJson}</span>
             <span>JSON</span>
@@ -165,6 +173,37 @@ export class ExportModal {
         confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
       });
     });
+
+    // Download 3D Model GLB
+    const btnDownloadGlb = modal.querySelector('#btn-download-glb');
+    if (btnDownloadGlb) {
+      btnDownloadGlb.addEventListener('click', async () => {
+        const orig = btnDownloadGlb.innerHTML;
+        btnDownloadGlb.innerHTML = `<span class="btn-icon-svg">${ICONS.cube}</span><span>${t('downloading_glb') || 'Wird geladen...'}</span>`;
+        btnDownloadGlb.disabled = true;
+        try {
+          await this.viewer.downloadActiveModelGlb();
+          confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
+        } finally {
+          btnDownloadGlb.innerHTML = orig;
+          btnDownloadGlb.disabled = false;
+        }
+      });
+    }
+
+    // Quick screenshot of current 3D view
+    const btnQuickScreenshot = modal.querySelector('#btn-quick-screenshot');
+    if (btnQuickScreenshot) {
+      btnQuickScreenshot.addEventListener('click', async () => {
+        btnQuickScreenshot.disabled = true;
+        try {
+          await this.viewer.captureCurrentView();
+          confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
+        } finally {
+          btnQuickScreenshot.disabled = false;
+        }
+      });
+    }
 
     // Export project JSON
     const btnDownloadJson = modal.querySelector('#btn-download-json');
