@@ -18,6 +18,7 @@ export class ExportModal {
     const backUrl = await this.viewer.captureAngle('back', 1200, 1200);
     const pattern = PATTERNS.find(p => p.id === this.state.patternId) || PATTERNS[0];
     const patternName = pattern.getName ? pattern.getName() : pattern.name;
+    const comparisonPhoto = this.state.activeProduct?.comparisonPhoto || null;
 
     const modal = document.createElement('div');
     modal.className = 'modal-backdrop';
@@ -124,6 +125,38 @@ export class ExportModal {
               `).join('') || `<div class="spec-empty">${t('no_logos')}</div>`}
             </div>
           </div>
+
+          ${comparisonPhoto ? `
+            <!-- 8-Angle Reference & 3D Comparison Sheet -->
+            <div class="comparison-export-card">
+              <div class="comparison-export-header">
+                <div class="comparison-header-left">
+                  <span class="view-tag-svg">${ICONS.eye}</span>
+                  <div>
+                    <span class="comparison-title">${t('photo_comparison_modal_title')}</span>
+                    <span class="comparison-sub">8 Rundum-Referenzfotos im direkten Vergleich mit dem 3D-Modell</span>
+                  </div>
+                </div>
+                <div class="comparison-header-actions">
+                  <button class="btn-sm btn-outline-glass" id="btn-open-comparison-dialog">
+                    <span class="btn-icon-svg">${ICONS.maximize}</span>
+                    <span>${t('photo_comparison_view')}</span>
+                  </button>
+                  <button class="btn-sm btn-outline-glass" id="btn-download-comparison-img">
+                    <span class="btn-icon-svg">${ICONS.download}</span>
+                    <span>${t('photo_comparison_download')}</span>
+                  </button>
+                </div>
+              </div>
+              <div class="comparison-banner-preview" id="comparison-banner-click" title="${t('photo_comparison_view')}">
+                <img src="${comparisonPhoto}" alt="${t('photo_comparison_modal_title')}" class="comparison-banner-img">
+                <div class="comparison-hover-pill">
+                  <span class="btn-icon-svg">${ICONS.maximize}</span>
+                  <span>${t('photo_comparison_view')}</span>
+                </div>
+              </div>
+            </div>
+          ` : ''}
         </div>
 
         <div class="modal-footer">
@@ -251,6 +284,36 @@ export class ExportModal {
       }
     });
 
+    // 8-Angle Photo Comparison Events
+    if (comparisonPhoto) {
+      const openDialog = () => this.openComparisonDialog(comparisonPhoto);
+      
+      const btnOpenComp = modal.querySelector('#btn-open-comparison-dialog');
+      if (btnOpenComp) btnOpenComp.addEventListener('click', openDialog);
+
+      const bannerClick = modal.querySelector('#comparison-banner-click');
+      if (bannerClick) bannerClick.addEventListener('click', openDialog);
+
+      const btnDownloadComp = modal.querySelector('#btn-download-comparison-img');
+      if (btnDownloadComp) {
+        btnDownloadComp.addEventListener('click', async () => {
+          try {
+            const res = await fetch(comparisonPhoto);
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sobral-${(this.state.activeProduct?.articleNumber || 'produkt').toLowerCase()}-fotovergleich.png`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
+            confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+          } catch (e) {
+            console.error('Error downloading comparison photo:', e);
+          }
+        });
+      }
+    }
+
     // Copy specification to clipboard
     modal.querySelector('#btn-copy-spec').addEventListener('click', (e) => {
       const textSummary = `
@@ -278,6 +341,33 @@ ${this.state.logos.filter(l => l.visible).map(l => `- ${l.name}: ${getZoneName(l
           btn.innerHTML = orig;
         }, 2000);
       });
+    });
+  }
+
+  openComparisonDialog(photoUrl) {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'comparison-dialog-root';
+    dialog.id = 'comparison-dialog';
+    dialog.innerHTML = `
+      <div class="dialog-bar">
+        <strong>${t('photo_comparison_modal_title')}</strong>
+        <button class="dialog-close-btn" id="close-dialog-btn">${t('close_modal')}</button>
+      </div>
+      <div class="dialog-scroll-body">
+        <img src="${photoUrl}" alt="${t('photo_comparison_modal_title')}" class="dialog-comparison-img">
+      </div>
+    `;
+    document.body.appendChild(dialog);
+    dialog.showModal();
+
+    const closeDialog = () => {
+      dialog.close();
+      dialog.remove();
+    };
+
+    dialog.querySelector('#close-dialog-btn').addEventListener('click', closeDialog);
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) closeDialog();
     });
   }
 

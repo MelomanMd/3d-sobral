@@ -276,6 +276,7 @@ export const DEFAULT_PRODUCTS = [
     backPreview: '/previews/WHE00113-back.png',
     leftPreview: '/previews/WHE00113-angle.png',
     rightPreview: '/previews/WHE00113-angle.png',
+    comparisonPhoto: '/previews/WHE00113-fotovergleich.png',
     materialRoles: ['shell_primary', 'emboss_white', 'hardware_black', 'hardware_orange', 'strap_webbing', 'liner_eps', 'clips_nylon'],
     zones: {
       crown: { name: 'Front Stirnplatte', isFront: true, defaultScale: 0.8, rayOrigin: [0.0, 0.05, 0.35] },

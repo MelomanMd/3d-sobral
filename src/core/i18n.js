@@ -182,6 +182,11 @@ export const translations = {
     mockup_header: 'SOBRAL 3D TRIKOT-MOCKUP',
     mockup_subheader: 'Spezifikation und Produktionsmuster',
     spec_summary_header: '--- SOBRAL 3D TRIKOT SPEZIFIKATION ---',
+    photo_comparison: 'Fotovergleich (Referenz & 3D)',
+    photo_comparison_modal_title: 'Referenzfotos und neues 3D-Modell',
+    photo_comparison_download: 'Fotovergleich (HD)',
+    photo_comparison_view: 'Fotovergleich öffnen',
+    close_modal: 'Schliessen ×',
 
     // Import Modal
     import_modal_badge: 'Design & Daten Import',
@@ -416,6 +421,11 @@ export const translations = {
     mockup_header: 'SOBRAL 3D JERSEY MOCKUP',
     mockup_subheader: 'Specification and Production Sample',
     spec_summary_header: '--- SOBRAL 3D JERSEY SPECIFICATION ---',
+    photo_comparison: 'Photo Comparison (Reference & 3D)',
+    photo_comparison_modal_title: 'Reference Photos and New 3D Model',
+    photo_comparison_download: 'Photo Comparison (HD)',
+    photo_comparison_view: 'Open Photo Comparison',
+    close_modal: 'Close ×',
 
     // Import Modal
     import_modal_badge: 'Design & Data Import',
