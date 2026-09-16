@@ -68,7 +68,7 @@ export class ShirtViewer {
 
     // 2. Camera
     this.camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
-    this.camera.position.set(0, 0.05, 0.92);
+    this.camera.position.set(0, 0.05, 1.55);
 
     // 3. Renderer
     this.renderer = new THREE.WebGLRenderer({
@@ -243,7 +243,7 @@ export class ShirtViewer {
           const size = bounds.getSize(new THREE.Vector3());
           const maxSize = Math.max(size.x, size.y, size.z);
           if (maxSize > 0) {
-            const displayHeight = 0.85;
+            const displayHeight = 0.72;
             root.scale.multiplyScalar(displayHeight / maxSize);
             root.updateMatrixWorld(true);
           }
@@ -261,10 +261,10 @@ export class ShirtViewer {
           }
 
           if (this.controls) {
-            this.controls.minDistance = 0.45;
-            this.controls.maxDistance = 2.0;
+            this.controls.minDistance = 0.35;
+            this.controls.maxDistance = 3.5;
             this.controls.target.set(0, 0.05, 0);
-            this.camera.position.set(0, 0.05, 0.92);
+            this.camera.position.set(0, 0.05, 1.55);
             this.controls.update();
           }
 
@@ -345,10 +345,10 @@ export class ShirtViewer {
           }
 
           if (this.controls) {
-            this.controls.minDistance = 0.45;
-            this.controls.maxDistance = 2.0;
+            this.controls.minDistance = 0.35;
+            this.controls.maxDistance = 3.5;
             this.controls.target.set(0, 0.05, 0);
-            this.camera.position.set(0, 0.05, 0.92);
+            this.camera.position.set(0, 0.05, 1.55);
             this.controls.update();
           }
         }
@@ -1122,14 +1122,14 @@ export class ShirtViewer {
   }
 
   setView(viewName, animate = true) {
-    const dist = 0.92;
+    const dist = 1.55;
     const targetY = 0.05;
     const center = new THREE.Vector3(0, targetY, 0);
 
     let targetPos = new THREE.Vector3(0, targetY, dist);
     if (viewName === 'perspective') {
       // 3/4 Perspective angle (depth and volume across all products)
-      targetPos.set(-dist * 0.64, targetY + dist * 0.40, dist * 0.85);
+      targetPos.set(-dist * 0.64, targetY + dist * 0.35, dist * 0.78);
     } else if (viewName === 'front') {
       targetPos.set(0, targetY, dist);
     } else if (viewName === 'back') {
@@ -1144,7 +1144,7 @@ export class ShirtViewer {
 
     if (this.controls) {
       this.controls.minDistance = 0.35;
-      this.controls.maxDistance = 2.5;
+      this.controls.maxDistance = 3.5;
 
       if (animate) {
         this.cameraTransition = {
