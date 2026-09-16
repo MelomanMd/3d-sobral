@@ -345,30 +345,7 @@ ${this.state.logos.filter(l => l.visible).map(l => `- ${l.name}: ${getZoneName(l
   }
 
   openComparisonDialog(photoUrl) {
-    const dialog = document.createElement('dialog');
-    dialog.className = 'comparison-dialog-root';
-    dialog.id = 'comparison-dialog';
-    dialog.innerHTML = `
-      <div class="dialog-bar">
-        <strong>${t('photo_comparison_modal_title')}</strong>
-        <button class="dialog-close-btn" id="close-dialog-btn">${t('close_modal')}</button>
-      </div>
-      <div class="dialog-scroll-body">
-        <img src="${photoUrl}" alt="${t('photo_comparison_modal_title')}" class="dialog-comparison-img">
-      </div>
-    `;
-    document.body.appendChild(dialog);
-    dialog.showModal();
-
-    const closeDialog = () => {
-      dialog.close();
-      dialog.remove();
-    };
-
-    dialog.querySelector('#close-dialog-btn').addEventListener('click', closeDialog);
-    dialog.addEventListener('click', (e) => {
-      if (e.target === dialog) closeDialog();
-    });
+    openPhotoComparisonDialog(photoUrl);
   }
 
   close() {
@@ -377,4 +354,34 @@ ${this.state.logos.filter(l => l.visible).map(l => `- ${l.name}: ${getZoneName(l
       this.modalEl = null;
     }
   }
+}
+
+export function openPhotoComparisonDialog(photoUrl) {
+  const existing = document.getElementById('comparison-dialog');
+  if (existing) existing.remove();
+
+  const dialog = document.createElement('dialog');
+  dialog.className = 'comparison-dialog-root';
+  dialog.id = 'comparison-dialog';
+  dialog.innerHTML = `
+    <div class="dialog-bar">
+      <strong>${t('photo_comparison_modal_title')}</strong>
+      <button class="dialog-close-btn" id="close-dialog-btn">${t('close_modal')}</button>
+    </div>
+    <div class="dialog-scroll-body">
+      <img src="${photoUrl}" alt="${t('photo_comparison_modal_title')}" class="dialog-comparison-img">
+    </div>
+  `;
+  document.body.appendChild(dialog);
+  dialog.showModal();
+
+  const closeDialog = () => {
+    dialog.close();
+    dialog.remove();
+  };
+
+  dialog.querySelector('#close-dialog-btn').addEventListener('click', closeDialog);
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) closeDialog();
+  });
 }

@@ -1,5 +1,6 @@
 import { t } from '../core/i18n.js';
 import { ICONS } from '../core/icons.js';
+import { openPhotoComparisonDialog } from './exportModal.js';
 
 export class ViewControls {
   constructor(containerElement, viewer, onModeChange) {
@@ -71,6 +72,11 @@ export class ViewControls {
           <button class="action-toggle-btn" id="btn-quick-screenshot" title="${t('save_screenshot')}">
             <span class="btn-icon-svg">${ICONS.camera}</span>
           </button>
+          ${this.viewer?.getState()?.activeProduct?.comparisonPhoto ? `
+            <button class="action-toggle-btn" id="btn-view-comparison" title="${t('photo_comparison_view')}">
+              <span class="btn-icon-svg">${ICONS.eye}</span>
+            </button>
+          ` : ''}
 
           <div class="bg-switcher-pill" id="bg-switcher-group" title="${t('bg_label')}">
             <button class="bg-pill-btn ${(this.viewer?.currentBackground || 'light') === 'light' ? 'active' : ''}" data-bg="light" title="${t('bg_studio_light')}">☀️</button>
@@ -169,6 +175,17 @@ export class ViewControls {
         this.updateBackgroundPill(bg);
         if (typeof origBgHandler === 'function') origBgHandler(bg);
       };
+    }
+
+    // Comparison Dialog Button
+    const btnComp = this.container.querySelector('#btn-view-comparison');
+    if (btnComp) {
+      btnComp.addEventListener('click', () => {
+        const photoUrl = this.viewer?.getState()?.activeProduct?.comparisonPhoto;
+        if (photoUrl) {
+          openPhotoComparisonDialog(photoUrl);
+        }
+      });
     }
 
     // Fullscreen toggle

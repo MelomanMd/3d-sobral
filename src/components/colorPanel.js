@@ -1,6 +1,7 @@
 import { PATTERNS } from '../core/patterns.js';
 import { t } from '../core/i18n.js';
 import { ICONS } from '../core/icons.js';
+import { openPhotoComparisonDialog } from './exportModal.js';
 
 export const SPORT_PALETTES = [
   { name: 'Navy Dunkelblau', hex: '#1b2034' },
@@ -221,6 +222,12 @@ export class ColorPanel {
             <label class="display-label" for="switch-panel-wireframe">Drahtgitter / Wireframe</label>
             <input type="checkbox" id="switch-panel-wireframe" class="custom-toggle" ${this.viewer?.isWireframe ? 'checked' : ''}>
           </div>
+          ${this.state.activeProduct?.comparisonPhoto ? `
+            <button class="btn-sm btn-outline-glass" id="btn-sidebar-comparison" style="width: 100%; justify-content: center; gap: 8px; margin-top: 4px; padding: 9px 12px; font-size: 12px;">
+              <span class="btn-icon-svg">${ICONS.eye}</span>
+              <span>${t('photo_comparison_view')}</span>
+            </button>
+          ` : ''}
           <button class="reset-link-btn" id="btn-panel-reset">
             ${t('reset_view')}
           </button>
@@ -320,6 +327,17 @@ export class ColorPanel {
         if (this.viewer) {
           this.viewer.resetView();
           this.render();
+        }
+      });
+    }
+
+    // Sidebar Comparison Dialog Button
+    const btnComp = this.container.querySelector('#btn-sidebar-comparison');
+    if (btnComp) {
+      btnComp.addEventListener('click', () => {
+        const photoUrl = this.state.activeProduct?.comparisonPhoto;
+        if (photoUrl) {
+          openPhotoComparisonDialog(photoUrl);
         }
       });
     }
