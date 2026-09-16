@@ -37,7 +37,8 @@ export const ICONS = {
   sparkles: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>`,
   flagDe: `<svg viewBox="0 0 24 16" width="18" height="12" style="border-radius:2px;overflow:hidden"><rect width="24" height="5.33" y="0" fill="#000000"/><rect width="24" height="5.33" y="5.33" fill="#DD0000"/><rect width="24" height="5.34" y="10.66" fill="#FFCE00"/></svg>`,
   flagEn: `<svg viewBox="0 0 24 16" width="18" height="12" style="border-radius:2px;overflow:hidden"><rect width="24" height="16" fill="#012169"/><path d="M0 0 L24 16 M24 0 L0 16" stroke="#ffffff" stroke-width="3"/><path d="M0 0 L24 16 M24 0 L0 16" stroke="#C8102E" stroke-width="1.5"/><path d="M12 0 v16 M0 8 h24" stroke="#ffffff" stroke-width="5"/><path d="M12 0 v16 M0 8 h24" stroke="#C8102E" stroke-width="3"/></svg>`,
-  user: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`
+  user: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  wireframe: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>`
 };
 
 export function getIcon(name) {

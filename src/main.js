@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!tabContentRoot) return;
     tabContentRoot.innerHTML = '';
     if (activeTab === 'colors') {
-      colorPanel = new ColorPanel(tabContentRoot, state, onStateChange);
+      colorPanel = new ColorPanel(tabContentRoot, state, onStateChange, viewer);
     } else if (activeTab === 'text') {
       textPanel = new TextPanel(tabContentRoot, state, onStateChange);
     } else if (activeTab === 'logos') {

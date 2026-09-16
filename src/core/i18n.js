@@ -35,14 +35,25 @@ export const translations = {
     viewport_hint: 'Linksklick: 360° Drehen • Elemente mit Maus ziehen • Mausrad: Zoom',
 
     // View Controls
+    view_perspective: '3/4 Ansicht',
     view_front: 'Vorne',
     view_back: 'Hinten',
     view_left: 'Links',
     view_right: 'Rechts',
+    view_top: 'Oben',
     view_3d: '3D-Ansicht',
     view_spin: '360° Drehung',
+    zoom_in: 'Vergrößern (+)',
+    zoom_out: 'Verkleinern (−)',
     fullscreen_enter: 'Vollbildmodus',
     fullscreen_exit: 'Vollbild beenden',
+
+    // Helmet Components
+    helmet_components: 'Bauteile & Details',
+    helmet_prints: 'Druckmotive (Werbeaufdrucke)',
+    helmet_straps: 'Kinnriemen & Schnallen',
+    helmet_inside: 'Innenausstattung & Dämpfung',
+    helmet_safety_colors: 'KASK Sicherheitsfarben',
 
     // Floating Gizmo
     gizmo_selected_hint: 'Ausgewählt zum Verschieben & Skalieren',
@@ -248,14 +259,25 @@ export const translations = {
     viewport_hint: 'Left click: 360° Rotate • Drag elements with mouse • Scroll: Zoom',
 
     // View Controls
+    view_perspective: '3/4 View',
     view_front: 'Front',
     view_back: 'Back',
     view_left: 'Left',
     view_right: 'Right',
+    view_top: 'Top',
     view_3d: '3D View',
     view_spin: '360° Spin',
+    zoom_in: 'Zoom In (+)',
+    zoom_out: 'Zoom Out (−)',
     fullscreen_enter: 'Fullscreen',
     fullscreen_exit: 'Exit Fullscreen',
+
+    // Helmet Components
+    helmet_components: 'Components & Details',
+    helmet_prints: 'Print Motifs (Logos)',
+    helmet_straps: 'Chin Straps & Buckles',
+    helmet_inside: 'Interior Liner & Cushioning',
+    helmet_safety_colors: 'KASK Safety Colors',
 
     // Floating Gizmo
     gizmo_selected_hint: 'Selected for moving & scaling',

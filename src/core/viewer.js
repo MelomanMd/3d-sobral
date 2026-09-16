@@ -25,6 +25,9 @@ export class ShirtViewer {
     this.decalGroup = new THREE.Group();
     this._loadId = 0;
     this.shadowMesh = null;
+    this.cameraTransition = null;
+    this.componentVisibility = { prints: true, straps: true, inside: true };
+    this.isWireframe = false;
 
     this.isAutoRotating = false;
     this.isTransitioningCamera = false;
@@ -87,10 +90,14 @@ export class ShirtViewer {
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.06;
     this.controls.minDistance = 0.45;
-    this.controls.maxDistance = 1.8;
-    this.controls.maxPolarAngle = Math.PI / 2 + 0.15;
+    this.controls.maxDistance = 2.5;
+    this.controls.maxPolarAngle = Math.PI;
     this.controls.target.set(0, 0.05, 0);
     this.controls.update();
+
+    this.controls.addEventListener('start', () => {
+      this.cameraTransition = null;
+    });
 
     // 5. Lighting Setup
     this.setupLighting();
@@ -264,6 +271,8 @@ export class ShirtViewer {
           // Apply product colors from state
           this.updateMaterialColor(this.getState().colors);
           this.updateDecals();
+          this.setComponentVisibility(this.componentVisibility);
+          if (this.isWireframe) this.setWireframe(true);
         } else {
           // Legacy single mesh mode (/shirt_baked.glb)
           this.isAiModel = false;
@@ -954,6 +963,16 @@ export class ShirtViewer {
 
   animate() {
     requestAnimationFrame(this.animate);
+    if (this.cameraTransition) {
+      const now = performance.now();
+      const t = Math.min((now - this.cameraTransition.start) / 450, 1.0);
+      const e = t * t * (3 - 2 * t);
+      this.camera.position.lerpVectors(this.cameraTransition.from, this.cameraTransition.to, e);
+      this.controls.target.lerpVectors(this.cameraTransition.fromTarget, this.cameraTransition.toTarget, e);
+      if (t >= 1.0) {
+        this.cameraTransition = null;
+      }
+    }
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
   }
@@ -1102,12 +1121,16 @@ export class ShirtViewer {
     return dataUrl;
   }
 
-  setView(viewName) {
+  setView(viewName, animate = true) {
     const dist = 0.92;
     const targetY = 0.05;
+    const center = new THREE.Vector3(0, targetY, 0);
 
     let targetPos = new THREE.Vector3(0, targetY, dist);
-    if (viewName === 'front') {
+    if (viewName === 'perspective') {
+      // 3/4 Perspective angle (depth and volume across all products)
+      targetPos.set(-dist * 0.64, targetY + dist * 0.40, dist * 0.85);
+    } else if (viewName === 'front') {
       targetPos.set(0, targetY, dist);
     } else if (viewName === 'back') {
       targetPos.set(0, targetY, -dist);
@@ -1115,14 +1138,80 @@ export class ShirtViewer {
       targetPos.set(-dist, targetY, 0);
     } else if (viewName === 'right') {
       targetPos.set(dist, targetY, 0);
+    } else if (viewName === 'top') {
+      targetPos.set(0, targetY + dist * 1.05, 0.001);
     }
 
     if (this.controls) {
-      this.controls.minDistance = 0.45;
-      this.controls.maxDistance = 2.0;
-      this.controls.target.set(0, targetY, 0);
-      this.camera.position.copy(targetPos);
+      this.controls.minDistance = 0.35;
+      this.controls.maxDistance = 2.5;
+
+      if (animate) {
+        this.cameraTransition = {
+          start: performance.now(),
+          from: this.camera.position.clone(),
+          to: targetPos,
+          fromTarget: this.controls.target.clone(),
+          toTarget: center
+        };
+      } else {
+        this.cameraTransition = null;
+        this.camera.position.copy(targetPos);
+        this.controls.target.copy(center);
+        this.controls.update();
+      }
+    }
+  }
+
+  zoom(factor) {
+    this.cameraTransition = null;
+    if (this.camera && this.controls) {
+      this.camera.position.sub(this.controls.target).multiplyScalar(factor).add(this.controls.target);
       this.controls.update();
     }
+  }
+
+  toggleWireframe() {
+    this.isWireframe = !this.isWireframe;
+    this.setWireframe(this.isWireframe);
+    return this.isWireframe;
+  }
+
+  setWireframe(enabled) {
+    this.isWireframe = !!enabled;
+    if (this.shirtGroup) {
+      this.shirtGroup.traverse((o) => {
+        if (o.isMesh && o.material) {
+          const mats = Array.isArray(o.material) ? o.material : [o.material];
+          mats.forEach(m => {
+            m.wireframe = this.isWireframe;
+          });
+        }
+      });
+    }
+  }
+
+  setComponentVisibility(opts = {}) {
+    this.componentVisibility = { ...this.componentVisibility, ...opts };
+    if (!this.shirtGroup) return;
+
+    const { prints = true, straps = true, inside = true } = this.componentVisibility;
+    const strapNames = ['ChinStrap', 'StrapHardware', 'ChinBuckle_Black', 'ChinBuckle_OrangeRelease'];
+    const insideNames = ['ImpactLiner', 'AdjustableHeadband', 'ForeheadPadding', 'OccipitalPadding', 'SuspensionArms', 'RearAdjustmentDial', 'AccessoryReceiver30mm_A', 'AccessoryReceiver30mm_B'];
+
+    this.shirtGroup.traverse((o) => {
+      // Toggle pre-baked manufacturer prints
+      if (o.name.startsWith('Print_')) {
+        o.visible = prints;
+      }
+      // Toggle straps / harness
+      if (strapNames.includes(o.name)) {
+        o.visible = straps;
+      }
+      // Toggle internal liner / cushioning
+      if (insideNames.includes(o.name)) {
+        o.visible = inside;
+      }
+    });
   }
 }

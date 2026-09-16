@@ -17,6 +17,15 @@ export const SPORT_PALETTES = [
   { name: 'Titanium Grey', hex: '#475569' }
 ];
 
+export const HELMET_SAFETY_PALETTES = [
+  { name: 'Original Weiss', hex: '#ffffff' },
+  { name: 'Signalgelb', hex: '#f5ce32' },
+  { name: 'Warnorange', hex: '#f07730' },
+  { name: 'Royalblau', hex: '#2768ad' },
+  { name: 'Anthrazit / Schwarz', hex: '#272d33' },
+  { name: 'Leuchtorange', hex: '#ff5500' }
+];
+
 export const GARMENT_ELEMENTS = [
   {
     id: 'primary',
@@ -45,10 +54,11 @@ export const GARMENT_ELEMENTS = [
 ];
 
 export class ColorPanel {
-  constructor(containerElement, state, onUpdate) {
+  constructor(containerElement, state, onUpdate, viewer = null) {
     this.container = containerElement;
     this.state = state;
     this.onUpdate = onUpdate;
+    this.viewer = viewer;
     this.activeZone = 'primary';
 
     this.render();
@@ -98,8 +108,13 @@ export class ColorPanel {
 
   render() {
     const elements = this.getGarmentElements();
+    const prod = this.state.activeProduct || {};
+    const isHelmet = prod.silhouette === 'helmet' || prod.articleNumber === 'WHE00113';
+    const activePalette = isHelmet ? HELMET_SAFETY_PALETTES : SPORT_PALETTES;
+    const compVis = this.viewer?.componentVisibility || { prints: true, straps: true, inside: true };
+
     this.container.innerHTML = `
-      <!-- 1. Compact Garment Parts List with Inline Pickers -->
+      <!-- 1. Compact Garment / Helmet Parts List with Inline Pickers -->
       <div class="panel-section" style="padding-bottom: 8px;">
         <div class="section-title">
           <span class="title-icon-svg">${ICONS.layers}</span>
@@ -129,15 +144,15 @@ export class ColorPanel {
         </div>
       </div>
 
-      <!-- 2. Quick Sport Palette Swatches Strip -->
+      <!-- 2. Quick Palette Swatches Strip -->
       <div class="panel-section" style="padding-top: 8px; padding-bottom: 12px;">
         <div class="section-header-row" style="margin-bottom: 8px;">
           <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
-            Schnellauswahl (${this.getActiveZoneName()})
+            ${isHelmet ? t('helmet_safety_colors') : `Schnellauswahl (${this.getActiveZoneName()})`}
           </span>
         </div>
         <div class="compact-swatches-row">
-          ${SPORT_PALETTES.map(p => `
+          ${activePalette.map(p => `
             <button class="mini-swatch-btn ${(this.state.colors[this.activeZone] || '').toLowerCase() === p.hex.toLowerCase() ? 'active' : ''}" 
                     data-hex="${p.hex}" 
                     title="${p.name} (${p.hex})" 
@@ -147,21 +162,45 @@ export class ColorPanel {
         </div>
       </div>
 
-      <!-- 3. Pattern / Cut Selector -->
-      <div class="panel-section" style="padding-top: 8px;">
-        <div class="section-title">
-          <span class="title-icon-svg">${ICONS.sparkles}</span>
-          <span>${t('section_pattern')}</span>
+      ${isHelmet ? `
+        <!-- Helmet Bauteile & Sichtbarkeit Switches -->
+        <div class="panel-section" style="padding-top: 8px;">
+          <div class="section-title">
+            <span class="title-icon-svg">${ICONS.layers}</span>
+            <span>${t('helmet_components')}</span>
+          </div>
+          <div class="helmet-switches-list">
+            <label class="switch-row-card" for="switch-prints">
+              <span class="switch-label">${t('helmet_prints')}</span>
+              <input type="checkbox" id="switch-prints" class="custom-toggle" data-comp="prints" ${compVis.prints ? 'checked' : ''}>
+            </label>
+            <label class="switch-row-card" for="switch-straps">
+              <span class="switch-label">${t('helmet_straps')}</span>
+              <input type="checkbox" id="switch-straps" class="custom-toggle" data-comp="straps" ${compVis.straps ? 'checked' : ''}>
+            </label>
+            <label class="switch-row-card" for="switch-inside">
+              <span class="switch-label">${t('helmet_inside')}</span>
+              <input type="checkbox" id="switch-inside" class="custom-toggle" data-comp="inside" ${compVis.inside ? 'checked' : ''}>
+            </label>
+          </div>
         </div>
-        <div class="compact-pattern-grid">
-          ${PATTERNS.map(p => `
-            <button class="compact-pattern-card ${this.state.patternId === p.id ? 'active' : ''}" data-pattern="${p.id}">
-              <div class="pattern-preview pattern-${p.id}"></div>
-              <span class="pattern-name">${p.getName ? p.getName() : p.name}</span>
-            </button>
-          `).join('')}
+      ` : `
+        <!-- 3. Pattern / Cut Selector for Garments -->
+        <div class="panel-section" style="padding-top: 8px;">
+          <div class="section-title">
+            <span class="title-icon-svg">${ICONS.sparkles}</span>
+            <span>${t('section_pattern')}</span>
+          </div>
+          <div class="compact-pattern-grid">
+            ${PATTERNS.map(p => `
+              <button class="compact-pattern-card ${this.state.patternId === p.id ? 'active' : ''}" data-pattern="${p.id}">
+                <div class="pattern-preview pattern-${p.id}"></div>
+                <span class="pattern-name">${p.getName ? p.getName() : p.name}</span>
+              </button>
+            `).join('')}
+          </div>
         </div>
-      </div>
+      `}
     `;
 
     this.bindEvents();
@@ -216,6 +255,16 @@ export class ColorPanel {
         this.state.patternId = patternId;
         this.render();
         this.onUpdate();
+      });
+    });
+
+    // Helmet Component Visibility Toggles
+    this.container.querySelectorAll('.custom-toggle').forEach(chk => {
+      chk.addEventListener('change', (e) => {
+        const comp = e.target.dataset.comp;
+        if (this.viewer && comp) {
+          this.viewer.setComponentVisibility({ [comp]: e.target.checked });
+        }
       });
     });
   }
