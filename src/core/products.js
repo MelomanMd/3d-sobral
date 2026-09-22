@@ -1,5 +1,14 @@
 import { ModelStorage } from './modelStorage.js';
 
+export function resolveAssetUrl(url) {
+  if (!url || typeof url !== 'string' || url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.BASE_URL) ? import.meta.env.BASE_URL : './';
+  const cleanPath = url.startsWith('/') ? url.slice(1) : url;
+  return base.endsWith('/') ? `${base}${cleanPath}` : `${base}/${cleanPath}`;
+}
+
 export const DEFAULT_PRODUCTS = [
   {
     id: 'sobral_workwear_tshirt',
@@ -9,7 +18,7 @@ export const DEFAULT_PRODUCTS = [
     price: '39.00 CHF',
     sku: 'SOB-TS-101',
     silhouette: 'tshirt',
-    modelUrl: '/shirt_baked.glb',
+    modelUrl: resolveAssetUrl('/shirt_baked.glb'),
     patternId: 'raglan_shoulder',
     baseColor: '#121316',
     accentColor: '#ff4400',
@@ -19,10 +28,10 @@ export const DEFAULT_PRODUCTS = [
       collar: '#121316',
       secondary: '#ffffff'
     },
-    frontPreview: '/images/blaklader_front.jpg',
-    backPreview: '/images/blaklader_back.jpg',
-    leftPreview: '/images/blaklader_left.jpg',
-    rightPreview: '/images/blaklader_right.jpg',
+    frontPreview: resolveAssetUrl('/images/blaklader_front.jpg'),
+    backPreview: resolveAssetUrl('/images/blaklader_back.jpg'),
+    leftPreview: resolveAssetUrl('/images/blaklader_left.jpg'),
+    rightPreview: resolveAssetUrl('/images/blaklader_right.jpg'),
     textureUrl: null,
     zones: {
       chest_center: { name: 'Brustmitte', u: 0.26, v: 0.23, defaultScale: 1.0, isFront: true },
@@ -43,7 +52,7 @@ export const DEFAULT_PRODUCTS = [
     price: '34.00 CHF',
     sku: 'SOB-3300',
     silhouette: 'tshirt',
-    modelUrl: '/models/sobral-3300.glb',
+    modelUrl: resolveAssetUrl('/models/sobral-3300.glb'),
     isMultiMesh: true,
     baseColor: '#243249',
     accentColor: '#ff4400',
@@ -53,10 +62,10 @@ export const DEFAULT_PRODUCTS = [
       collar: '#243249',
       secondary: '#ffffff'
     },
-    frontPreview: '/previews/3300-front.png',
-    backPreview: '/previews/3300-back.png',
-    leftPreview: '/previews/3300-side.png',
-    rightPreview: '/previews/3300-side.png',
+    frontPreview: resolveAssetUrl('/previews/3300-front.png'),
+    backPreview: resolveAssetUrl('/previews/3300-back.png'),
+    leftPreview: resolveAssetUrl('/previews/3300-side.png'),
+    rightPreview: resolveAssetUrl('/previews/3300-side.png'),
     materialRoles: ['fabric_primary', 'thread_primary', 'rib_trim'],
     zones: {
       chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.08, 0.12, 0.5] },
@@ -76,7 +85,7 @@ export const DEFAULT_PRODUCTS = [
     price: '48.00 CHF',
     sku: 'SOB-3340',
     silhouette: 'sweatshirt',
-    modelUrl: '/models/sobral-3340.glb',
+    modelUrl: resolveAssetUrl('/models/sobral-3340.glb'),
     isMultiMesh: true,
     baseColor: '#c4c7c9',
     accentColor: '#ff4400',
@@ -86,10 +95,10 @@ export const DEFAULT_PRODUCTS = [
       collar: '#adafb1',
       secondary: '#121316'
     },
-    frontPreview: '/previews/3340-front.png',
-    backPreview: '/previews/3340-back.png',
-    leftPreview: '/previews/3340-side.png',
-    rightPreview: '/previews/3340-side.png',
+    frontPreview: resolveAssetUrl('/previews/3340-front.png'),
+    backPreview: resolveAssetUrl('/previews/3340-back.png'),
+    leftPreview: resolveAssetUrl('/previews/3340-side.png'),
+    rightPreview: resolveAssetUrl('/previews/3340-side.png'),
     materialRoles: ['fabric_primary', 'rib_trim', 'thread_primary'],
     zones: {
       chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.08, 0.12, 0.5] },
@@ -109,7 +118,7 @@ export const DEFAULT_PRODUCTS = [
     price: '64.00 CHF',
     sku: 'SOB-3362',
     silhouette: 'jacket',
-    modelUrl: '/models/sobral-3362.glb',
+    modelUrl: resolveAssetUrl('/models/sobral-3362.glb'),
     isMultiMesh: true,
     baseColor: '#1c2430',
     accentColor: '#ff4400',
@@ -119,10 +128,10 @@ export const DEFAULT_PRODUCTS = [
       collar: '#1c2430',
       secondary: '#ffffff'
     },
-    frontPreview: '/previews/3362-front.png',
-    backPreview: '/previews/3362-back.png',
-    leftPreview: '/previews/3362-side.png',
-    rightPreview: '/previews/3362-side.png',
+    frontPreview: resolveAssetUrl('/previews/3362-front.png'),
+    backPreview: resolveAssetUrl('/previews/3362-back.png'),
+    leftPreview: resolveAssetUrl('/previews/3362-side.png'),
+    rightPreview: resolveAssetUrl('/previews/3362-side.png'),
     materialRoles: ['fabric_primary', 'fabric_secondary', 'rib_trim', 'zipper'],
     zones: {
       chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.09, 0.11, 0.5] },
@@ -141,7 +150,7 @@ export const DEFAULT_PRODUCTS = [
     price: '72.00 CHF',
     sku: 'SOB-3366',
     silhouette: 'hoodie',
-    modelUrl: '/models/sobral-3366.glb',
+    modelUrl: resolveAssetUrl('/models/sobral-3366.glb'),
     isMultiMesh: true,
     baseColor: '#181e28',
     accentColor: '#ff4400',
@@ -151,10 +160,10 @@ export const DEFAULT_PRODUCTS = [
       collar: '#181e28',
       secondary: '#ffffff'
     },
-    frontPreview: '/previews/3366-front.png',
-    backPreview: '/previews/3366-back.png',
-    leftPreview: '/previews/3366-side.png',
-    rightPreview: '/previews/3366-side.png',
+    frontPreview: resolveAssetUrl('/previews/3366-front.png'),
+    backPreview: resolveAssetUrl('/previews/3366-back.png'),
+    leftPreview: resolveAssetUrl('/previews/3366-side.png'),
+    rightPreview: resolveAssetUrl('/previews/3366-side.png'),
     materialRoles: ['fabric_primary', 'fabric_secondary', 'hood_lining', 'rib_trim', 'zipper'],
     zones: {
       chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.09, 0.10, 0.5] },
@@ -172,7 +181,7 @@ export const DEFAULT_PRODUCTS = [
     price: '119.00 CHF',
     sku: 'SOB-4890',
     silhouette: 'jacket',
-    modelUrl: '/models/sobral-4890.glb',
+    modelUrl: resolveAssetUrl('/models/sobral-4890.glb'),
     isMultiMesh: true,
     baseColor: '#15171a',
     accentColor: '#ff4400',
@@ -182,10 +191,10 @@ export const DEFAULT_PRODUCTS = [
       collar: '#15171a',
       secondary: '#ffffff'
     },
-    frontPreview: '/previews/4890-front.png',
-    backPreview: '/previews/4890-back.png',
-    leftPreview: '/previews/4890-side.png',
-    rightPreview: '/previews/4890-side.png',
+    frontPreview: resolveAssetUrl('/previews/4890-front.png'),
+    backPreview: resolveAssetUrl('/previews/4890-back.png'),
+    leftPreview: resolveAssetUrl('/previews/4890-side.png'),
+    rightPreview: resolveAssetUrl('/previews/4890-side.png'),
     materialRoles: ['fabric_primary', 'fabric_secondary', 'hood_lining', 'zipper'],
     zones: {
       chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.09, 0.10, 0.5] },
@@ -203,7 +212,7 @@ export const DEFAULT_PRODUCTS = [
     price: '89.00 CHF',
     sku: 'SOB-1750',
     silhouette: 'trousers',
-    modelUrl: '/models/sobral-1750.glb',
+    modelUrl: resolveAssetUrl('/models/sobral-1750.glb'),
     isMultiMesh: true,
     baseColor: '#1a2232',
     accentColor: '#ff4400',
@@ -213,10 +222,10 @@ export const DEFAULT_PRODUCTS = [
       collar: '#121418',
       secondary: '#ffffff'
     },
-    frontPreview: '/previews/1750-front.png',
-    backPreview: '/previews/1750-back.png',
-    leftPreview: '/previews/1750-side.png',
-    rightPreview: '/previews/1750-side.png',
+    frontPreview: resolveAssetUrl('/previews/1750-front.png'),
+    backPreview: resolveAssetUrl('/previews/1750-back.png'),
+    leftPreview: resolveAssetUrl('/previews/1750-side.png'),
+    rightPreview: resolveAssetUrl('/previews/1750-side.png'),
     materialRoles: ['fabric_primary', 'stretch_panels', 'reinforcement'],
     zones: {
       leg_left: { name: 'Linke Schenkeltasche', isFront: true, defaultScale: 0.7, rayOrigin: [0.14, 0.02, 0.4] },
@@ -233,7 +242,7 @@ export const DEFAULT_PRODUCTS = [
     price: '24.00 CHF',
     sku: 'SOB-2003',
     silhouette: 'beanie',
-    modelUrl: '/models/sobral-2003.glb',
+    modelUrl: resolveAssetUrl('/models/sobral-2003.glb'),
     isMultiMesh: true,
     baseColor: '#121624',
     accentColor: '#ff4400',
@@ -243,10 +252,10 @@ export const DEFAULT_PRODUCTS = [
       collar: '#121624',
       secondary: '#ffffff'
     },
-    frontPreview: '/previews/2003-front.png',
-    backPreview: '/previews/2003-back.png',
-    leftPreview: '/previews/2003-side.png',
-    rightPreview: '/previews/2003-side.png',
+    frontPreview: resolveAssetUrl('/previews/2003-front.png'),
+    backPreview: resolveAssetUrl('/previews/2003-back.png'),
+    leftPreview: resolveAssetUrl('/previews/2003-side.png'),
+    rightPreview: resolveAssetUrl('/previews/2003-side.png'),
     materialRoles: ['fabric_primary', 'lining'],
     zones: {
       front: { name: 'Stirn (Logo)', isFront: true, defaultScale: 0.8, rayOrigin: [0.0, 0.04, 0.3] },
@@ -262,7 +271,7 @@ export const DEFAULT_PRODUCTS = [
     price: '145.00 CHF',
     sku: 'SOB-WHE00113',
     silhouette: 'helmet',
-    modelUrl: '/models/sobral-whe00113.glb',
+    modelUrl: resolveAssetUrl('/models/sobral-whe00113.glb'),
     isMultiMesh: true,
     baseColor: '#e2e5e8',
     accentColor: '#ff4400',
@@ -272,11 +281,11 @@ export const DEFAULT_PRODUCTS = [
       collar: '#1e2024',
       secondary: '#121316'
     },
-    frontPreview: '/previews/WHE00113-front.png',
-    backPreview: '/previews/WHE00113-back.png',
-    leftPreview: '/previews/WHE00113-angle.png',
-    rightPreview: '/previews/WHE00113-angle.png',
-    comparisonPhoto: '/previews/WHE00113-fotovergleich.png',
+    frontPreview: resolveAssetUrl('/previews/WHE00113-front.png'),
+    backPreview: resolveAssetUrl('/previews/WHE00113-back.png'),
+    leftPreview: resolveAssetUrl('/previews/WHE00113-angle.png'),
+    rightPreview: resolveAssetUrl('/previews/WHE00113-angle.png'),
+    comparisonPhoto: resolveAssetUrl('/previews/WHE00113-fotovergleich.png'),
     materialRoles: ['shell_primary', 'emboss_white', 'hardware_black', 'hardware_orange', 'strap_webbing', 'liner_eps', 'clips_nylon'],
     zones: {
       crown: { name: 'Front Stirnplatte', isFront: true, defaultScale: 0.8, rayOrigin: [0.0, 0.05, 0.35] },
