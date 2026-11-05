@@ -180,7 +180,7 @@ export class TextPanel {
       btnAdd.addEventListener('click', () => {
         const newId = 'text_' + Date.now();
         const defaultZone = this.state.activeProduct?.zones
-          ? Object.keys(this.state.activeProduct.zones)[0]
+          ? (this.state.activeProduct.zones['chest_center'] ? 'chest_center' : Object.keys(this.state.activeProduct.zones)[0])
           : 'chest_center';
         const newItem = {
           id: newId,

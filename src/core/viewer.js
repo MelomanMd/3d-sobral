@@ -472,9 +472,27 @@ export class ShirtViewer {
     if (!targetMeshes.length) return;
 
     const raycastSurface = (origin, direction, preferredRole = null) => {
+      // Exclude neutral mesh (skin/face/boots) so decals never accidentally attach to face
+      const validMeshes = targetMeshes.filter(m => m.name !== 'Worker_neutral');
+      if (!validMeshes.length) return null;
+
       const ray = new THREE.Raycaster(origin, direction.normalize());
-      const intersects = ray.intersectObjects(targetMeshes, false);
+
+      if (preferredRole) {
+        // Try direct raycast against only the preferred meshes first
+        const prefMeshes = validMeshes.filter(m => 
+          m.name?.toLowerCase().includes(preferredRole.toLowerCase()) || 
+          m.material?.name?.toLowerCase() === preferredRole.toLowerCase()
+        );
+        if (prefMeshes.length > 0) {
+          const directHits = ray.intersectObjects(prefMeshes, false);
+          if (directHits.length > 0) return directHits[0];
+        }
+      }
+
+      const intersects = ray.intersectObjects(validMeshes, false);
       if (!intersects.length) return null;
+
       if (preferredRole) {
         const preferred = intersects.find(hit => 
           hit.object.name?.toLowerCase().includes(preferredRole.toLowerCase()) || 
@@ -482,6 +500,7 @@ export class ShirtViewer {
         );
         if (preferred) return preferred;
       }
+
       const candidate = intersects.find(hit => hit.object.userData?.decalTarget === true);
       return candidate || intersects[0];
     };
@@ -538,7 +557,8 @@ export class ShirtViewer {
           const orient = new THREE.Euler().setFromQuaternion(q);
 
           const baseScale = (zoneDef?.defaultScale || 1.0) * (logo.scale || 1.0);
-          const size = new THREE.Vector3(0.18 * baseScale, 0.18 * baseScale, 0.15);
+          const depth = Math.min(0.06, 0.12 * baseScale);
+          const size = new THREE.Vector3(0.18 * baseScale, 0.18 * baseScale, depth);
 
           const decalGeo = new DecalGeometry(hit.object, hit.point, orient, size);
           const decalMat = new THREE.MeshStandardMaterial({
@@ -548,6 +568,7 @@ export class ShirtViewer {
             depthWrite: false,
             polygonOffset: true,
             polygonOffsetFactor: -4,
+            polygonOffsetUnits: -4,
             roughness: 0.9,
             metalness: 0
           });
@@ -614,7 +635,8 @@ export class ShirtViewer {
           const orient = new THREE.Euler().setFromQuaternion(q);
 
           const baseScale = (zoneDef?.defaultScale || 1.0);
-          const size = new THREE.Vector3(0.28 * baseScale, 0.14 * baseScale, 0.15);
+          const depth = Math.min(0.06, 0.12 * baseScale);
+          const size = new THREE.Vector3(0.28 * baseScale, 0.14 * baseScale, depth);
           const decalGeo = new DecalGeometry(hit.object, hit.point, orient, size);
           const decalMat = new THREE.MeshStandardMaterial({
             map: textTex,
@@ -623,6 +645,7 @@ export class ShirtViewer {
             depthWrite: false,
             polygonOffset: true,
             polygonOffsetFactor: -4,
+            polygonOffsetUnits: -4,
             roughness: 0.9,
             metalness: 0
           });

@@ -321,12 +321,21 @@ export const DEFAULT_PRODUCTS = [
     rightPreview: resolveAssetUrl('/previews/worker-side.png'),
     materialRoles: ['helmet', 'fabric_primary', 'trousers', 'fabric_secondary', 'neutral'],
     zones: {
-      crown: { name: 'Schutzhelm Front (KASK)', isFront: true, defaultScale: 0.45, rayOrigin: [0.0, 0.372, 0.3], rayDir: [0, 0, -1], targetMesh: 'worker_helmet' },
-      chest_center: { name: 'Brustmitte (Jacke)', isFront: true, defaultScale: 0.9, rayOrigin: [0.0, 0.12, 0.5], rayDir: [0, 0, -1], targetMesh: 'worker_fabric_primary' },
-      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.6, rayOrigin: [0.07, 0.14, 0.5], rayDir: [-0.1, 0, -1], targetMesh: 'worker_fabric_primary' },
-      back_center: { name: 'Rückenprint (Jacke)', isFront: false, defaultScale: 1.0, rayOrigin: [0.0, 0.12, -0.5], rayDir: [0, 0, 1], targetMesh: 'worker_fabric_primary' },
-      thigh_left: { name: 'Linkes Hosenbein', isFront: true, defaultScale: 0.7, rayOrigin: [0.06, -0.08, 0.4], rayDir: [0, 0, -1], targetMesh: 'worker_trousers' },
-      thigh_right: { name: 'Rechtes Hosenbein', isFront: true, defaultScale: 0.7, rayOrigin: [-0.06, -0.08, 0.4], rayDir: [0, 0, -1], targetMesh: 'worker_trousers' }
+      crown: { name: 'Schutzhelm Front (KASK)', isFront: true, defaultScale: 0.35, rayOrigin: [0.0, 0.382, 0.3], rayDir: [0, 0, -1], targetMesh: 'worker_helmet' },
+      helmet_back: { name: 'Schutzhelm Hinten', isFront: false, defaultScale: 0.45, rayOrigin: [0.0, 0.365, -0.3], rayDir: [0, 0, 1], targetMesh: 'worker_helmet' },
+      helmet_left: { name: 'Schutzhelm Links', isFront: true, defaultScale: 0.40, rayOrigin: [0.25, 0.365, 0.0], rayDir: [-1, 0, 0], targetMesh: 'worker_helmet' },
+      helmet_right: { name: 'Schutzhelm Rechts', isFront: true, defaultScale: 0.40, rayOrigin: [-0.25, 0.365, 0.0], rayDir: [1, 0, 0], targetMesh: 'worker_helmet' },
+      chest_center: { name: 'Brustmitte (Jacke)', isFront: true, defaultScale: 0.85, rayOrigin: [0.0, 0.12, 0.5], rayDir: [0, 0, -1], targetMesh: 'worker_fabric_primary' },
+      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.55, rayOrigin: [0.06, 0.14, 0.5], rayDir: [-0.05, 0, -1], targetMesh: 'worker_fabric_primary' },
+      chest_right: { name: 'Rechte Brust', isFront: true, defaultScale: 0.55, rayOrigin: [-0.06, 0.14, 0.5], rayDir: [0.05, 0, -1], targetMesh: 'worker_fabric_primary' },
+      back_center: { name: 'Rückenprint (Jacke)', isFront: false, defaultScale: 0.95, rayOrigin: [0.0, 0.12, -0.5], rayDir: [0, 0, 1], targetMesh: 'worker_fabric_primary' },
+      sleeve_left: { name: 'Linker Ärmel (Jacke)', isFront: true, defaultScale: 0.50, rayOrigin: [0.18, 0.15, 0.0], rayDir: [-1, 0, 0], targetMesh: 'worker_fabric_primary' },
+      sleeve_right: { name: 'Rechter Ärmel (Jacke)', isFront: true, defaultScale: 0.50, rayOrigin: [-0.18, 0.15, 0.0], rayDir: [1, 0, 0], targetMesh: 'worker_fabric_primary' },
+      thigh_left: { name: 'Linkes Hosenbein (Front)', isFront: true, defaultScale: 0.60, rayOrigin: [0.05, -0.08, 0.4], rayDir: [0, 0, -1], targetMesh: 'worker_trousers' },
+      thigh_right: { name: 'Rechtes Hosenbein (Front)', isFront: true, defaultScale: 0.60, rayOrigin: [-0.05, -0.08, 0.4], rayDir: [0, 0, -1], targetMesh: 'worker_trousers' },
+      leg_left_side: { name: 'Linke Hosentasche (Seite)', isFront: true, defaultScale: 0.55, rayOrigin: [0.18, -0.10, 0.0], rayDir: [-1, 0, 0], targetMesh: 'worker_trousers' },
+      leg_right_side: { name: 'Rechte Hosentasche (Seite)', isFront: true, defaultScale: 0.55, rayOrigin: [-0.18, -0.10, 0.0], rayDir: [1, 0, 0], targetMesh: 'worker_trousers' },
+      trousers_back: { name: 'Gesässtasche (Hose)', isFront: false, defaultScale: 0.60, rayOrigin: [0.05, -0.06, -0.4], rayDir: [0, 0, 1], targetMesh: 'worker_trousers' }
     }
   }
 ];
