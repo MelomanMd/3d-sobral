@@ -287,6 +287,8 @@ export class LogoPanel {
     if (zoneSelect) {
       zoneSelect.addEventListener('change', (e) => {
         activeItem.zone = e.target.value;
+        activeItem.offsetX = 0;
+        activeItem.offsetY = 0;
         this.render();
         this.onUpdate();
       });
@@ -334,6 +336,21 @@ export class LogoPanel {
       if (sliderY && valY) {
         sliderY.value = offsetY;
         valY.textContent = offsetY;
+      }
+    }
+  }
+
+  updateZone(itemId, zone) {
+    const item = this.state.logos?.find(l => l.id === itemId);
+    if (item && item.zone !== zone) {
+      item.zone = zone;
+      if (this.activeLogoId === itemId) {
+        const select = this.container.querySelector('#select-logo-zone');
+        if (select) select.value = zone;
+      }
+      const badge = this.container.querySelector(`.layer-item[data-id="${itemId}"] .layer-zone-badge`);
+      if (badge && this.state.activeProduct?.zones?.[zone]) {
+        badge.textContent = this.state.activeProduct.zones[zone].name;
       }
     }
   }

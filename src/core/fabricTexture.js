@@ -211,6 +211,10 @@ export class FabricTextureGenerator {
     ctx.restore();
   }
 
+  loadImage(src) {
+    return FabricTextureEngine.loadImage(src);
+  }
+
   static async loadImage(src) {
     return new Promise((resolve) => {
       const img = new Image();

@@ -474,8 +474,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  viewer.onItemDrag = (type, itemId, offsetX, offsetY) => {
+  viewer.onItemDrag = (type, itemId, offsetX, offsetY, newZone) => {
     onStateUpdate();
+    if (newZone) {
+      if (type === 'text' && textPanel) textPanel.updateZone(itemId, newZone);
+      if (type === 'logo' && logoPanel) logoPanel.updateZone(itemId, newZone);
+    }
     if (type === 'text' && textPanel) {
       textPanel.updateOffsets(itemId, offsetX, offsetY);
     } else if (type === 'logo' && logoPanel) {

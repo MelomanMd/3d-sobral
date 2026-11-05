@@ -508,7 +508,12 @@ export class ShirtViewer {
     // Project Logos onto 3D Mesh
     for (const logo of state.logos || []) {
       if (!logo.visible) continue;
-      const img = await this.textureEngine.loadImage(logo.src);
+      const loadImageFn = (src) => {
+        if (typeof this.textureEngine?.loadImage === 'function') return this.textureEngine.loadImage(src);
+        if (typeof this.textureEngine?.constructor?.loadImage === 'function') return this.textureEngine.constructor.loadImage(src);
+        return new Promise(r => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => r(i); i.onerror = () => r(null); i.src = src; });
+      };
+      const img = await loadImageFn(logo.src);
       if (!img) continue;
 
       const logoTex = new THREE.CanvasTexture(img);
@@ -564,8 +569,9 @@ export class ShirtViewer {
           }
           const orient = new THREE.Euler().setFromQuaternion(q);
 
+          const isHelmet = hit.object.name === 'Worker_helmet';
           const baseScale = (zoneDef?.defaultScale || 1.0) * (logo.scale || 1.0);
-          const depth = Math.min(0.06, 0.12 * baseScale);
+          const depth = isHelmet ? 0.025 : Math.min(0.06, 0.12 * baseScale);
           const size = new THREE.Vector3(0.18 * baseScale, 0.18 * baseScale, depth);
 
           const decalGeo = new DecalGeometry(hit.object, hit.point, orient, size);
@@ -603,6 +609,8 @@ export class ShirtViewer {
       if (textItem.strokeWidth) {
         ctx.strokeStyle = textItem.strokeColor || '#000000';
         ctx.lineWidth = textItem.strokeWidth * 2;
+        ctx.lineJoin = 'round';
+        ctx.miterLimit = 2;
         ctx.strokeText(textItem.text, 256, 128);
       }
       ctx.fillStyle = textItem.color || '#ffffff';
@@ -650,8 +658,9 @@ export class ShirtViewer {
           }
           const orient = new THREE.Euler().setFromQuaternion(q);
 
+          const isHelmet = hit.object.name === 'Worker_helmet';
           const baseScale = (zoneDef?.defaultScale || 1.0);
-          const depth = Math.min(0.06, 0.12 * baseScale);
+          const depth = isHelmet ? 0.025 : Math.min(0.06, 0.12 * baseScale);
           const size = new THREE.Vector3(0.28 * baseScale, 0.14 * baseScale, depth);
           const decalGeo = new DecalGeometry(hit.object, hit.point, orient, size);
           const decalMat = new THREE.MeshStandardMaterial({
@@ -817,6 +826,47 @@ export class ShirtViewer {
       // 1. Handling active dragging modes
       if (this.dragMode === 'move' && this.draggedItem) {
         if (this.isMultiMesh) {
+          const { x, y } = getPointerCoords(e);
+          this.pointer.set(x, y);
+          this.raycaster.setFromCamera(this.pointer, this.camera);
+          const validMeshes = (this.productMeshes || []).filter(m => m.name !== 'Worker_neutral');
+          const hit = this.raycaster.intersectObjects(validMeshes, false)[0];
+          if (hit && hit.face) {
+            const hitMeshName = hit.object.name;
+            const hitPoint = hit.point;
+            const normal = hit.face.normal.clone().applyNormalMatrix(
+              new THREE.Matrix3().getNormalMatrix(hit.object.matrixWorld)
+            ).normalize();
+
+            let targetZone = this.draggedItem.zone;
+            if (hitMeshName === 'Worker_helmet') {
+              if (normal.z < -0.4) targetZone = 'helmet_back';
+              else if (hitPoint.x > 0.02) targetZone = 'helmet_left';
+              else if (hitPoint.x < -0.02) targetZone = 'helmet_right';
+              else targetZone = 'crown';
+            } else if (hitMeshName === 'Worker_fabric_primary') {
+              if (Math.abs(hitPoint.x) > 0.17) targetZone = hitPoint.x > 0 ? 'sleeve_left' : 'sleeve_right';
+              else if (normal.z < -0.4) targetZone = 'back_center';
+              else targetZone = hitPoint.x > 0.04 ? 'chest_left' : (hitPoint.x < -0.04 ? 'chest_right' : 'chest_center');
+            } else if (hitMeshName === 'Worker_trousers') {
+              if (normal.z < -0.4) targetZone = 'trousers_back';
+              else if (Math.abs(hitPoint.x) > 0.15) targetZone = hitPoint.x > 0 ? 'leg_left_side' : 'leg_right_side';
+              else targetZone = hitPoint.x > 0 ? 'thigh_left' : 'thigh_right';
+            }
+
+            this.draggedItem.zone = targetZone;
+            const activeProduct = this.getState()?.activeProduct;
+            const zoneDef = activeProduct?.zones?.[targetZone];
+            if (zoneDef?.rayOrigin) {
+              const [rx, ry] = zoneDef.rayOrigin;
+              this.draggedItem.offsetX = Math.max(-180, Math.min(180, Math.round((hitPoint.x - rx) * 1000)));
+              this.draggedItem.offsetY = Math.max(-180, Math.min(180, Math.round((ry - hitPoint.y) * 1000)));
+            }
+            if (this.onItemDrag) {
+              this.onItemDrag(this.draggedType, this.draggedItem.id, this.draggedItem.offsetX, this.draggedItem.offsetY, targetZone);
+            }
+            return;
+          }
           const dx = Math.round((e.movementX || 0) * 1.5);
           const dy = Math.round((e.movementY || 0) * 1.5);
           this.draggedItem.offsetX = Math.max(-180, Math.min(180, (this.draggedItem.offsetX || 0) + dx));
