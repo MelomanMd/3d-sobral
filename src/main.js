@@ -369,6 +369,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     historyManager.push(state);
   };
 
+  window.appSwitchProduct = onProductSwitched;
+  catalog.onProductChange((newProd) => {
+    onProductSwitched(newProd);
+  });
+
   // 9. Setup History Manager (Ctrl+Z / Ctrl+Y)
   let activeTab = 'colors';
   let colorPanel = null;

@@ -382,32 +382,61 @@ export class ShirtViewer {
       const accentColor = colors.accent || primaryColor;
       const collarColor = colors.collar || colors.accent || primaryColor;
 
+      // Helper: for worker model colorable zones, strip the photorealistic texture
+      // so material.color becomes the sole color source (no multiplicative darkening).
+      const setColorClean = (mat, hex) => {
+        mat.color.set(hex);
+        // If this material still has a photorealistic base-color map that would
+        // multiply with the color, remove it.  We detect "worker" materials by
+        // checking if we stored the original map during first load.
+        if (mat.map && !mat._sobralTexNeutralised) {
+          // Save original map so we could restore later if needed
+          mat._sobralOrigMap = mat.map;
+          mat.map = null;
+          mat.needsUpdate = true;
+          mat._sobralTexNeutralised = true;
+        }
+      };
+
+      // Detect whether the active product is the worker mannequin
+      const state = this.getState();
+      const isWorker = state?.activeProduct?.silhouette === 'worker';
+
       // Primary Body / Shell Roles (includes helmet shell)
       ['fabric_primary', 'shell_primary', 'knit_shell', 'trousers_mainshell', 'shirt'].forEach(role => {
         const group = this.materialGroups.get(role);
-        if (group) group.forEach(mat => mat.color.set(primaryColor));
+        if (group) group.forEach(mat => {
+          if (isWorker) { setColorClean(mat, primaryColor); } else { mat.color.set(primaryColor); }
+        });
       });
 
       // Accent / Secondary / Hood / Hardware Roles
       ['fabric_secondary', 'shell_secondary', 'hood_lining', 'stretch_panels', 'reinforcement', 'hardware_orange', 'emboss_white'].forEach(role => {
         const group = this.materialGroups.get(role);
-        if (group) group.forEach(mat => mat.color.set(accentColor));
+        if (group) group.forEach(mat => {
+          if (isWorker) { setColorClean(mat, accentColor); } else { mat.color.set(accentColor); }
+        });
       });
 
       const trousersCol = colors.trousers || '#1a2232';
       ['trousers'].forEach(role => {
         const group = this.materialGroups.get(role);
-        if (group) group.forEach(mat => mat.color.set(trousersCol));
+        if (group) group.forEach(mat => {
+          if (isWorker) { setColorClean(mat, trousersCol); } else { mat.color.set(trousersCol); }
+        });
       });
 
       // Dedicated Helmet Shell Role
       const helmetColor = colors.helmet || '#ffffff';
       ['helmet'].forEach(role => {
         const group = this.materialGroups.get(role);
-        if (group) group.forEach(mat => mat.color.set(helmetColor));
+        if (group) group.forEach(mat => {
+          if (isWorker) { setColorClean(mat, helmetColor); } else { mat.color.set(helmetColor); }
+        });
       });
 
       // Photorealistic Neutral Roles (face, skin, boots, gloves) - always pure neutral
+      // For neutral zones we KEEP the original texture so they remain photorealistic
       ['neutral', 'skin', 'boots'].forEach(role => {
         const group = this.materialGroups.get(role);
         if (group) group.forEach(mat => mat.color.set(0xffffff));
