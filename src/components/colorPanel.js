@@ -74,8 +74,7 @@ export class ColorPanel {
       return [
         { id: 'helmet', name: 'Schutzhelm', sub: 'KASK Helmschale', icon: 'shield' },
         { id: 'primary', name: 'Arbeitsjacke', sub: 'Jacke & Ärmel', icon: 'shirt' },
-        { id: 'trousers', name: 'Arbeitshose', sub: 'Hose & Taschen', icon: 'scissors' },
-        { id: 'accent', name: 'Kniepolster & Details', sub: 'Verstärkungen', icon: 'layers' }
+        { id: 'trousers', name: 'Arbeitshose', sub: 'Hose & Beine', icon: 'scissors' }
       ];
     }
     if (sil === 'helmet' || art === 'WHE00113') {

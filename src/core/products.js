@@ -319,7 +319,7 @@ export const DEFAULT_PRODUCTS = [
     backPreview: resolveAssetUrl('/previews/worker-back.png'),
     leftPreview: resolveAssetUrl('/previews/worker-side.png'),
     rightPreview: resolveAssetUrl('/previews/worker-side.png'),
-    materialRoles: ['helmet', 'fabric_primary', 'trousers', 'fabric_secondary', 'neutral'],
+    materialRoles: ['helmet', 'fabric_primary', 'trousers', 'neutral'],
     zones: {
       crown: { name: 'Schutzhelm Front (KASK)', isFront: true, defaultScale: 0.35, rayOrigin: [0.0, 0.382, 0.3], rayDir: [0, 0, -1], targetMesh: 'worker_helmet' },
       helmet_back: { name: 'Schutzhelm Hinten', isFront: false, defaultScale: 0.45, rayOrigin: [0.0, 0.365, -0.3], rayDir: [0, 0, 1], targetMesh: 'worker_helmet' },
