@@ -400,6 +400,19 @@ export class ShirtViewer {
         if (group) group.forEach(mat => mat.color.set(trousersCol));
       });
 
+      // Dedicated Helmet Shell Role
+      const helmetColor = colors.helmet || '#ffffff';
+      ['helmet'].forEach(role => {
+        const group = this.materialGroups.get(role);
+        if (group) group.forEach(mat => mat.color.set(helmetColor));
+      });
+
+      // Photorealistic Neutral Roles (face, skin, boots, gloves) - always pure neutral
+      ['neutral', 'skin', 'boots'].forEach(role => {
+        const group = this.materialGroups.get(role);
+        if (group) group.forEach(mat => mat.color.set(0xffffff));
+      });
+
       // Collar / Rib trim / Straps / Headband Roles
       ['rib_trim', 'collar', 'lining', 'shirt_trim', 'strap_webbing', 'headband', 'hardware_black'].forEach(role => {
         const group = this.materialGroups.get(role);
@@ -429,10 +442,17 @@ export class ShirtViewer {
     const targetMeshes = this.isMultiMesh ? this.productMeshes : (this.shirtMesh ? [this.shirtMesh] : []);
     if (!targetMeshes.length) return;
 
-    const raycastSurface = (origin, direction) => {
+    const raycastSurface = (origin, direction, preferredRole = null) => {
       const ray = new THREE.Raycaster(origin, direction.normalize());
       const intersects = ray.intersectObjects(targetMeshes, false);
       if (!intersects.length) return null;
+      if (preferredRole) {
+        const preferred = intersects.find(hit => 
+          hit.object.name?.toLowerCase().includes(preferredRole.toLowerCase()) || 
+          hit.object.material?.name?.toLowerCase() === preferredRole.toLowerCase()
+        );
+        if (preferred) return preferred;
+      }
       const candidate = intersects.find(hit => hit.object.userData?.decalTarget === true);
       return candidate || intersects[0];
     };
@@ -452,8 +472,8 @@ export class ShirtViewer {
       if (zoneDef?.rayOrigin) {
         const [rx, ry, rz] = zoneDef.rayOrigin;
         const origin = new THREE.Vector3(rx + (logo.offsetX || 0) * 0.001, ry - (logo.offsetY || 0) * 0.001, rz);
-        const dir = new THREE.Vector3(-rx * 0.5, 0, -rz * 0.5);
-        hit = raycastSurface(origin, dir.length() > 0 ? dir : new THREE.Vector3(0, 0, -1));
+        const dir = zoneDef.rayDir ? new THREE.Vector3(...zoneDef.rayDir) : new THREE.Vector3(-rx * 0.5, 0, -rz * 0.5);
+        hit = raycastSurface(origin, dir.length() > 0 ? dir : new THREE.Vector3(0, 0, -1), zoneDef.targetMesh || zoneDef.role);
       }
 
       if (!hit) {
@@ -475,7 +495,7 @@ export class ShirtViewer {
           origin = new THREE.Vector3(-(logo.offsetX || 0) * 0.002, 0.08 - (logo.offsetY || 0) * 0.002, -0.6);
           dir = new THREE.Vector3(0, 0, 1);
         }
-        hit = raycastSurface(origin, dir);
+        hit = raycastSurface(origin, dir, zoneDef?.targetMesh || zoneDef?.role);
       }
 
       if (hit && hit.face) {
@@ -539,8 +559,8 @@ export class ShirtViewer {
       if (zoneDef?.rayOrigin) {
         const [rx, ry, rz] = zoneDef.rayOrigin;
         const origin = new THREE.Vector3(rx + (textItem.offsetX || 0) * 0.001, ry - (textItem.offsetY || 0) * 0.001, rz);
-        const dir = new THREE.Vector3(-rx * 0.5, 0, -rz * 0.5);
-        hit = raycastSurface(origin, dir.length() > 0 ? dir : new THREE.Vector3(0, 0, -1));
+        const dir = zoneDef.rayDir ? new THREE.Vector3(...zoneDef.rayDir) : new THREE.Vector3(-rx * 0.5, 0, -rz * 0.5);
+        hit = raycastSurface(origin, dir.length() > 0 ? dir : new THREE.Vector3(0, 0, -1), zoneDef.targetMesh || zoneDef.role);
       }
 
       if (!hit) {
@@ -551,7 +571,7 @@ export class ShirtViewer {
           isFront ? 0.6 : -0.6
         );
         const dir = new THREE.Vector3(0, 0, isFront ? -1 : 1);
-        hit = raycastSurface(origin, dir);
+        hit = raycastSurface(origin, dir, zoneDef?.targetMesh || zoneDef?.role);
       }
 
       if (hit && hit.face) {
@@ -564,7 +584,8 @@ export class ShirtViewer {
           q.multiply(new THREE.Quaternion().setFromAxisAngle(zAxis, THREE.MathUtils.degToRad(textItem.rotation || 0)));
           const orient = new THREE.Euler().setFromQuaternion(q);
 
-          const size = new THREE.Vector3(0.28, 0.14, 0.15);
+          const baseScale = (zoneDef?.defaultScale || 1.0);
+          const size = new THREE.Vector3(0.28 * baseScale, 0.14 * baseScale, 0.15);
           const decalGeo = new DecalGeometry(hit.object, hit.point, orient, size);
           const decalMat = new THREE.MeshStandardMaterial({
             map: textTex,
@@ -1137,14 +1158,18 @@ export class ShirtViewer {
   }
 
   setView(viewName, animate = true) {
-    const dist = 1.55;
-    const targetY = 0.05;
+    const isWorker = this.getState().activeProduct?.silhouette === 'worker';
+    const dist = isWorker ? 1.75 : 1.55;
+    const targetY = isWorker ? 0.0 : 0.05;
     const center = new THREE.Vector3(0, targetY, 0);
 
     let targetPos = new THREE.Vector3(0, targetY, dist);
     if (viewName === 'perspective') {
       // 3/4 Perspective angle (depth and volume across all products)
-      targetPos.set(-dist * 0.64, targetY + dist * 0.35, dist * 0.78);
+      const pElevation = isWorker ? 0.15 : 0.35;
+      const pX = isWorker ? 0.5 : 0.64;
+      const pZ = isWorker ? 0.85 : 0.78;
+      targetPos.set(-dist * pX, targetY + dist * pElevation, dist * pZ);
     } else if (viewName === 'front') {
       targetPos.set(0, targetY, dist);
     } else if (viewName === 'back') {

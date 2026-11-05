@@ -23,6 +23,23 @@ export class TextPanel {
   render() {
     const activeItem = this.state.texts.find(t => t.id === this.activeTextId) || this.state.texts[0];
 
+    const availableZones = this.state.activeProduct?.zones
+      ? Object.entries(this.state.activeProduct.zones).map(([key, def]) => ({
+          key,
+          name: def.name || getZoneName(key)
+        }))
+      : Object.entries(PLACEMENT_ZONES).map(([key]) => ({
+          key,
+          name: getZoneName(key)
+        }));
+
+    const resolveZoneName = (zoneKey) => {
+      if (this.state.activeProduct?.zones?.[zoneKey]?.name) {
+        return this.state.activeProduct.zones[zoneKey].name;
+      }
+      return getZoneName(zoneKey);
+    };
+
     this.container.innerHTML = `
       <div class="drag-hint-banner">
         <span class="hint-icon-svg">${ICONS.crosshair}</span>
@@ -45,7 +62,7 @@ export class TextPanel {
             <div class="layer-item ${item.id === this.activeTextId ? 'active' : ''}" data-id="${item.id}">
               <div class="layer-info">
                 <span class="layer-title">${item.text || t('no_text')}</span>
-                <span class="layer-zone-badge">${getZoneName(item.zone)}</span>
+                <span class="layer-zone-badge">${resolveZoneName(item.zone)}</span>
               </div>
               <div class="layer-actions">
                 <button class="icon-btn btn-toggle-vis" title="Visibility" data-id="${item.id}">
@@ -70,8 +87,8 @@ export class TextPanel {
           <div class="form-group">
             <label class="form-label">${t('label_text_zone')}</label>
             <select class="select-glass" id="select-text-zone">
-              ${Object.entries(PLACEMENT_ZONES).map(([key]) => `
-                <option value="${key}" ${activeItem.zone === key ? 'selected' : ''}>${getZoneName(key)}</option>
+              ${availableZones.map(z => `
+                <option value="${z.key}" ${activeItem.zone === z.key ? 'selected' : ''}>${z.name}</option>
               `).join('')}
             </select>
           </div>
@@ -162,10 +179,13 @@ export class TextPanel {
     if (btnAdd) {
       btnAdd.addEventListener('click', () => {
         const newId = 'text_' + Date.now();
+        const defaultZone = this.state.activeProduct?.zones
+          ? Object.keys(this.state.activeProduct.zones)[0]
+          : 'chest_center';
         const newItem = {
           id: newId,
           text: 'SOBRAL',
-          zone: 'chest_center',
+          zone: defaultZone,
           fontFamily: FONT_OPTIONS[0].value,
           fontSize: 56,
           fontWeight: '900',

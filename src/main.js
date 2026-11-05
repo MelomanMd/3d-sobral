@@ -24,7 +24,9 @@ let state = {
     primary: '#121316',
     accent: '#ff4400',
     collar: '#121316',
-    secondary: '#ffffff'
+    secondary: '#ffffff',
+    helmet: '#ffffff',
+    trousers: '#1b2034'
   },
   texts: [
     {
@@ -223,7 +225,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     primary: initialProd.colors?.primary || initialProd.baseColor || '#1b2034',
     accent: initialProd.colors?.accent || initialProd.accentColor || '#5b6c84',
     collar: initialProd.colors?.collar || '#1b2034',
-    secondary: initialProd.colors?.secondary || '#ffffff'
+    secondary: initialProd.colors?.secondary || '#ffffff',
+    helmet: initialProd.colors?.helmet || '#ffffff',
+    trousers: initialProd.colors?.trousers || '#1b2034'
   };
   state.productFrontPhoto = initialProd.frontPreview || null;
   state.productBackPhoto = initialProd.backPreview || null;
@@ -237,6 +241,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 6. Create 3D Viewer with state getter
   viewer = new ShirtViewer(canvasContainer, textureEngine, () => state);
   viewer.setTheme(currentTheme);
+  window.appViewer = viewer;
+  window.appCatalog = catalog;
 
   // 6. Create 2D Photo Mockup Viewer
   const viewportArea = document.querySelector('.viewport-area');
@@ -339,6 +345,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.colors.accent = accentCol;
     state.colors.collar = collarCol;
     state.colors.secondary = prod.colors?.secondary || '#ffffff';
+    state.colors.helmet = prod.colors?.helmet || '#ffffff';
+    state.colors.trousers = prod.colors?.trousers || '#1b2034';
 
     await textureEngine.render(state);
 

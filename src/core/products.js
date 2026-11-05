@@ -293,6 +293,39 @@ export const DEFAULT_PRODUCTS = [
       side_right: { name: 'Rechte Seite', isFront: true, defaultScale: 0.6, rayOrigin: [-0.18, 0.04, 0.0] },
       back: { name: 'Hinterkopf', isFront: false, defaultScale: 0.7, rayOrigin: [0.0, 0.04, -0.35] }
     }
+  },
+  {
+    id: 'sobral_worker',
+    articleNumber: 'WORKER-PRO',
+    name: 'SOBRAL Workwear Mannequin (Komplett-Look)',
+    category: 'outfits',
+    categoryName: 'Komplett-Outfits & Workwear',
+    price: 'Komplett-Look',
+    sku: 'SOB-WORKER-PRO',
+    silhouette: 'worker',
+    modelUrl: resolveAssetUrl('/models/sobral-worker.glb'),
+    isMultiMesh: true,
+    baseColor: '#243249',
+    accentColor: '#ff4400',
+    colors: {
+      helmet: '#ffffff',
+      primary: '#243249',
+      trousers: '#1b2034',
+      accent: '#ff4400',
+      collar: '#243249',
+      secondary: '#ffffff'
+    },
+    frontPreview: resolveAssetUrl('/previews/worker-front.png'),
+    backPreview: resolveAssetUrl('/previews/worker-back.png'),
+    leftPreview: resolveAssetUrl('/previews/worker-side.png'),
+    rightPreview: resolveAssetUrl('/previews/worker-side.png'),
+    materialRoles: ['helmet', 'fabric_primary', 'trousers', 'fabric_secondary', 'neutral'],
+    zones: {
+      crown: { name: 'Schutzhelm Front (KASK)', isFront: true, defaultScale: 0.45, rayOrigin: [0.0, 0.372, 0.3], rayDir: [0, 0, -1] },
+      chest_center: { name: 'Brustmitte (Jacke)', isFront: true, defaultScale: 0.9, rayOrigin: [0.0, 0.12, 0.5], rayDir: [0, 0, -1] },
+      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.6, rayOrigin: [0.07, 0.14, 0.5], rayDir: [-0.1, 0, -1] },
+      back_center: { name: 'Rückenprint (Jacke)', isFront: false, defaultScale: 1.0, rayOrigin: [0.0, 0.12, -0.5], rayDir: [0, 0, 1] }
+    }
   }
 ];
 

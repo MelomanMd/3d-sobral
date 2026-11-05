@@ -28,6 +28,23 @@ export class LogoPanel {
     const activeItem = this.state.logos.find(l => l.id === this.activeLogoId) || this.state.logos[0];
     const tintOptions = this.getTintOptions();
 
+    const availableZones = this.state.activeProduct?.zones
+      ? Object.entries(this.state.activeProduct.zones).map(([key, def]) => ({
+          key,
+          name: def.name || getZoneName(key)
+        }))
+      : Object.entries(PLACEMENT_ZONES).map(([key]) => ({
+          key,
+          name: getZoneName(key)
+        }));
+
+    const resolveZoneName = (zoneKey) => {
+      if (this.state.activeProduct?.zones?.[zoneKey]?.name) {
+        return this.state.activeProduct.zones[zoneKey].name;
+      }
+      return getZoneName(zoneKey);
+    };
+
     this.container.innerHTML = `
       <div class="drag-hint-banner">
         <span class="hint-icon-svg">${ICONS.crosshair}</span>
@@ -80,7 +97,7 @@ export class LogoPanel {
             <div class="layer-item ${item.id === this.activeLogoId ? 'active' : ''}" data-id="${item.id}">
               <div class="layer-info">
                 <span class="layer-title">${item.name || 'Logo'}</span>
-                <span class="layer-zone-badge">${getZoneName(item.zone)}</span>
+                <span class="layer-zone-badge">${resolveZoneName(item.zone)}</span>
               </div>
               <div class="layer-actions">
                 <button class="icon-btn btn-toggle-logo-vis" title="Visibility" data-id="${item.id}">
@@ -100,8 +117,8 @@ export class LogoPanel {
           <div class="form-group">
             <label class="form-label">${t('label_text_zone')}</label>
             <select class="select-glass" id="select-logo-zone">
-              ${Object.entries(PLACEMENT_ZONES).map(([key]) => `
-                <option value="${key}" ${activeItem.zone === key ? 'selected' : ''}>${getZoneName(key)}</option>
+              ${availableZones.map(z => `
+                <option value="${z.key}" ${activeItem.zone === z.key ? 'selected' : ''}>${z.name}</option>
               `).join('')}
             </select>
           </div>
@@ -205,11 +222,15 @@ export class LogoPanel {
         const newId = 'logo_' + Date.now();
         const dataUrl = getLogoDataUrl(logoItem);
 
+        const defaultZone = this.state.activeProduct?.zones
+          ? (this.state.activeProduct.zones['chest_left'] ? 'chest_left' : Object.keys(this.state.activeProduct.zones)[0])
+          : 'chest_left';
+
         this.state.logos.push({
           id: newId,
           name: logoItem.name,
           src: dataUrl,
-          zone: 'chest_left',
+          zone: defaultZone,
           scale: 1.0,
           rotation: 0,
           opacity: 1.0,
@@ -351,11 +372,15 @@ export class LogoPanel {
       const newId = 'logo_' + Date.now();
       const fileName = file.name.replace(/\.[^/.]+$/, '');
 
+      const defaultZone = this.state.activeProduct?.zones
+        ? (this.state.activeProduct.zones['chest_center'] ? 'chest_center' : Object.keys(this.state.activeProduct.zones)[0])
+        : 'chest_center';
+
       this.state.logos.push({
         id: newId,
         name: fileName,
         src: dataUrl,
-        zone: 'chest_center',
+        zone: defaultZone,
         scale: 1.0,
         rotation: 0,
         opacity: 1.0,

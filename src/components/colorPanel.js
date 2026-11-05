@@ -70,6 +70,14 @@ export class ColorPanel {
     const sil = prod.silhouette || '';
     const art = prod.articleNumber || '';
 
+    if (sil === 'worker' || art === 'WORKER-PRO') {
+      return [
+        { id: 'helmet', name: 'Schutzhelm', sub: 'KASK Helmschale', icon: 'shield' },
+        { id: 'primary', name: 'Arbeitsjacke', sub: 'Jacke & Ärmel', icon: 'shirt' },
+        { id: 'trousers', name: 'Arbeitshose', sub: 'Hose & Taschen', icon: 'scissors' },
+        { id: 'accent', name: 'Kniepolster & Details', sub: 'Verstärkungen', icon: 'layers' }
+      ];
+    }
     if (sil === 'helmet' || art === 'WHE00113') {
       return [
         { id: 'primary', name: 'Helmschale (Shell)', sub: 'Hauptfarbe', icon: 'shield' },
@@ -110,9 +118,12 @@ export class ColorPanel {
   render() {
     const elements = this.getGarmentElements();
     const prod = this.state.activeProduct || {};
-    const isHelmet = prod.silhouette === 'helmet' || prod.articleNumber === 'WHE00113';
+    const sil = prod.silhouette || '';
+    const isHelmetProd = sil === 'helmet' || prod.articleNumber === 'WHE00113';
+    const isHelmet = isHelmetProd || this.activeZone === 'helmet';
     const activePalette = isHelmet ? HELMET_SAFETY_PALETTES : SPORT_PALETTES;
     const compVis = this.viewer?.componentVisibility || { prints: true, straps: true, inside: true };
+    const hidePatterns = isHelmetProd || sil === 'worker' || sil === 'person' || sil === 'trousers' || sil === 'beanie';
 
     this.container.innerHTML = `
       <!-- 1. Compact Garment / Helmet Parts List with Inline Pickers -->
@@ -163,7 +174,7 @@ export class ColorPanel {
         </div>
       </div>
 
-      ${isHelmet ? `
+      ${isHelmetProd ? `
         <!-- Helmet Bauteile & Sichtbarkeit Switches -->
         <div class="panel-section" style="padding-top: 8px;">
           <div class="section-title">
@@ -185,7 +196,7 @@ export class ColorPanel {
             </label>
           </div>
         </div>
-      ` : `
+      ` : (!hidePatterns ? `
         <!-- 3. Pattern / Cut Selector for Garments -->
         <div class="panel-section" style="padding-top: 8px;">
           <div class="section-title">
@@ -201,7 +212,7 @@ export class ColorPanel {
             `).join('')}
           </div>
         </div>
-      `}
+      ` : '')}
 
       <!-- Darstellung & Studio (Background, Wireframe & Reset) -->
       <div class="panel-section" style="padding-top: 8px;">
@@ -239,7 +250,8 @@ export class ColorPanel {
   }
 
   getActiveZoneName() {
-    const el = GARMENT_ELEMENTS.find(e => e.id === this.activeZone);
+    const elements = this.getGarmentElements();
+    const el = elements.find(e => e.id === this.activeZone) || GARMENT_ELEMENTS.find(e => e.id === this.activeZone);
     return el ? el.name.split(' ')[0] : 'Element';
   }
 
