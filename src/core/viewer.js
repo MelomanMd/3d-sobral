@@ -551,9 +551,17 @@ export class ShirtViewer {
           const normal = hit.face.normal.clone().applyNormalMatrix(
             new THREE.Matrix3().getNormalMatrix(hit.object.matrixWorld)
           ).normalize();
-          const zAxis = new THREE.Vector3(0, 0, 1);
-          const q = new THREE.Quaternion().setFromUnitVectors(zAxis, normal);
-          q.multiply(new THREE.Quaternion().setFromAxisAngle(zAxis, THREE.MathUtils.degToRad(logo.rotation || 0)));
+          let worldUp = new THREE.Vector3(0, 1, 0);
+          if (Math.abs(normal.dot(worldUp)) > 0.92) {
+            worldUp = new THREE.Vector3(0, 0, -1);
+          }
+          const right = new THREE.Vector3().crossVectors(worldUp, normal).normalize();
+          const up = new THREE.Vector3().crossVectors(normal, right).normalize();
+          const rotMatrix = new THREE.Matrix4().makeBasis(right, up, normal);
+          const q = new THREE.Quaternion().setFromRotationMatrix(rotMatrix);
+          if (logo.rotation) {
+            q.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), THREE.MathUtils.degToRad(logo.rotation)));
+          }
           const orient = new THREE.Euler().setFromQuaternion(q);
 
           const baseScale = (zoneDef?.defaultScale || 1.0) * (logo.scale || 1.0);
@@ -629,9 +637,17 @@ export class ShirtViewer {
           const normal = hit.face.normal.clone().applyNormalMatrix(
             new THREE.Matrix3().getNormalMatrix(hit.object.matrixWorld)
           ).normalize();
-          const zAxis = new THREE.Vector3(0, 0, 1);
-          const q = new THREE.Quaternion().setFromUnitVectors(zAxis, normal);
-          q.multiply(new THREE.Quaternion().setFromAxisAngle(zAxis, THREE.MathUtils.degToRad(textItem.rotation || 0)));
+          let worldUp = new THREE.Vector3(0, 1, 0);
+          if (Math.abs(normal.dot(worldUp)) > 0.92) {
+            worldUp = new THREE.Vector3(0, 0, -1);
+          }
+          const right = new THREE.Vector3().crossVectors(worldUp, normal).normalize();
+          const up = new THREE.Vector3().crossVectors(normal, right).normalize();
+          const rotMatrix = new THREE.Matrix4().makeBasis(right, up, normal);
+          const q = new THREE.Quaternion().setFromRotationMatrix(rotMatrix);
+          if (textItem.rotation) {
+            q.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), THREE.MathUtils.degToRad(textItem.rotation)));
+          }
           const orient = new THREE.Euler().setFromQuaternion(q);
 
           const baseScale = (zoneDef?.defaultScale || 1.0);
