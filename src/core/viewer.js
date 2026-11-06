@@ -81,7 +81,7 @@ export class ShirtViewer {
     this.scene = new THREE.Scene();
 
     // 2. Camera
-    this.camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
+    this.camera = new THREE.PerspectiveCamera(38, width / height, 0.02, 100);
     this.camera.position.set(0, 0.05, 1.55);
 
     // 3. Renderer
@@ -103,9 +103,11 @@ export class ShirtViewer {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.06;
-    this.controls.minDistance = 0.45;
+    this.controls.enablePan = false;
+    this.controls.minDistance = 0.58;
     this.controls.maxDistance = 2.5;
-    this.controls.maxPolarAngle = Math.PI;
+    this.controls.minPolarAngle = 0.08;
+    this.controls.maxPolarAngle = Math.PI * 0.58;
     this.controls.target.set(0, 0.05, 0);
     this.controls.update();
 
@@ -367,8 +369,12 @@ export class ShirtViewer {
           }
 
           if (this.controls) {
-            this.controls.minDistance = 0.35;
+            const isWorker = this.getState().activeProduct?.silhouette === 'worker';
+            this.controls.enablePan = false;
+            this.controls.minDistance = isWorker ? 0.58 : 0.48;
             this.controls.maxDistance = 3.5;
+            this.controls.minPolarAngle = 0.08;
+            this.controls.maxPolarAngle = Math.PI * 0.58;
             this.controls.target.set(0, 0.05, 0);
             this.camera.position.set(0, 0.05, 1.55);
             this.controls.update();
@@ -451,8 +457,12 @@ export class ShirtViewer {
           }
 
           if (this.controls) {
-            this.controls.minDistance = 0.35;
+            const isWorker = this.getState().activeProduct?.silhouette === 'worker';
+            this.controls.enablePan = false;
+            this.controls.minDistance = isWorker ? 0.58 : 0.48;
             this.controls.maxDistance = 3.5;
+            this.controls.minPolarAngle = 0.08;
+            this.controls.maxPolarAngle = Math.PI * 0.58;
             this.controls.target.set(0, 0.05, 0);
             this.camera.position.set(0, 0.05, 1.55);
             this.controls.update();
@@ -1425,8 +1435,11 @@ export class ShirtViewer {
     }
 
     if (this.controls) {
-      this.controls.minDistance = 0.35;
+      this.controls.enablePan = false;
+      this.controls.minDistance = isWorker ? 0.58 : 0.48;
       this.controls.maxDistance = 3.5;
+      this.controls.minPolarAngle = 0.08;
+      this.controls.maxPolarAngle = Math.PI * 0.58;
 
       if (animate) {
         this.cameraTransition = {
