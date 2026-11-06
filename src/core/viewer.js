@@ -64,10 +64,10 @@ export class ShirtViewer {
     this.onBackgroundChange = null;
 
     this.lights = {};
-    this.currentTheme = 'light';
-    this.currentBackground = 'light';
+    this.currentTheme = 'dark';
+    this.currentBackground = 'dark';
     try {
-      this.currentBackground = localStorage.getItem('sobral_viewer_bg') || 'light';
+      this.currentBackground = localStorage.getItem('sobral_viewer_bg') || 'dark';
     } catch (e) {}
 
     this.init();
@@ -222,6 +222,81 @@ export class ShirtViewer {
           if (node.isMesh) meshesInGltf.push(node);
         });
 
+        // Modular Worker mannequin splitting: extract Worker_boots from Worker_neutral
+        const workerNeutral = meshesInGltf.find(m => m.name === 'Worker_neutral');
+        if (workerNeutral && !meshesInGltf.some(m => m.name === 'Worker_boots')) {
+          const srcGeo = workerNeutral.geometry;
+          const pos = srcGeo.attributes.position;
+          const index = srcGeo.index;
+          if (pos && index) {
+            const bootIndices = [];
+            const neutralIndices = [];
+            for (let i = 0; i < index.count; i += 3) {
+              const a = index.getX(i);
+              const ya = pos.getY(a);
+              if (ya < -0.6) {
+                bootIndices.push(index.getX(i), index.getX(i + 1), index.getX(i + 2));
+              } else {
+                neutralIndices.push(index.getX(i), index.getX(i + 1), index.getX(i + 2));
+              }
+            }
+
+            const createSubGeometry = (indices) => {
+              const subGeo = new THREE.BufferGeometry();
+              const oldNorm = srcGeo.attributes.normal;
+              const oldUv = srcGeo.attributes.uv;
+              const oldToNew = new Map();
+              const newPos = [];
+              const newNorm = [];
+              const newUv = [];
+              const newIndices = [];
+
+              for (let i = 0; i < indices.length; i++) {
+                const oldIdx = indices[i];
+                let newIdx = oldToNew.get(oldIdx);
+                if (newIdx === undefined) {
+                  newIdx = oldToNew.size;
+                  oldToNew.set(oldIdx, newIdx);
+                  newPos.push(pos.getX(oldIdx), pos.getY(oldIdx), pos.getZ(oldIdx));
+                  if (oldNorm) newNorm.push(oldNorm.getX(oldIdx), oldNorm.getY(oldIdx), oldNorm.getZ(oldIdx));
+                  if (oldUv) newUv.push(oldUv.getX(oldIdx), oldUv.getY(oldIdx));
+                }
+                newIndices.push(newIdx);
+              }
+
+              subGeo.setAttribute('position', new THREE.Float32BufferAttribute(newPos, 3));
+              if (oldNorm) subGeo.setAttribute('normal', new THREE.Float32BufferAttribute(newNorm, 3));
+              if (oldUv) subGeo.setAttribute('uv', new THREE.Float32BufferAttribute(newUv, 2));
+              subGeo.setIndex(newIndices);
+              subGeo.computeBoundingBox();
+              subGeo.computeBoundingSphere();
+              return subGeo;
+            };
+
+            const bootGeo = createSubGeometry(bootIndices);
+            const cleanNeutGeo = createSubGeometry(neutralIndices);
+
+            workerNeutral.geometry = cleanNeutGeo;
+
+            const origMat = Array.isArray(workerNeutral.material) ? workerNeutral.material[0] : workerNeutral.material;
+            const bootMat = origMat.clone();
+            bootMat.name = 'boots';
+            bootMat.userData = { sobralRole: 'boots' };
+
+            const bootMesh = new THREE.Mesh(bootGeo, bootMat);
+            bootMesh.name = 'Worker_boots';
+            bootMesh.position.copy(workerNeutral.position);
+            bootMesh.rotation.copy(workerNeutral.rotation);
+            bootMesh.scale.copy(workerNeutral.scale);
+            if (workerNeutral.parent) {
+              workerNeutral.parent.add(bootMesh);
+            } else {
+              root.add(bootMesh);
+            }
+            meshesInGltf.push(bootMesh);
+          }
+        }
+
         const isSobralSortiment = modelUrl.includes('/models/sobral-') || meshesInGltf.length > 1;
         this.isMultiMesh = isSobralSortiment;
 
@@ -247,6 +322,22 @@ export class ShirtViewer {
               return material;
             });
             node.material = Array.isArray(node.material) ? materials : materials[0];
+
+            // Prevent waist bleed & z-fighting between jacket hem and trousers waist
+            if (node.name === 'Worker_trousers') {
+              node.renderOrder = 1;
+              materials.forEach(mat => {
+                mat.polygonOffset = true;
+                mat.polygonOffsetFactor = 1.0;
+                mat.polygonOffsetUnits = 1.0;
+              });
+            } else if (node.name === 'Worker_fabric_primary') {
+              node.renderOrder = 2;
+            } else if (node.name === 'Worker_boots') {
+              node.renderOrder = 1;
+            } else if (node.name === 'Worker_helmet') {
+              node.renderOrder = 3;
+            }
           });
 
           // Set primary mesh reference for raycasting fallback
@@ -435,9 +526,18 @@ export class ShirtViewer {
         });
       });
 
-      // Photorealistic Neutral Roles (face, skin, boots, gloves) - always pure neutral
+      // Dedicated Boots / Shoes Role
+      const bootsColor = colors.boots || '#1a1a1a';
+      ['boots'].forEach(role => {
+        const group = this.materialGroups.get(role);
+        if (group) group.forEach(mat => {
+          if (isWorker) { setColorClean(mat, bootsColor); } else { mat.color.set(bootsColor); }
+        });
+      });
+
+      // Photorealistic Neutral Roles (face, skin, gloves) - always pure neutral
       // For neutral zones we KEEP the original texture so they remain photorealistic
-      ['neutral', 'skin', 'boots'].forEach(role => {
+      ['neutral', 'skin'].forEach(role => {
         const group = this.materialGroups.get(role);
         if (group) group.forEach(mat => mat.color.set(0xffffff));
       });
@@ -839,6 +939,9 @@ export class ShirtViewer {
             ).normalize();
 
             let targetZone = this.draggedItem.zone;
+            const activeProduct = this.getState()?.activeProduct;
+            const zones = activeProduct?.zones || {};
+
             if (hitMeshName === 'Worker_helmet') {
               if (normal.z < -0.4) targetZone = 'helmet_back';
               else if (hitPoint.x > 0.02) targetZone = 'helmet_left';
@@ -852,11 +955,32 @@ export class ShirtViewer {
               if (normal.z < -0.4) targetZone = 'trousers_back';
               else if (Math.abs(hitPoint.x) > 0.15) targetZone = hitPoint.x > 0 ? 'leg_left_side' : 'leg_right_side';
               else targetZone = hitPoint.x > 0 ? 'thigh_left' : 'thigh_right';
+            } else {
+              // Universal zone detection for all catalog products
+              let bestZone = null;
+              let minDistance = Infinity;
+
+              for (const [zKey, zDef] of Object.entries(zones)) {
+                if (!zDef.rayOrigin) continue;
+                const [rx, ry, rz] = zDef.rayOrigin;
+                const dir = zDef.rayDir ? new THREE.Vector3(...zDef.rayDir) : new THREE.Vector3(-rx * 0.5, 0, -rz * 0.5).normalize();
+                
+                // Ray direction should be roughly opposite to surface normal
+                if (normal.dot(dir) > 0.25) continue;
+
+                const dist = Math.hypot(hitPoint.x - rx, hitPoint.y - ry);
+                if (dist < minDistance) {
+                  minDistance = dist;
+                  bestZone = zKey;
+                }
+              }
+              if (bestZone) {
+                targetZone = bestZone;
+              }
             }
 
             this.draggedItem.zone = targetZone;
-            const activeProduct = this.getState()?.activeProduct;
-            const zoneDef = activeProduct?.zones?.[targetZone];
+            const zoneDef = zones?.[targetZone];
             if (zoneDef?.rayOrigin) {
               const [rx, ry] = zoneDef.rayOrigin;
               this.draggedItem.offsetX = Math.max(-180, Math.min(180, Math.round((hitPoint.x - rx) * 1000)));
@@ -1373,7 +1497,7 @@ export class ShirtViewer {
     });
   }
 
-  setBackground(bgType = 'light') {
+  setBackground(bgType = 'dark') {
     this.currentBackground = bgType;
     try {
       localStorage.setItem('sobral_viewer_bg', bgType);
@@ -1385,7 +1509,10 @@ export class ShirtViewer {
     }
 
     if (this.shadowMesh) {
-      this.shadowMesh.visible = (bgType !== 'dark');
+      this.shadowMesh.visible = true;
+      if (this.shadowMesh.material) {
+        this.shadowMesh.material.opacity = (bgType === 'dark' ? 0.75 : 0.6);
+      }
     }
 
     if (this.renderer && this.scene && this.camera) {
@@ -1468,6 +1595,6 @@ export class ShirtViewer {
     if (this.componentVisibility) {
       this.setComponentVisibility({ prints: true, straps: true, inside: true });
     }
-    this.setBackground('light');
+    this.setBackground('dark');
   }
 }

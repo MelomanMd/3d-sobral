@@ -222,8 +222,9 @@ export class LogoPanel {
         const newId = 'logo_' + Date.now();
         const dataUrl = getLogoDataUrl(logoItem);
 
-        const defaultZone = this.state.activeProduct?.zones
-          ? (this.state.activeProduct.zones['chest_left'] ? 'chest_left' : Object.keys(this.state.activeProduct.zones)[0])
+        const zones = this.state.activeProduct?.zones;
+        const defaultZone = zones
+          ? (zones['chest_left'] ? 'chest_left' : (zones['chest_center'] ? 'chest_center' : (zones['front_center'] ? 'front_center' : (zones['crown'] ? 'crown' : Object.keys(zones)[0]))))
           : 'chest_left';
 
         this.state.logos.push({
@@ -389,9 +390,10 @@ export class LogoPanel {
       const newId = 'logo_' + Date.now();
       const fileName = file.name.replace(/\.[^/.]+$/, '');
 
-      const defaultZone = this.state.activeProduct?.zones
-        ? (this.state.activeProduct.zones['chest_center'] ? 'chest_center' : Object.keys(this.state.activeProduct.zones)[0])
-        : 'chest_center';
+      const zones = this.state.activeProduct?.zones;
+      const defaultZone = zones
+        ? (zones['chest_left'] ? 'chest_left' : (zones['chest_center'] ? 'chest_center' : (zones['front_center'] ? 'front_center' : (zones['crown'] ? 'crown' : Object.keys(zones)[0]))))
+        : 'chest_left';
 
       this.state.logos.push({
         id: newId,

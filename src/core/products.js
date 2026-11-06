@@ -68,12 +68,12 @@ export const DEFAULT_PRODUCTS = [
     rightPreview: resolveAssetUrl('/previews/3300-side.png'),
     materialRoles: ['fabric_primary', 'thread_primary', 'rib_trim'],
     zones: {
-      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.08, 0.12, 0.5] },
-      chest_center: { name: 'Brustmitte', isFront: true, defaultScale: 1.0, rayOrigin: [0.0, 0.10, 0.5] },
-      back_top: { name: 'Rücken oben', isFront: false, defaultScale: 0.8, rayOrigin: [0.0, 0.16, -0.5] },
-      back_center: { name: 'Rückenmitte', isFront: false, defaultScale: 1.0, rayOrigin: [0.0, 0.06, -0.5] },
-      sleeve_left: { name: 'Linker Ärmel', isFront: true, defaultScale: 0.6, rayOrigin: [0.28, 0.12, 0.0] },
-      sleeve_right: { name: 'Rechter Ärmel', isFront: true, defaultScale: 0.6, rayOrigin: [-0.28, 0.12, 0.0] }
+      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.09, 0.18, 0.4], rayDir: [0, 0, -1] },
+      chest_center: { name: 'Brustmitte', isFront: true, defaultScale: 1.0, rayOrigin: [0.0, 0.14, 0.4], rayDir: [0, 0, -1] },
+      back_top: { name: 'Rücken oben', isFront: false, defaultScale: 0.8, rayOrigin: [0.0, 0.22, -0.4], rayDir: [0, 0, 1] },
+      back_center: { name: 'Rückenmitte', isFront: false, defaultScale: 1.0, rayOrigin: [0.0, 0.10, -0.4], rayDir: [0, 0, 1] },
+      sleeve_left: { name: 'Linker Ärmel', isFront: true, defaultScale: 0.6, rayOrigin: [0.35, 0.21, 0.0], rayDir: [-1, 0, 0] },
+      sleeve_right: { name: 'Rechter Ärmel', isFront: true, defaultScale: 0.6, rayOrigin: [-0.35, 0.21, 0.0], rayDir: [1, 0, 0] }
     }
   },
   {
@@ -101,12 +101,12 @@ export const DEFAULT_PRODUCTS = [
     rightPreview: resolveAssetUrl('/previews/3340-side.png'),
     materialRoles: ['fabric_primary', 'rib_trim', 'thread_primary'],
     zones: {
-      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.08, 0.12, 0.5] },
-      chest_center: { name: 'Brustmitte', isFront: true, defaultScale: 1.0, rayOrigin: [0.0, 0.10, 0.5] },
-      back_top: { name: 'Rücken oben', isFront: false, defaultScale: 0.8, rayOrigin: [0.0, 0.16, -0.5] },
-      back_center: { name: 'Rückenmitte', isFront: false, defaultScale: 1.0, rayOrigin: [0.0, 0.06, -0.5] },
-      sleeve_left: { name: 'Linker Ärmel', isFront: true, defaultScale: 0.6, rayOrigin: [0.28, 0.10, 0.0] },
-      sleeve_right: { name: 'Rechter Ärmel', isFront: true, defaultScale: 0.6, rayOrigin: [-0.28, 0.10, 0.0] }
+      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.09, 0.18, 0.4], rayDir: [0, 0, -1] },
+      chest_center: { name: 'Brustmitte', isFront: true, defaultScale: 1.0, rayOrigin: [0.0, 0.14, 0.4], rayDir: [0, 0, -1] },
+      back_top: { name: 'Rücken oben', isFront: false, defaultScale: 0.8, rayOrigin: [0.0, 0.22, -0.4], rayDir: [0, 0, 1] },
+      back_center: { name: 'Rückenmitte', isFront: false, defaultScale: 1.0, rayOrigin: [0.0, 0.10, -0.4], rayDir: [0, 0, 1] },
+      sleeve_left: { name: 'Linker Ärmel', isFront: true, defaultScale: 0.6, rayOrigin: [0.35, 0.21, 0.0], rayDir: [-1, 0, 0] },
+      sleeve_right: { name: 'Rechter Ärmel', isFront: true, defaultScale: 0.6, rayOrigin: [-0.35, 0.21, 0.0], rayDir: [1, 0, 0] }
     }
   },
   {
@@ -134,11 +134,11 @@ export const DEFAULT_PRODUCTS = [
     rightPreview: resolveAssetUrl('/previews/3362-side.png'),
     materialRoles: ['fabric_primary', 'fabric_secondary', 'rib_trim', 'zipper'],
     zones: {
-      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.09, 0.11, 0.5] },
-      chest_right: { name: 'Rechte Brust', isFront: true, defaultScale: 0.7, rayOrigin: [-0.09, 0.11, 0.5] },
-      back_top: { name: 'Rücken oben', isFront: false, defaultScale: 0.8, rayOrigin: [0.0, 0.16, -0.5] },
-      back_center: { name: 'Rückenmitte', isFront: false, defaultScale: 1.0, rayOrigin: [0.0, 0.06, -0.5] },
-      sleeve_left: { name: 'Linker Ärmel', isFront: true, defaultScale: 0.6, rayOrigin: [0.28, 0.10, 0.0] }
+      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.09, 0.16, 0.4], rayDir: [0, 0, -1] },
+      chest_right: { name: 'Rechte Brust', isFront: true, defaultScale: 0.7, rayOrigin: [-0.09, 0.16, 0.4], rayDir: [0, 0, -1] },
+      back_top: { name: 'Rücken oben', isFront: false, defaultScale: 0.8, rayOrigin: [0.0, 0.22, -0.4], rayDir: [0, 0, 1] },
+      back_center: { name: 'Rückenmitte', isFront: false, defaultScale: 1.0, rayOrigin: [0.0, 0.10, -0.4], rayDir: [0, 0, 1] },
+      sleeve_left: { name: 'Linker Ärmel', isFront: true, defaultScale: 0.6, rayOrigin: [0.35, 0.20, 0.0], rayDir: [-1, 0, 0] }
     }
   },
   {
@@ -166,10 +166,10 @@ export const DEFAULT_PRODUCTS = [
     rightPreview: resolveAssetUrl('/previews/3366-side.png'),
     materialRoles: ['fabric_primary', 'fabric_secondary', 'hood_lining', 'rib_trim', 'zipper'],
     zones: {
-      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.09, 0.10, 0.5] },
-      chest_right: { name: 'Rechte Brust', isFront: true, defaultScale: 0.7, rayOrigin: [-0.09, 0.10, 0.5] },
-      back_center: { name: 'Rückenmitte', isFront: false, defaultScale: 1.0, rayOrigin: [0.0, 0.04, -0.5] },
-      hood: { name: 'Kapuze', isFront: false, defaultScale: 0.8, rayOrigin: [0.0, 0.26, -0.4] }
+      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.09, 0.15, 0.4], rayDir: [0, 0, -1] },
+      chest_right: { name: 'Rechte Brust', isFront: true, defaultScale: 0.7, rayOrigin: [-0.09, 0.15, 0.4], rayDir: [0, 0, -1] },
+      back_center: { name: 'Rückenmitte', isFront: false, defaultScale: 1.0, rayOrigin: [0.0, 0.08, -0.4], rayDir: [0, 0, 1] },
+      hood: { name: 'Kapuze', isFront: false, defaultScale: 0.8, rayOrigin: [0.0, 0.32, -0.4], rayDir: [0, 0, 1] }
     }
   },
   {
@@ -197,10 +197,10 @@ export const DEFAULT_PRODUCTS = [
     rightPreview: resolveAssetUrl('/previews/4890-side.png'),
     materialRoles: ['fabric_primary', 'fabric_secondary', 'hood_lining', 'zipper'],
     zones: {
-      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.09, 0.10, 0.5] },
-      chest_right: { name: 'Rechte Brust', isFront: true, defaultScale: 0.7, rayOrigin: [-0.09, 0.10, 0.5] },
-      back_center: { name: 'Rückenmitte', isFront: false, defaultScale: 1.0, rayOrigin: [0.0, 0.06, -0.5] },
-      sleeve_left: { name: 'Linker Ärmel', isFront: true, defaultScale: 0.6, rayOrigin: [0.28, 0.10, 0.0] }
+      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.7, rayOrigin: [0.09, 0.16, 0.4], rayDir: [0, 0, -1] },
+      chest_right: { name: 'Rechte Brust', isFront: true, defaultScale: 0.7, rayOrigin: [-0.09, 0.16, 0.4], rayDir: [0, 0, -1] },
+      back_center: { name: 'Rückenmitte', isFront: false, defaultScale: 1.0, rayOrigin: [0.0, 0.10, -0.4], rayDir: [0, 0, 1] },
+      sleeve_left: { name: 'Linker Ärmel', isFront: true, defaultScale: 0.6, rayOrigin: [0.35, 0.20, 0.0], rayDir: [-1, 0, 0] }
     }
   },
   {
@@ -228,9 +228,9 @@ export const DEFAULT_PRODUCTS = [
     rightPreview: resolveAssetUrl('/previews/1750-side.png'),
     materialRoles: ['fabric_primary', 'stretch_panels', 'reinforcement'],
     zones: {
-      leg_left: { name: 'Linke Schenkeltasche', isFront: true, defaultScale: 0.7, rayOrigin: [0.14, 0.02, 0.4] },
-      leg_right: { name: 'Rechte Schenkeltasche', isFront: true, defaultScale: 0.7, rayOrigin: [-0.14, 0.02, 0.4] },
-      back_pocket: { name: 'Gesässtasche', isFront: false, defaultScale: 0.7, rayOrigin: [0.12, 0.15, -0.4] }
+      leg_left: { name: 'Linke Schenkeltasche', isFront: true, defaultScale: 0.7, rayOrigin: [0.09, 0.14, 0.4], rayDir: [0, 0, -1] },
+      leg_right: { name: 'Rechte Schenkeltasche', isFront: true, defaultScale: 0.7, rayOrigin: [-0.09, 0.14, 0.4], rayDir: [0, 0, -1] },
+      back_pocket: { name: 'Gesässtasche', isFront: false, defaultScale: 0.7, rayOrigin: [0.10, 0.28, -0.4], rayDir: [0, 0, 1] }
     }
   },
   {
@@ -258,8 +258,8 @@ export const DEFAULT_PRODUCTS = [
     rightPreview: resolveAssetUrl('/previews/2003-side.png'),
     materialRoles: ['fabric_primary', 'lining'],
     zones: {
-      front: { name: 'Stirn (Logo)', isFront: true, defaultScale: 0.8, rayOrigin: [0.0, 0.04, 0.3] },
-      side: { name: 'Seite', isFront: true, defaultScale: 0.6, rayOrigin: [0.15, 0.04, 0.0] }
+      front: { name: 'Stirn (Logo)', isFront: true, defaultScale: 0.8, rayOrigin: [0.0, 0.05, 0.5], rayDir: [0, 0, -1], targetMesh: 'knit_shell' },
+      side: { name: 'Seite', isFront: true, defaultScale: 0.6, rayOrigin: [0.45, 0.05, 0.0], rayDir: [-1, 0, 0], targetMesh: 'knit_shell' }
     }
   },
   {
@@ -288,10 +288,10 @@ export const DEFAULT_PRODUCTS = [
     comparisonPhoto: resolveAssetUrl('/previews/WHE00113-fotovergleich.png'),
     materialRoles: ['shell_primary', 'emboss_white', 'hardware_black', 'hardware_orange', 'strap_webbing', 'liner_eps', 'clips_nylon'],
     zones: {
-      crown: { name: 'Front Stirnplatte', isFront: true, defaultScale: 0.8, rayOrigin: [0.0, 0.05, 0.35] },
-      side_left: { name: 'Linke Seite', isFront: true, defaultScale: 0.6, rayOrigin: [0.18, 0.04, 0.0] },
-      side_right: { name: 'Rechte Seite', isFront: true, defaultScale: 0.6, rayOrigin: [-0.18, 0.04, 0.0] },
-      back: { name: 'Hinterkopf', isFront: false, defaultScale: 0.7, rayOrigin: [0.0, 0.04, -0.35] }
+      crown: { name: 'Front Stirnplatte', isFront: true, defaultScale: 0.8, rayOrigin: [0.0, 0.24, 0.4], rayDir: [0, 0, -1], targetMesh: 'OuterShell' },
+      side_left: { name: 'Linke Seite', isFront: true, defaultScale: 0.6, rayOrigin: [0.35, 0.25, 0.0], rayDir: [-1, 0, 0], targetMesh: 'OuterShell' },
+      side_right: { name: 'Rechte Seite', isFront: true, defaultScale: 0.6, rayOrigin: [-0.35, 0.25, 0.0], rayDir: [1, 0, 0], targetMesh: 'OuterShell' },
+      back: { name: 'Hinterkopf', isFront: false, defaultScale: 0.7, rayOrigin: [0.0, 0.24, -0.4], rayDir: [0, 0, 1], targetMesh: 'OuterShell' }
     }
   },
   {
@@ -311,6 +311,7 @@ export const DEFAULT_PRODUCTS = [
       helmet: '#ffffff',
       primary: '#243249',
       trousers: '#1b2034',
+      boots: '#1a1a1a',
       accent: '#ff4400',
       collar: '#243249',
       secondary: '#ffffff'
@@ -319,7 +320,7 @@ export const DEFAULT_PRODUCTS = [
     backPreview: resolveAssetUrl('/previews/worker-back.png'),
     leftPreview: resolveAssetUrl('/previews/worker-side.png'),
     rightPreview: resolveAssetUrl('/previews/worker-side.png'),
-    materialRoles: ['helmet', 'fabric_primary', 'trousers', 'neutral'],
+    materialRoles: ['helmet', 'fabric_primary', 'trousers', 'boots', 'neutral'],
     zones: {
       crown: { name: 'Schutzhelm Front (KASK)', isFront: true, defaultScale: 0.22, rayOrigin: [0.0, 0.375, 0.35], rayDir: [0, 0, -1], targetMesh: 'worker_helmet' },
       helmet_back: { name: 'Schutzhelm Hinten', isFront: false, defaultScale: 0.25, rayOrigin: [0.0, 0.370, -0.35], rayDir: [0, 0, 1], targetMesh: 'worker_helmet' },

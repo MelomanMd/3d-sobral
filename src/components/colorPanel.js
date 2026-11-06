@@ -27,6 +27,15 @@ export const HELMET_SAFETY_PALETTES = [
   { name: 'Leuchtorange', hex: '#ff5500' }
 ];
 
+export const BOOT_PALETTES = [
+  { name: 'Stealth Black', hex: '#1a1a1a' },
+  { name: 'Dunkelbraun Leder', hex: '#3d2514' },
+  { name: 'Anthrazit', hex: '#2d3139' },
+  { name: 'Coyote / Sand', hex: '#8c7355' },
+  { name: 'Warnorange', hex: '#ea580c' },
+  { name: 'Marineblau', hex: '#1b2034' }
+];
+
 export const GARMENT_ELEMENTS = [
   {
     id: 'primary',
@@ -74,7 +83,8 @@ export class ColorPanel {
       return [
         { id: 'helmet', name: 'Schutzhelm', sub: 'KASK Helmschale', icon: 'shield' },
         { id: 'primary', name: 'Arbeitsjacke', sub: 'Jacke & Ärmel', icon: 'shirt' },
-        { id: 'trousers', name: 'Arbeitshose', sub: 'Hose & Beine', icon: 'scissors' }
+        { id: 'trousers', name: 'Arbeitshose', sub: 'Hose & Beine', icon: 'scissors' },
+        { id: 'boots', name: 'Arbeitsschuhe', sub: 'Sicherheitsschuhe S3', icon: 'footprints' }
       ];
     }
     if (sil === 'helmet' || art === 'WHE00113') {
@@ -120,7 +130,8 @@ export class ColorPanel {
     const sil = prod.silhouette || '';
     const isHelmetProd = sil === 'helmet' || prod.articleNumber === 'WHE00113';
     const isHelmet = isHelmetProd || this.activeZone === 'helmet';
-    const activePalette = isHelmet ? HELMET_SAFETY_PALETTES : SPORT_PALETTES;
+    const isBoots = this.activeZone === 'boots';
+    const activePalette = isHelmet ? HELMET_SAFETY_PALETTES : (isBoots ? BOOT_PALETTES : SPORT_PALETTES);
     const compVis = this.viewer?.componentVisibility || { prints: true, straps: true, inside: true };
     const hidePatterns = isHelmetProd || sil === 'worker' || sil === 'person' || sil === 'trousers' || sil === 'beanie';
 

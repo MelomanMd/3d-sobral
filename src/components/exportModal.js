@@ -3,6 +3,8 @@ import { PATTERNS } from '../core/patterns.js';
 import { PLACEMENT_ZONES, getZoneName } from '../core/textureEngine.js';
 import { t } from '../core/i18n.js';
 import { ICONS } from '../core/icons.js';
+import { downloadProductionPdf } from '../core/pdfExport.js';
+import { QuoteModal } from './quoteModal.js';
 
 export class ExportModal {
   constructor(viewer, state) {
@@ -126,6 +128,27 @@ export class ExportModal {
             </div>
           </div>
 
+          <!-- Size Matrix Breakdown in Export Modal -->
+          <div class="spec-card" style="margin-top: 14px;">
+            <div class="spec-card-title" style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="spec-title-icon">${ICONS.layers}</span>
+                <span>Grössen- und Mengenmatrix (Stückzahlen)</span>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; color: #ff4400;">
+                Gesamt: <b id="export-matrix-total">25</b> Stück
+              </span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin-top: 10px;">
+              ${['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'].map(sz => `
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                  <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 3px;">${sz}</span>
+                  <input type="number" class="export-size-qty" data-size="${sz}" min="0" max="9999" value="${sz === 'M' || sz === 'L' ? 10 : (sz === 'XL' ? 5 : 0)}" style="width: 100%; text-align: center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #fff; padding: 5px 2px; font-weight: 600; font-size: 12px;">
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
           ${comparisonPhoto ? `
             <!-- 8-Angle Reference & 3D Comparison Sheet -->
             <div class="comparison-export-card">
@@ -159,27 +182,36 @@ export class ExportModal {
           ` : ''}
         </div>
 
-        <div class="modal-footer">
-          <button class="btn-outline-glass" id="btn-download-glb" title="${t('download_glb')}">
-            <span class="btn-icon-svg">${ICONS.cube}</span>
-            <span>3D-Modell (.GLB)</span>
-          </button>
-          <button class="btn-outline-glass" id="btn-quick-screenshot" title="${t('save_screenshot')}">
-            <span class="btn-icon-svg">${ICONS.camera}</span>
-            <span>Aktuelle Ansicht (PNG)</span>
-          </button>
-          <button class="btn-outline-glass" id="btn-download-json" title="${t('download_project_json')}">
-            <span class="btn-icon-svg">${ICONS.fileJson}</span>
-            <span>JSON</span>
-          </button>
-          <button class="btn-outline-glass" id="btn-copy-spec">
-            <span class="btn-icon-svg">${ICONS.copy}</span>
-            <span>${t('copy_spec')}</span>
-          </button>
-          <button class="btn-primary-action" id="btn-download-composite">
-            <span class="btn-icon-svg">${ICONS.download}</span>
-            <span>${t('download_composite')}</span>
-          </button>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn-outline-glass" id="btn-save-customer-account" title="Design im Kundenkonto (Mein Konto) sichern">
+              <span class="btn-icon-svg">${ICONS.user}</span>
+              <span id="save-account-text">Konto speichern</span>
+            </button>
+            <button class="btn-outline-glass" id="btn-download-glb" title="${t('download_glb')}">
+              <span class="btn-icon-svg">${ICONS.cube}</span>
+              <span>3D-Modell (.GLB)</span>
+            </button>
+            <button class="btn-outline-glass" id="btn-quick-screenshot" title="${t('save_screenshot')}">
+              <span class="btn-icon-svg">${ICONS.camera}</span>
+              <span>PNG</span>
+            </button>
+            <button class="btn-outline-glass" id="btn-download-json" title="${t('download_project_json')}">
+              <span class="btn-icon-svg">${ICONS.fileJson}</span>
+              <span>JSON</span>
+            </button>
+          </div>
+
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="btn-outline-glass" id="btn-download-pdf" style="border-color: rgba(255, 68, 0, 0.4); color: #ff6b35;" title="Druckfertige Produktions-Spezifikation (A4 PDF)">
+              <span class="btn-icon-svg">${ICONS.fileText}</span>
+              <span>Produktions-PDF</span>
+            </button>
+            <button class="btn-primary-action" id="btn-modal-open-quote" style="background: linear-gradient(135deg, #ff4400 0%, #ff6b35 100%); font-weight: 700; padding: 0 18px;" title="Unverbindliches Angebot mit Stückzahlen anfordern">
+              <span class="btn-icon-svg">${ICONS.send}</span>
+              <span>Angebot anfordern</span>
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -192,6 +224,107 @@ export class ExportModal {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) this.close();
     });
+
+    // Size matrix state
+    const sizeMatrix = {
+      XS: 0, S: 5, M: 10, L: 10, XL: 5, '2XL': 0, '3XL': 0, '4XL': 0
+    };
+    const updateMatrixTotal = () => {
+      const tot = Object.values(sizeMatrix).reduce((sum, v) => sum + (parseInt(v, 10) || 0), 0);
+      const totalEl = modal.querySelector('#export-matrix-total');
+      if (totalEl) totalEl.textContent = tot;
+    };
+    modal.querySelectorAll('.export-size-qty').forEach(inp => {
+      inp.addEventListener('input', (e) => {
+        sizeMatrix[e.target.dataset.size] = parseInt(e.target.value, 10) || 0;
+        updateMatrixTotal();
+      });
+    });
+
+    // Download Production PDF
+    const btnDownloadPdf = modal.querySelector('#btn-download-pdf');
+    if (btnDownloadPdf) {
+      btnDownloadPdf.addEventListener('click', async () => {
+        const orig = btnDownloadPdf.innerHTML;
+        btnDownloadPdf.innerHTML = `<span>Erstelle PDF...</span>`;
+        btnDownloadPdf.disabled = true;
+        try {
+          await downloadProductionPdf(this.viewer, this.state, sizeMatrix);
+          confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+        } finally {
+          btnDownloadPdf.innerHTML = orig;
+          btnDownloadPdf.disabled = false;
+        }
+      });
+    }
+
+    // Open Quote Modal
+    const btnOpenQuote = modal.querySelector('#btn-modal-open-quote');
+    if (btnOpenQuote) {
+      btnOpenQuote.addEventListener('click', () => {
+        this.close();
+        const quoteModal = new QuoteModal(this.viewer, this.state);
+        quoteModal.sizes = { ...sizeMatrix };
+        quoteModal.open();
+      });
+    }
+
+    // Save to Customer Account
+    const btnSaveAccount = modal.querySelector('#btn-save-customer-account');
+    if (btnSaveAccount) {
+      btnSaveAccount.addEventListener('click', async () => {
+        const orig = btnSaveAccount.innerHTML;
+        btnSaveAccount.innerHTML = `<span>Wird gespeichert...</span>`;
+        btnSaveAccount.disabled = true;
+
+        try {
+          const customer = window.SOBRAL_CUSTOMER;
+          const savePayload = {
+            productId: this.state.activeProduct?.id || 'product',
+            title: this.state.activeProduct?.name || '3D Konfiguration',
+            previewImage: frontUrl,
+            config: {
+              patternId: this.state.patternId,
+              colors: this.state.colors,
+              logos: this.state.logos,
+              texts: this.state.texts,
+              sizeMatrix
+            }
+          };
+
+          if (customer?.isLoggedIn && customer?.saveUrl) {
+            const resp = await fetch(customer.saveUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(savePayload)
+            });
+            const data = await resp.json();
+            if (data.success) {
+              alert('Ihre Konfiguration wurde erfolgreich in Ihrem Kundenkonto gespeichert!');
+              confetti({ particleCount: 50, spread: 50, origin: { y: 0.7 } });
+            } else {
+              alert(data.message || 'Konnte nicht gespeichert werden.');
+            }
+          } else {
+            // Save to localStorage and notify
+            const localSaved = JSON.parse(localStorage.getItem('sobral_saved_designs') || '[]');
+            localSaved.unshift({
+              id: 'local_' + Date.now(),
+              date: new Date().toLocaleDateString('de-CH'),
+              ...savePayload
+            });
+            localStorage.setItem('sobral_saved_designs', JSON.stringify(localSaved.slice(0, 30)));
+            alert('Ihr Entwurf wurde lokal im Browser gesichert! Melden Sie sich an, um Entwürfe direkt in Ihrem Kundenkonto (Mein Konto) zu synchronisieren.');
+            confetti({ particleCount: 35, spread: 40, origin: { y: 0.7 } });
+          }
+        } catch (err) {
+          alert('Speichern fehlgeschlagen. Bitte erneut versuchen.');
+        } finally {
+          btnSaveAccount.innerHTML = orig;
+          btnSaveAccount.disabled = false;
+        }
+      });
+    }
 
     // Single angle downloads
     modal.querySelectorAll('.btn-download-single').forEach(btn => {

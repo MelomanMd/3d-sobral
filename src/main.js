@@ -6,6 +6,7 @@ import { TextPanel } from './components/textPanel.js';
 import { LogoPanel } from './components/logoPanel.js';
 import { ViewControls } from './components/viewControls.js';
 import { ExportModal } from './components/exportModal.js';
+import { QuoteModal } from './components/quoteModal.js';
 import { CreationScreen } from './components/creationScreen.js';
 import { ProductCatalog } from './core/products.js';
 import { ProductSwitcher } from './components/productSwitcher.js';
@@ -26,7 +27,8 @@ let state = {
     collar: '#121316',
     secondary: '#ffffff',
     helmet: '#ffffff',
-    trousers: '#1b2034'
+    trousers: '#1b2034',
+    boots: '#1a1a1a'
   },
   texts: [
     {
@@ -95,6 +97,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const elImport = document.getElementById('icon-import');
     if (elImport) elImport.innerHTML = ICONS.folderOpen;
+
+    const elQuote = document.getElementById('icon-quote');
+    if (elQuote) elQuote.innerHTML = ICONS.send;
 
     const elShuffle = document.getElementById('icon-shuffle');
     if (elShuffle) elShuffle.innerHTML = ICONS.shuffle;
@@ -188,8 +193,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // 3. Theme Setup (Light by default)
-  let currentTheme = localStorage.getItem('sobral_theme') || 'light';
+  // 3. Theme Setup (Dark by default)
+  let currentTheme = localStorage.getItem('sobral_theme') || 'dark';
   const applyTheme = (theme) => {
     currentTheme = theme;
     document.documentElement.setAttribute('data-theme', theme);
@@ -328,9 +333,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.productRightPhoto = prod.rightPreview || null;
     state.productTextureUrl = prod.textureUrl || null;
 
-    // Reset design to be completely clean & blank for the new product
-    state.texts = [];
-    state.logos = [];
+    // Adapt existing logos and texts to the new product's available zones
+    if (prod.zones) {
+      const validZones = Object.keys(prod.zones);
+      const defaultZone = prod.zones['chest_left'] ? 'chest_left' : (prod.zones['chest_center'] ? 'chest_center' : validZones[0]);
+      (state.logos || []).forEach(logo => {
+        if (!validZones.includes(logo.zone)) {
+          logo.zone = defaultZone;
+          logo.offsetX = 0;
+          logo.offsetY = 0;
+        }
+      });
+      (state.texts || []).forEach(text => {
+        if (!validZones.includes(text.zone)) {
+          text.zone = defaultZone;
+          text.offsetX = 0;
+          text.offsetY = 0;
+        }
+      });
+    }
+
     state.selectedItemId = null;
     state.silhouette = prod.silhouette || 'tshirt';
     state.isSleeveless = prod.silhouette === 'tanktop' || !!prod.isSleeveless;
@@ -347,6 +369,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.colors.secondary = prod.colors?.secondary || '#ffffff';
     state.colors.helmet = prod.colors?.helmet || '#ffffff';
     state.colors.trousers = prod.colors?.trousers || '#1b2034';
+    state.colors.boots = prod.colors?.boots || '#1a1a1a';
 
     await textureEngine.render(state);
 
@@ -595,6 +618,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnExport.addEventListener('click', () => {
       const modal = new ExportModal(viewer, state);
       modal.open();
+    });
+  }
+
+  // 17b. Direct Quote Request Modal
+  const btnQuote = document.getElementById('btn-open-quote');
+  if (btnQuote) {
+    btnQuote.addEventListener('click', () => {
+      const quoteModal = new QuoteModal(viewer, state);
+      quoteModal.open();
     });
   }
 
