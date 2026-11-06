@@ -222,7 +222,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 4. Hydrate offline 3D models and photos from IndexedDB
   await catalog.hydrateOfflineModels();
-  const initialProd = catalog.getActiveProduct() || DEFAULT_PRODUCTS[0];
+  const urlParams = new URLSearchParams(window.location.search);
+  const requestedProdId = urlParams.get('product');
+  const initialProd = (requestedProdId && catalog.getProductById(requestedProdId)) || catalog.getActiveProduct() || DEFAULT_PRODUCTS[0];
   state.activeProduct = initialProd;
   state.silhouette = initialProd.silhouette || 'tshirt';
   state.patternId = initialProd.patternId || 'raglan_shoulder';
@@ -232,7 +234,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     collar: initialProd.colors?.collar || '#1b2034',
     secondary: initialProd.colors?.secondary || '#ffffff',
     helmet: initialProd.colors?.helmet || '#ffffff',
-    trousers: initialProd.colors?.trousers || '#1b2034'
+    trousers: initialProd.colors?.trousers || '#1b2034',
+    boots: initialProd.colors?.boots || '#1a1a1a'
   };
   state.productFrontPhoto = initialProd.frontPreview || null;
   state.productBackPhoto = initialProd.backPreview || null;

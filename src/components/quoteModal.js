@@ -290,3 +290,4 @@ export class QuoteModal {
     this.modalEl = null;
   }
 }
+

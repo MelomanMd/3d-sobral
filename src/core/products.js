@@ -401,6 +401,11 @@ export class ProductCatalog {
     return this.products;
   }
 
+  getProductById(id) {
+    if (!id) return null;
+    return this.products.find(p => p.id === id || p.articleNumber === id) || null;
+  }
+
   getActiveProduct() {
     return this.products.find(p => p.id === this.activeProductId) || this.products[0];
   }

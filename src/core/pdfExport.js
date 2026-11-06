@@ -65,6 +65,9 @@ export function getClosestColorSpec(hexColor) {
  * Add a subtle watermark over an image context
  */
 function applyWatermark(dataUrl, watermarkText = 'SOBRAL WORKWEAR') {
+  if (typeof Image === 'undefined' || typeof document === 'undefined') {
+    return Promise.resolve(dataUrl);
+  }
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -414,3 +417,4 @@ export async function downloadProductionPdf(viewer, state, sizeMatrix = null) {
   doc.save(filename);
   return filename;
 }
+

@@ -395,27 +395,29 @@ export class ExportModal {
     }
 
     // Composite Download (Front + Back side by side)
-    modal.querySelector('#btn-download-composite').addEventListener('click', async () => {
-      const btn = modal.querySelector('#btn-download-composite');
-      const origText = btn.innerHTML;
-      btn.innerHTML = `<span class="btn-icon-svg">${ICONS.download}</span><span>${t('generating_mockup')}</span>`;
+    const btnComp = modal.querySelector('#btn-download-composite');
+    if (btnComp) {
+      btnComp.addEventListener('click', async () => {
+        const origText = btnComp.innerHTML;
+        btnComp.innerHTML = `<span class="btn-icon-svg">${ICONS.download}</span><span>${t('generating_mockup')}</span>`;
 
-      try {
-        const compositeUrl = await this.viewer.captureComposite(2400, 1350);
-        const a = document.createElement('a');
-        a.href = compositeUrl;
-        a.download = 'sobral_mockup.png';
-        a.click();
+        try {
+          const compositeUrl = await this.viewer.captureComposite(2400, 1350);
+          const a = document.createElement('a');
+          a.href = compositeUrl;
+          a.download = 'sobral_mockup.png';
+          a.click();
 
-        confetti({
-          particleCount: 100,
-          spread: 80,
-          origin: { y: 0.6 }
-        });
-      } finally {
-        btn.innerHTML = origText;
-      }
-    });
+          confetti({
+            particleCount: 100,
+            spread: 80,
+            origin: { y: 0.6 }
+          });
+        } finally {
+          btnComp.innerHTML = origText;
+        }
+      });
+    }
 
     // 8-Angle Photo Comparison Events
     if (comparisonPhoto) {
@@ -448,7 +450,9 @@ export class ExportModal {
     }
 
     // Copy specification to clipboard
-    modal.querySelector('#btn-copy-spec').addEventListener('click', (e) => {
+    const btnCopy = modal.querySelector('#btn-copy-spec');
+    if (btnCopy) {
+      btnCopy.addEventListener('click', (e) => {
       const textSummary = `
 ${t('spec_summary_header')}
 ${t('section_pattern')}: ${patternName}
@@ -475,6 +479,7 @@ ${this.state.logos.filter(l => l.visible).map(l => `- ${l.name}: ${getZoneName(l
         }, 2000);
       });
     });
+    }
   }
 
   openComparisonDialog(photoUrl) {
