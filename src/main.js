@@ -101,11 +101,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const elQuote = document.getElementById('icon-quote');
     if (elQuote) elQuote.innerHTML = ICONS.send;
 
+    const elQuoteSidebar = document.getElementById('icon-quote-sidebar');
+    if (elQuoteSidebar) elQuoteSidebar.innerHTML = ICONS.send;
+
     const elShuffle = document.getElementById('icon-shuffle');
     if (elShuffle) elShuffle.innerHTML = ICONS.shuffle;
 
     const elDownload = document.getElementById('icon-download');
     if (elDownload) elDownload.innerHTML = ICONS.download;
+
+    const elDownloadSidebar = document.getElementById('icon-download-sidebar');
+    if (elDownloadSidebar) elDownloadSidebar.innerHTML = ICONS.download;
 
     const elCrosshair = document.getElementById('icon-crosshair');
     if (elCrosshair) elCrosshair.innerHTML = ICONS.crosshair;
@@ -624,10 +630,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  const btnSidebarExport = document.getElementById('btn-sidebar-export');
+  if (btnSidebarExport) {
+    btnSidebarExport.addEventListener('click', () => {
+      const modal = new ExportModal(viewer, state);
+      modal.open();
+    });
+  }
+
   // 17b. Direct Quote Request Modal
   const btnQuote = document.getElementById('btn-open-quote');
   if (btnQuote) {
     btnQuote.addEventListener('click', () => {
+      const quoteModal = new QuoteModal(viewer, state);
+      quoteModal.open();
+    });
+  }
+
+  const btnSidebarQuote = document.getElementById('btn-sidebar-quote');
+  if (btnSidebarQuote) {
+    btnSidebarQuote.addEventListener('click', () => {
       const quoteModal = new QuoteModal(viewer, state);
       quoteModal.open();
     });
