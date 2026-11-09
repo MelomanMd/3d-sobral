@@ -3,36 +3,42 @@ import { t } from './i18n.js';
 export const PATTERNS = [
   {
     id: 'raglan_shoulder',
+    colorZones: ['primary', 'accent', 'collar'],
     getName: () => t('pattern_raglan_shoulder') || 'Kontrast-Schultern (Blåkläder)',
     name: 'Kontrast-Schultern (Blåkläder)',
     render: renderRaglanShoulderPattern
   },
   {
     id: 'solid',
+    colorZones: ['primary', 'collar'],
     getName: () => t('pattern_solid'),
     name: 'Klassisch Einfarbig',
     render: renderSolidPattern
   },
   {
     id: 'vexa',
+    colorZones: ['primary', 'accent', 'collar', 'secondary'],
     getName: () => t('pattern_vexa'),
     name: 'Vexa Sport',
     render: renderVexaPattern
   },
   {
     id: 'racing',
+    colorZones: ['primary', 'accent', 'collar', 'secondary'],
     getName: () => t('pattern_racing'),
     name: 'Speed Racing',
     render: renderRacingPattern
   },
   {
     id: 'cyber_hex',
+    colorZones: ['primary', 'accent', 'collar'],
     getName: () => t('pattern_cyber_hex'),
     name: 'Cyber Mesh / Hex',
     render: renderHexPattern
   },
   {
     id: 'gradient',
+    colorZones: ['primary', 'accent', 'collar', 'secondary'],
     getName: () => t('pattern_gradient'),
     name: 'Gradient Flow',
     render: renderGradientPattern

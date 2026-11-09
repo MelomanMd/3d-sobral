@@ -45,8 +45,8 @@ export const GARMENT_ELEMENTS = [
   },
   {
     id: 'accent',
-    name: 'Schultereinsätze (Passe)',
-    sub: 'Kontrast-Schultern',
+    name: 'Kontrastfarbe',
+    sub: 'Einsätze & Muster',
     icon: 'layers'
   },
   {
@@ -57,8 +57,8 @@ export const GARMENT_ELEMENTS = [
   },
   {
     id: 'secondary',
-    name: 'Sekundärakzente',
-    sub: 'Zierlinien',
+    name: 'Weitere Musterfarbe',
+    sub: 'Zierlinien / Verlauf',
     icon: 'palette'
   }
 ];
@@ -75,48 +75,14 @@ export class ColorPanel {
   }
 
   getGarmentElements() {
-    const prod = this.state.activeProduct || {};
-    const sil = prod.silhouette || '';
-    const art = prod.articleNumber || '';
-
-    if (sil === 'worker' || art === 'WORKER-PRO') {
-      return [
-        { id: 'helmet', name: 'Schutzhelm', sub: 'KASK Helmschale', icon: 'shield' },
-        { id: 'primary', name: 'Arbeitsjacke', sub: 'Jacke & Ärmel', icon: 'shirt' },
-        { id: 'trousers', name: 'Arbeitshose', sub: 'Hose & Beine', icon: 'scissors' },
-        { id: 'boots', name: 'Arbeitsschuhe', sub: 'Sicherheitsschuhe S3', icon: 'footprints' }
-      ];
+    const product = this.state.activeProduct;
+    if (!this.viewer || this.viewer.loadedModelUrl !== product?.modelUrl) return [];
+    // Procedural zones depend on the selected pattern, not just the garment.
+    if (!this.viewer.isMultiMesh) {
+      const pattern = PATTERNS.find(pattern => pattern.id === this.state.patternId) || PATTERNS[0];
+      return GARMENT_ELEMENTS.filter(element => pattern.colorZones.includes(element.id));
     }
-    if (sil === 'helmet' || art === 'WHE00113') {
-      return [
-        { id: 'primary', name: 'Helmschale (Shell)', sub: 'Hauptfarbe', icon: 'shield' },
-        { id: 'accent', name: 'Belüftung / Krone', sub: 'Einsätze', icon: 'layers' },
-        { id: 'collar', name: 'Kinnriemen & Polster', sub: 'Befestigung', icon: 'sparkles' }
-      ];
-    }
-    if (sil === 'trousers' || art === '1750') {
-      return [
-        { id: 'primary', name: 'Hauptstoff (Hose)', sub: 'Beine & Gesäss', icon: 'scissors' },
-        { id: 'accent', name: 'Kniepolster & Stretch', sub: 'Verstärkungen', icon: 'layers' },
-        { id: 'collar', name: 'Bund & Bündchen', sub: 'Details', icon: 'sparkles' }
-      ];
-    }
-    if (sil === 'hoodie' || sil === 'jacket' || art === '3362' || art === '3366' || art === '4890') {
-      return [
-        { id: 'primary', name: 'Hauptstoff (Body)', sub: 'Vorder- & Rückseite', icon: 'shirt' },
-        { id: 'accent', name: 'Kapuzenfutter & Einsätze', sub: 'Kontraste', icon: 'layers' },
-        { id: 'collar', name: 'Bündchen & Kragen', sub: 'Rippstrick', icon: 'sparkles' }
-      ];
-    }
-    if (sil === 'beanie' || art === '2003') {
-      return [
-        { id: 'primary', name: 'Strickmütze (Shell)', sub: 'Aussenstoff', icon: 'shirt' },
-        { id: 'accent', name: 'Label & Akzent', sub: 'Details', icon: 'layers' },
-        { id: 'collar', name: 'Fleece-Innenfutter', sub: 'Innenseite', icon: 'sparkles' }
-      ];
-    }
-
-    return GARMENT_ELEMENTS;
+    return this.viewer.getColorControls();
   }
 
   setActiveZone(zone) {
@@ -126,6 +92,9 @@ export class ColorPanel {
 
   render() {
     const elements = this.getGarmentElements();
+    if (!elements.some(element => element.id === this.activeZone)) {
+      this.activeZone = elements[0]?.id || 'primary';
+    }
     const prod = this.state.activeProduct || {};
     const sil = prod.silhouette || '';
     const isHelmetProd = sil === 'helmet' || prod.articleNumber === 'WHE00113';
@@ -133,7 +102,7 @@ export class ColorPanel {
     const isBoots = this.activeZone === 'boots';
     const activePalette = isHelmet ? HELMET_SAFETY_PALETTES : (isBoots ? BOOT_PALETTES : SPORT_PALETTES);
     const compVis = this.viewer?.componentVisibility || { prints: true, straps: true, inside: true };
-    const hidePatterns = isHelmetProd || sil === 'worker' || sil === 'person' || sil === 'trousers' || sil === 'beanie';
+    const hidePatterns = !elements.length || this.viewer?.isMultiMesh;
 
     this.container.innerHTML = `
       <!-- 1. Compact Garment / Helmet Parts List with Inline Pickers -->
@@ -174,7 +143,7 @@ export class ColorPanel {
           </span>
         </div>
         <div class="compact-swatches-row">
-          ${activePalette.map(p => `
+          ${(elements.length ? activePalette : []).map(p => `
             <button class="mini-swatch-btn ${(this.state.colors[this.activeZone] || '').toLowerCase() === p.hex.toLowerCase() ? 'active' : ''}" 
                     data-hex="${p.hex}" 
                     title="${p.name} (${p.hex})" 
@@ -184,7 +153,7 @@ export class ColorPanel {
         </div>
       </div>
 
-      ${isHelmetProd ? `
+      ${isHelmetProd && !prod.colorMaterials ? `
         <!-- Helmet Bauteile & Sichtbarkeit Switches -->
         <div class="panel-section" style="padding-top: 8px;">
           <div class="section-title">

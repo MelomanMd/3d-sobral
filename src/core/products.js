@@ -85,7 +85,7 @@ export const DEFAULT_PRODUCTS = [
     price: '48.00 CHF',
     sku: 'SOB-3340',
     silhouette: 'sweatshirt',
-    modelUrl: resolveAssetUrl('/models/sobral-3340.glb'),
+    modelUrl: resolveAssetUrl('/models/sobral-3340-klein.glb'),
     isMultiMesh: true,
     baseColor: '#c4c7c9',
     accentColor: '#ff4400',
@@ -118,7 +118,7 @@ export const DEFAULT_PRODUCTS = [
     price: '64.00 CHF',
     sku: 'SOB-3362',
     silhouette: 'jacket',
-    modelUrl: resolveAssetUrl('/models/sobral-3362.glb'),
+    modelUrl: resolveAssetUrl('/models/sobral-3362-klein.glb'),
     isMultiMesh: true,
     baseColor: '#1c2430',
     accentColor: '#ff4400',
@@ -181,7 +181,7 @@ export const DEFAULT_PRODUCTS = [
     price: '119.00 CHF',
     sku: 'SOB-4890',
     silhouette: 'jacket',
-    modelUrl: resolveAssetUrl('/models/sobral-4890.glb'),
+    modelUrl: resolveAssetUrl('/models/sobral-4890-klein.glb'),
     isMultiMesh: true,
     baseColor: '#15171a',
     accentColor: '#ff4400',
@@ -212,7 +212,7 @@ export const DEFAULT_PRODUCTS = [
     price: '89.00 CHF',
     sku: 'SOB-1750',
     silhouette: 'trousers',
-    modelUrl: resolveAssetUrl('/models/sobral-1750.glb'),
+    modelUrl: resolveAssetUrl('/models/sobral-1750-klein.glb'),
     isMultiMesh: true,
     baseColor: '#1a2232',
     accentColor: '#ff4400',
@@ -341,13 +341,52 @@ export const DEFAULT_PRODUCTS = [
   }
 ];
 
+// Scans have one editable body material; labels keep their original textures.
+for (const product of DEFAULT_PRODUCTS) {
+  if (product.modelUrl.includes('-klein.glb')) {
+    product.colorMaterials = { primary: [product.silhouette === 'helmet' ? 'helm' : 'Material_0'] };
+  }
+}
+
+const importedProduct = (templateId, overrides) => ({
+  ...DEFAULT_PRODUCTS.find(product => product.id === templateId),
+  frontPreview: null,
+  backPreview: null,
+  leftPreview: null,
+  rightPreview: null,
+  materialRoles: [],
+  colorMaterials: { primary: ['Material_0'] },
+  ...overrides
+});
+
+DEFAULT_PRODUCTS.push(
+  importedProduct('sobral_1750', {
+    id: 'sobral_1751',
+    articleNumber: '1751',
+    name: 'SOBRAL Arbeitshose Schwarz (1751)',
+    sku: 'SOB-1751',
+    price: 'Auf Anfrage',
+    modelUrl: resolveAssetUrl('/models/sobral-1751-klein.glb')
+  }),
+  importedProduct('sobral_3340', {
+    id: 'sobral_hakro_polo',
+    articleNumber: null,
+    name: 'HAKRO Polo Blau',
+    categoryName: 'Poloshirts',
+    sku: 'HAKRO-POLO',
+    price: 'Auf Anfrage',
+    silhouette: 'polo',
+    modelUrl: resolveAssetUrl('/models/sobral-hakro-polo-klein.glb')
+  })
+);
+
 export class ProductCatalog {
   constructor() {
     this.storageKey = 'sobral_custom_products';
     this.activeProductIdKey = 'sobral_active_product_id';
     this.products = this.loadProducts();
     const storedActiveId = localStorage.getItem(this.activeProductIdKey);
-    this.activeProductId = (storedActiveId && storedActiveId !== 'sobral_person_01') ? storedActiveId : this.products[0].id;
+    this.activeProductId = this.products.some(product => product.id === storedActiveId) ? storedActiveId : this.products[0].id;
     this.listeners = [];
   }
 
@@ -358,7 +397,7 @@ export class ProductCatalog {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
           // Merge defaults with custom products, excluding any obsolete person mannequin
-          const customOnly = parsed.filter(p => p.id !== 'sobral_person_01' && !DEFAULT_PRODUCTS.some(d => d.id === p.id));
+          const customOnly = parsed.filter(p => !['sobral_person_01', 'sobral_worker_comparison'].includes(p.id) && !DEFAULT_PRODUCTS.some(d => d.id === p.id));
           return [...DEFAULT_PRODUCTS, ...customOnly];
         }
       }

@@ -248,9 +248,17 @@ export class ExportModal {
         const orig = btnDownloadPdf.innerHTML;
         btnDownloadPdf.innerHTML = `<span>Erstelle PDF...</span>`;
         btnDownloadPdf.disabled = true;
+        modal.querySelector('.pdf-export-error')?.remove();
         try {
           await downloadProductionPdf(this.viewer, this.state, sizeMatrix);
           confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+        } catch (error) {
+          const message = document.createElement('p');
+          message.className = 'pdf-export-error';
+          message.setAttribute('role', 'alert');
+          message.style.color = '#ff6b35';
+          message.textContent = error.message || 'PDF konnte nicht erstellt werden. Bitte erneut versuchen.';
+          btnDownloadPdf.insertAdjacentElement('afterend', message);
         } finally {
           btnDownloadPdf.innerHTML = orig;
           btnDownloadPdf.disabled = false;

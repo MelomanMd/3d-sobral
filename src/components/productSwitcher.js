@@ -2,18 +2,23 @@ import { t } from '../core/i18n.js';
 import { ICONS } from '../core/icons.js';
 
 export class ProductSwitcher {
-  constructor(containerElement, catalog, onSelectProduct, onOpenAddModal) {
+  constructor(containerElement, catalog, onOpenAddModal) {
     this.container = containerElement;
     this.catalog = catalog;
-    this.onSelectProduct = onSelectProduct;
     this.onOpenAddModal = onOpenAddModal;
     this.isOpen = false;
+    this.scrollTop = 0;
 
     this.render();
     this.bindGlobalEvents();
   }
 
   render() {
+    const previousList = this.container.querySelector('.dropdown-products-list');
+    // A closed menu has no layout; its scrollTop may read as zero.
+    if (previousList && this.container.querySelector('.product-dropdown-menu.open')) {
+      this.scrollTop = previousList.scrollTop;
+    }
     const activeProduct = this.catalog.getActiveProduct();
     const products = this.catalog.getProducts();
 
@@ -58,6 +63,18 @@ export class ProductSwitcher {
     `;
 
     this.bindEvents();
+    if (this.isOpen) {
+      const list = this.container.querySelector('.dropdown-products-list');
+      list.scrollTop = this.scrollTop;
+      const active = list.querySelector('.dropdown-product-item.active');
+      if (active) {
+        const listBounds = list.getBoundingClientRect();
+        const activeBounds = active.getBoundingClientRect();
+        if (activeBounds.top < listBounds.top) list.scrollTop -= listBounds.top - activeBounds.top;
+        if (activeBounds.bottom > listBounds.bottom) list.scrollTop += activeBounds.bottom - listBounds.bottom;
+      }
+      this.scrollTop = list.scrollTop;
+    }
   }
 
   bindEvents() {
@@ -77,7 +94,8 @@ export class ProductSwitcher {
         this.catalog.setActiveProduct(id);
         this.isOpen = false;
         this.render();
-        this.onSelectProduct(this.catalog.getActiveProduct());
+        // setActiveProduct already notifies the application. Calling its switch
+        // handler again here used to load and prepare every selected model twice.
       });
     });
 

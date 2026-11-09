@@ -1,7 +1,8 @@
 import { jsPDF } from 'jspdf';
 import { getZoneName } from './textureEngine.js';
+import { PATTERNS } from './patterns.js';
+import { captureProductionReport } from './productionReport.js';
 
-// Nearest RAL & Pantone color approximation database for workwear
 const RAL_PANTONE_DATABASE = [
   { name: 'Reinorange', hex: '#ff4400', ral: 'RAL 2004', pantone: 'Pantone 021 C' },
   { name: 'Warnorange', hex: '#ea580c', ral: 'RAL 2000', pantone: 'Pantone 151 C' },
@@ -23,393 +24,167 @@ const RAL_PANTONE_DATABASE = [
 ];
 
 export function getClosestColorSpec(hexColor) {
-  if (!hexColor) return { ral: 'RAL 9005', pantone: 'Pantone Black C', hex: '#1a1a1a' };
-  const cleanHex = hexColor.trim().toLowerCase();
-  
-  const parseHex = (h) => {
-    let hex = h.replace('#', '');
-    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
-    const num = parseInt(hex, 16);
-    return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
-  };
-
-  try {
-    const target = parseHex(cleanHex);
-    let closest = RAL_PANTONE_DATABASE[0];
-    let minDistance = Infinity;
-
-    for (const item of RAL_PANTONE_DATABASE) {
-      const current = parseHex(item.hex);
-      const dist = Math.sqrt(
-        Math.pow(target.r - current.r, 2) +
-        Math.pow(target.g - current.g, 2) +
-        Math.pow(target.b - current.b, 2)
-      );
-      if (dist < minDistance) {
-        minDistance = dist;
-        closest = item;
-      }
-    }
-    return {
-      hex: cleanHex.toUpperCase(),
-      name: closest.name,
-      ral: closest.ral,
-      pantone: closest.pantone
-    };
-  } catch (e) {
-    return { hex: cleanHex.toUpperCase(), name: 'Sonderfarbe', ral: 'Individuell', pantone: 'Individuell' };
-  }
+  const hex = /^#[0-9a-f]{6}$/i.test(hexColor || '') ? hexColor : '#1a1a1a';
+  const rgb = value => [1, 3, 5].map(index => parseInt(value.slice(index, index + 2), 16));
+  const target = rgb(hex);
+  const closest = RAL_PANTONE_DATABASE.reduce((best, item) => {
+    const distance = rgb(item.hex).reduce((sum, value, index) => sum + (value - target[index]) ** 2, 0);
+    return distance < best.distance ? { item, distance } : best;
+  }, { item: RAL_PANTONE_DATABASE[0], distance: Infinity }).item;
+  return { ...closest, hex: hex.toUpperCase() };
 }
 
-/**
- * Add a subtle watermark over an image context
- */
-function applyWatermark(dataUrl, watermarkText = 'SOBRAL WORKWEAR') {
-  if (typeof Image === 'undefined' || typeof document === 'undefined') {
-    return Promise.resolve(dataUrl);
-  }
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-
-      // Draw original image
-      ctx.drawImage(img, 0, 0);
-
-      // Semi-transparent angled watermark
-      ctx.save();
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate(-Math.PI / 6);
-      ctx.font = `bold ${Math.round(canvas.width * 0.055)}px sans-serif`;
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(watermarkText + ' • PRODUKTIONSMUSTER', 0, 0);
-
-      // Border frame around render
-      ctx.restore();
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-      ctx.lineWidth = 4;
-      ctx.strokeRect(2, 2, canvas.width - 4, canvas.height - 4);
-
-      resolve(canvas.toDataURL('image/jpeg', 0.92));
-    };
-    img.onerror = () => resolve(dataUrl);
-    img.src = dataUrl;
-  });
-}
-
-/**
- * Generate a complete print-ready PDF specification sheet
- */
 export async function generateProductionPdf(viewer, state, sizeMatrix = null) {
-  const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4'
-  });
-
-  const pageWidth = doc.internal.pageSize.getWidth(); // 210 mm
-  const pageHeight = doc.internal.pageSize.getHeight(); // 297 mm
-  const margin = 14;
-  const contentWidth = pageWidth - margin * 2; // 182 mm
-
-  // Capture 4 mockup angles
-  const [rawFront, rawBack, rawLeft, rawRight] = await Promise.all([
-    viewer.captureAngle('front', 800, 800, true),
-    viewer.captureAngle('back', 800, 800, true),
-    viewer.captureAngle('left', 800, 800, true),
-    viewer.captureAngle('right', 800, 800, true)
-  ]);
-
-  const [frontUrl, backUrl, leftUrl, rightUrl] = await Promise.all([
-    applyWatermark(rawFront),
-    applyWatermark(rawBack),
-    applyWatermark(rawLeft),
-    applyWatermark(rawRight)
-  ]);
-
-  // Page 1: Header, 4 Mockup Views, Colors & Materials, and Size Matrix
-  // Header Bar (Dark Navy #121620)
-  doc.setFillColor(18, 22, 32);
-  doc.rect(0, 0, pageWidth, 28, 'F');
-
-  // Orange Accent line
-  doc.setFillColor(255, 68, 0);
-  doc.rect(0, 27, pageWidth, 1.2, 'F');
-
-  // Title & Subtitle
-  doc.setTextColor(255, 255, 255);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('SOBRAL WORKWEAR • PRODUKTIONS-SPEZIFIKATION', margin, 12);
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.5);
-  doc.setTextColor(200, 205, 220);
-  const prodName = state.activeProduct?.name || 'Spezialanfertigung';
-  const artNumber = state.activeProduct?.articleNumber || state.activeProduct?.id || 'SOB-WORKWEAR';
-  const timestamp = new Date().toLocaleDateString('de-CH') + ' ' + new Date().toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' });
-  doc.text(`Artikel: ${artNumber} - ${prodName} | Datum: ${timestamp} | Freigabe-Muster`, margin, 18);
-
-  // SECTION 1: 4 MOCKUP RENDERS (Front, Back, Left, Right)
-  let curY = 32;
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(18, 22, 32);
-  doc.text('1. 3D-ANSICHTEN / MOCKUP-FREIGABE (4 PERSPEKTIVEN)', margin, curY);
-
-  curY += 3;
-  const imgBoxW = (contentWidth - 6) / 4; // ~44 mm each
-  const imgBoxH = 48; // mm
-
-  const views = [
-    { label: 'FRONT', url: frontUrl },
-    { label: 'RÜCKEN', url: backUrl },
-    { label: 'LINKS', url: leftUrl },
-    { label: 'RECHTS', url: rightUrl }
-  ];
-
-  views.forEach((v, idx) => {
-    const x = margin + idx * (imgBoxW + 2);
-    // Dark background box
-    doc.setFillColor(22, 26, 36);
-    doc.roundedRect(x, curY, imgBoxW, imgBoxH, 1.5, 1.5, 'F');
-    // Add image
-    doc.addImage(v.url, 'JPEG', x + 1, curY + 1, imgBoxW - 2, imgBoxH - 6);
-    // Label
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
+  // Snapshot the same configuration used by both the render and the tables.
+  const snapshot = structuredClone(state);
+  const usesMaterials = viewer.isMultiMesh;
+  const materialControls = viewer.getColorControls().map(control => ({ ...control }));
+  const report = await captureProductionReport(viewer, snapshot);
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+  const margin = 14, width = 182;
+  let y = 0;
+  const product = snapshot.activeProduct || {};
+  const title = product.name || 'SOBRAL Workwear';
+  const header = subtitle => {
+    doc.setFillColor(18, 22, 32);
+    doc.rect(0, 0, 210, 27, 'F');
     doc.setTextColor(255, 255, 255);
-    doc.text(v.label, x + imgBoxW / 2, curY + imgBoxH - 2, { align: 'center' });
-  });
-
-  curY += imgBoxH + 6;
-
-  // SECTION 2: COLOR & MATERIAL SPECIFICATION TABLE (HEX / RAL / Pantone)
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(18, 22, 32);
-  doc.text('2. FARB- UND MATERIAL-SPEZIFIKATION (HEX / RAL / PANTONE)', margin, curY);
-  curY += 3;
-
-  // Component breakdown
-  const components = [];
-  const prod = state.activeProduct || {};
-  const isWorker = prod.silhouette === 'worker' || prod.articleNumber === 'WORKER-PRO';
-
-  if (isWorker) {
-    components.push({ part: 'Schutzhelm (KASK)', hex: state.colors.helmet || '#ffffff' });
-    components.push({ part: 'Arbeitsjacke (Body/Ärmel)', hex: state.colors.primary || '#243249' });
-    components.push({ part: 'Arbeitshose (Beine)', hex: state.colors.trousers || '#1b2034' });
-    components.push({ part: 'Arbeitsschuhe (S3)', hex: state.colors.boots || '#1a1a1a' });
-  } else if (prod.silhouette === 'helmet' || prod.articleNumber === 'WHE00113') {
-    components.push({ part: 'Helmschale (Outer Shell)', hex: state.colors.primary || '#ffffff' });
-    components.push({ part: 'Belüftungseinsätze / Krone', hex: state.colors.accent || '#ff4400' });
-    components.push({ part: 'Kinnriemen / Befestigung', hex: state.colors.collar || '#1b2034' });
-  } else if (prod.silhouette === 'trousers' || prod.articleNumber === '1750') {
-    components.push({ part: 'Hauptgewebe (Hose)', hex: state.colors.primary || '#1b2034' });
-    components.push({ part: 'Knieverstärkung & Stretch', hex: state.colors.accent || '#ff4400' });
-    components.push({ part: 'Bund / Akzente', hex: state.colors.collar || '#1b2034' });
-  } else {
-    components.push({ part: 'Hauptkörper (Body)', hex: state.colors.primary || '#1b2034' });
-    components.push({ part: 'Akzente / Schultern', hex: state.colors.accent || '#ff4400' });
-    components.push({ part: 'Kragen / Bündchen', hex: state.colors.collar || '#1b2034' });
-  }
-
-  // Draw Table Header
-  const colW = [50, 32, 45, 55]; // sum = 182 mm
-  doc.setFillColor(240, 243, 248);
-  doc.rect(margin, curY, contentWidth, 6, 'F');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
-  doc.setTextColor(40, 50, 70);
-  doc.text('KOMPONENTE / BAUTEIL', margin + 3, curY + 4.2);
-  doc.text('HEX-CODE', margin + colW[0] + 3, curY + 4.2);
-  doc.text('RAL-REFERENZ', margin + colW[0] + colW[1] + 3, curY + 4.2);
-  doc.text('PANTONE-REFERENZ / FARBNAME', margin + colW[0] + colW[1] + colW[2] + 3, curY + 4.2);
-
-  curY += 6;
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-
-  components.forEach((c) => {
-    const spec = getClosestColorSpec(c.hex);
-    // Alternating row or border
-    doc.setDrawColor(230, 233, 240);
-    doc.line(margin, curY + 6.5, margin + contentWidth, curY + 6.5);
-
-    // Color swatch
-    doc.setFillColor(spec.hex);
-    doc.rect(margin + 2, curY + 1.2, 4.5, 4.5, 'FD');
-
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('SOBRAL - PLATZIERUNGSPLAN', margin, 10);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text(doc.splitTextToSize(title, width).slice(0, 2), margin, 16);
     doc.setTextColor(20, 25, 35);
-    doc.text(c.part, margin + 9, curY + 4.5);
-    doc.text(spec.hex, margin + colW[0] + 3, curY + 4.5);
-    doc.text(spec.ral, margin + colW[0] + colW[1] + 3, curY + 4.5);
-    doc.text(`${spec.pantone} (${spec.name})`, margin + colW[0] + colW[1] + colW[2] + 3, curY + 4.5);
+    doc.setFontSize(10);
+    doc.text(subtitle, margin, 34);
+    y = 40;
+  };
+  const ensure = height => {
+    if (y + height <= 278) return;
+    doc.addPage();
+    header('FORTSETZUNG - MODELLREFERENZ');
+  };
+  const text = (value, size = 8, color = [35, 45, 60]) => {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(size);
+    doc.setTextColor(...color);
+    const lines = doc.splitTextToSize(String(value), width);
+    for (const line of lines) {
+      ensure(5);
+      doc.text(line, margin, y);
+      y += 4.5;
+    }
+  };
+  const section = value => {
+    ensure(12);
+    y += 3;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(18, 22, 32);
+    doc.text(value, margin, y);
+    y += 6;
+  };
+  header('KONFIGURATION & UEBERSICHT');
+  text(`Artikel: ${product.articleNumber || product.sku || product.id || '-'} | ${new Date().toLocaleString('de-CH')}`);
+  text('MODELLREFERENZ - NICHT PHYSISCH KALIBRIERT', 9, [190, 55, 20]);
+  text('Positionen beziehen sich auf die orthografische Projektion der aktuellen 3D-Geometrie. Keine erfundenen mm/cm. Fuer die Fertigung sind reale Masse und Bezugspunkte am ausgewaehlten Artikel separat zu bestaetigen.');
 
-    curY += 6.5;
-  });
+  const thumb = 43;
+  for (let index = 0; index < report.views.length; index++) {
+    const view = report.views[index];
+    const x = margin + index * 46;
+    doc.addImage(view.image, 'PNG', x, y, thumb, thumb, `model-${view.id}`, 'FAST');
+    doc.setFontSize(7);
+    doc.setTextColor(35, 45, 60);
+    doc.text(view.label, x + thumb / 2, y + thumb + 4, { align: 'center' });
+  }
+  y += 53;
+  section('FARBEN - NUR TATSAECHLICH VERWENDETE BEREICHE');
+  const names = { primary: 'Grundfarbe', accent: 'Kontrastfarbe', collar: 'Kragen / Details', secondary: 'Weitere Musterfarbe' };
+  const controls = usesMaterials ? materialControls :
+    (PATTERNS.find(pattern => pattern.id === snapshot.patternId) || PATTERNS[0]).colorZones.map(id => ({ id, name: names[id] }));
+  for (const control of controls) {
+    const spec = getClosestColorSpec(snapshot.colors?.[control.id]);
+    text(`${control.name}: ${spec.hex} | Naeherung: ${spec.ral}, ${spec.pantone}`);
+  }
+  text('RAL/Pantone sind Farbnaeherungen, keine verbindliche Farbfreigabe.', 7, [100, 110, 125]);
 
-  curY += 4;
-
-  // SECTION 3: EXACT LOGO & GRAPHICS PLACEMENT TABLE
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(18, 22, 32);
-  doc.text('3. LOGO- & DRUCKPOSITIONEN (EXAKTE KOORDINATEN & DIMENSIONEN)', margin, curY);
-  curY += 3;
-
-  const logoColW = [42, 45, 38, 32, 25]; // sum = 182 mm
-  doc.setFillColor(240, 243, 248);
-  doc.rect(margin, curY, contentWidth, 6, 'F');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
-  doc.setTextColor(40, 50, 70);
-  doc.text('GRAFIK / MOTIV', margin + 3, curY + 4.2);
-  doc.text('PLATZIERUNGSZONE', margin + logoColW[0] + 3, curY + 4.2);
-  doc.text('OFFSET (X / Y)', margin + logoColW[0] + logoColW[1] + 3, curY + 4.2);
-  doc.text('BREITE x HÖHE (CA.)', margin + logoColW[0] + logoColW[1] + logoColW[2] + 3, curY + 4.2);
-  doc.text('STATUS', margin + logoColW[0] + logoColW[1] + logoColW[2] + logoColW[3] + 3, curY + 4.2);
-
-  curY += 6;
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-
-  const activeLogos = (state.logos || []).filter(l => l.visible);
-  const activeTexts = (state.texts || []).filter(tItem => tItem.visible && tItem.text);
-
-  if (activeLogos.length === 0 && activeTexts.length === 0) {
-    doc.setTextColor(120, 130, 145);
-    doc.text('Keine kundenspezifischen Logos oder Texte platziert (Blanko-Freigabe).', margin + 3, curY + 5);
-    curY += 7;
-  } else {
-    activeLogos.forEach(logo => {
-      const zoneName = prod.zones?.[logo.zone]?.name || getZoneName(logo.zone);
-      const offXmm = Math.round((logo.offsetX || 0) * 0.5); // approx mm
-      const offYmm = Math.round((logo.offsetY || 0) * 0.5);
-      const scalePct = Math.round((logo.scale || 1.0) * 100);
-      const estWidthCm = ((logo.scale || 1.0) * 8.5).toFixed(1);
-      const estHeightCm = ((logo.scale || 1.0) * 5.0).toFixed(1);
-
-      doc.setDrawColor(230, 233, 240);
-      doc.line(margin, curY + 7, margin + contentWidth, curY + 7);
-
-      doc.setTextColor(20, 25, 35);
-      doc.text(logo.name || 'Kundengrafik', margin + 3, curY + 4.8);
-      doc.text(zoneName, margin + logoColW[0] + 3, curY + 4.8);
-      doc.text(`X: ${offXmm >= 0 ? '+' : ''}${offXmm} mm | Y: ${offYmm >= 0 ? '+' : ''}${offYmm} mm`, margin + logoColW[0] + logoColW[1] + 3, curY + 4.8);
-      doc.text(`${estWidthCm} x ${estHeightCm} cm (${scalePct}%)`, margin + logoColW[0] + logoColW[1] + logoColW[2] + 3, curY + 4.8);
-      doc.setTextColor(255, 68, 0);
-      doc.text('Vektordruck', margin + logoColW[0] + logoColW[1] + logoColW[2] + logoColW[3] + 3, curY + 4.8);
-
-      curY += 7.5;
-    });
-
-    activeTexts.forEach(txt => {
-      const zoneName = prod.zones?.[txt.zone]?.name || getZoneName(txt.zone);
-      const offXmm = Math.round((txt.offsetX || 0) * 0.5);
-      const offYmm = Math.round((txt.offsetY || 0) * 0.5);
-
-      doc.setDrawColor(230, 233, 240);
-      doc.line(margin, curY + 7, margin + contentWidth, curY + 7);
-
-      doc.setTextColor(20, 25, 35);
-      doc.text(`Text: "${txt.text}"`, margin + 3, curY + 4.8);
-      doc.text(zoneName, margin + logoColW[0] + 3, curY + 4.8);
-      doc.text(`X: ${offXmm >= 0 ? '+' : ''}${offXmm} mm | Y: ${offYmm >= 0 ? '+' : ''}${offYmm} mm`, margin + logoColW[0] + logoColW[1] + 3, curY + 4.8);
-      doc.text(`Farbe: ${txt.color}`, margin + logoColW[0] + logoColW[1] + logoColW[2] + 3, curY + 4.8);
-      doc.setTextColor(30, 130, 60);
-      doc.text('Stick / Flock', margin + logoColW[0] + logoColW[1] + logoColW[2] + logoColW[3] + 3, curY + 4.8);
-
-      curY += 7.5;
-    });
+  section('MOTIVE & TEXTE');
+  if (!report.items.length) text('Keine sichtbaren kundenspezifischen Motive oder Texte.');
+  for (const item of report.items) {
+    const zone = product.zones?.[item.zone]?.name || getZoneName(item.zone);
+    const visible = report.views.some(view => view.placements.find(placement => placement.number === item.number)?.ink);
+    text(`#${item.number} ${item.type === 'text' ? 'Text' : 'Logo'}: ${item.label}`);
+    text(`Zone: ${zone} | Drehung: ${Number(item.rotation || 0).toFixed(1)} Grad | ${visible ? 'Auf Modell sichtbar' : 'NICHT AUF MODELL SICHTBAR - KEINE FREIGABE'}`, 7, visible ? [70, 80, 95] : [190, 40, 20]);
+    if (item.type === 'text') text(`Schrift: ${item.fontFamily || 'sans-serif'} | Gewicht: ${item.fontWeight || 'bold'} | Farbe: ${item.color || '#ffffff'}`, 7);
   }
 
-  curY += 4;
+  section('GROESSEN & MENGEN');
+  const matrix = sizeMatrix || {};
+  const entries = Object.entries(matrix).filter(([, quantity]) => Number(quantity) > 0);
+  text(entries.length ? entries.map(([size, quantity]) => `${size}: ${quantity}`).join(' | ') : 'Keine Mengen angegeben.');
+  text(`Gesamt: ${entries.reduce((total, [, quantity]) => total + Number(quantity), 0)}`);
 
-  // SECTION 4: SIZE & QUANTITY MATRIX TABLE
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(18, 22, 32);
-  doc.text('4. MENGEN- UND GRÖSSENMATRIX (STÜCKZAHLEN PRO GRÖSSE)', margin, curY);
-  curY += 3;
-
-  const sizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', 'TOTAL'];
-  const sizeColW = contentWidth / sizes.length; // ~20.2 mm each
-
-  // Header
-  doc.setFillColor(240, 243, 248);
-  doc.rect(margin, curY, contentWidth, 6, 'F');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
-  doc.setTextColor(40, 50, 70);
-
-  sizes.forEach((s, idx) => {
-    doc.text(s, margin + idx * sizeColW + sizeColW / 2, curY + 4.2, { align: 'center' });
-  });
-
-  curY += 6;
-
-  // Values row
-  const matrix = sizeMatrix || {
-    XS: 0, S: 5, M: 15, L: 20, XL: 15, '2XL': 10, '3XL': 2, '4XL': 0
-  };
-  const total = Object.values(matrix).reduce((a, b) => (parseInt(a) || 0) + (parseInt(b) || 0), 0);
-
-  doc.setFillColor(255, 255, 255);
-  doc.rect(margin, curY, contentWidth, 7, 'F');
-  doc.setDrawColor(200, 205, 220);
-  doc.rect(margin, curY, contentWidth, 7, 'D');
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.setTextColor(20, 25, 35);
-
-  sizes.forEach((s, idx) => {
-    const val = s === 'TOTAL' ? total : (matrix[s] !== undefined ? matrix[s] : '-');
-    if (s === 'TOTAL') doc.setTextColor(255, 68, 0);
-    else doc.setTextColor(20, 25, 35);
-    doc.text(String(val), margin + idx * sizeColW + sizeColW / 2, curY + 4.8, { align: 'center' });
-  });
-
-  curY += 12;
-
-  // SECTION 5: APPROVAL & SIGN-OFF BOX
-  doc.setDrawColor(220, 224, 235);
-  doc.setFillColor(248, 250, 253);
-  doc.roundedRect(margin, curY, contentWidth, 24, 2, 2, 'FD');
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  doc.setTextColor(40, 50, 70);
-  doc.text('PRODUKTIONSFREIGABE & UNTERSCHRIFT:', margin + 4, curY + 5);
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
-  doc.setTextColor(90, 100, 120);
-  doc.text('Mit Ihrer Freigabe bestätigen Sie die Richtigkeit der angegebenen Farben (RAL/Pantone), Positionen und Abmessungen.', margin + 4, curY + 9);
-
-  doc.text('Datum / Ort: ___________________________', margin + 4, curY + 18);
-  doc.text('Unterschrift Kunde: ___________________________', margin + 95, curY + 18);
-
-  // Footer note
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7);
-  doc.setTextColor(140, 145, 160);
-  doc.text('Sobral AG • Industriestrasse • CH-Schweiz • www.sobral.ch • Vertrauliche Produktionsspezifikation', pageWidth / 2, pageHeight - 5, { align: 'center' });
-
+  for (const view of report.views) {
+    if (!report.items.length) break;
+    doc.addPage();
+    header(`${view.label} - ORTHOGRAFISCHER PLATZIERUNGSPLAN`);
+    text('X: von links nach rechts. Y: von oben nach unten. Ursprung = linke obere Ecke des gestrichelten Modellrahmens.', 7);
+    text('Alle Angaben in % der projizierten Modellbreite/-hoehe; keine Nahtabstaende, keine mm. Sichtbare Druckkontur, nicht Leinwandrand.', 7);
+    const box = { x: margin, y: y + 2, size: width };
+    doc.addImage(view.image, 'PNG', box.x, box.y, box.size, box.size, `model-${view.id}`, 'FAST');
+    const scale = box.size / view.pixels;
+    const model = view.modelRect;
+    doc.setDrawColor(60, 130, 220);
+    doc.setLineWidth(0.25);
+    doc.setLineDashPattern([1.5, 1.2], 0);
+    doc.rect(box.x + model.x * scale, box.y + model.y * scale, model.width * scale, model.height * scale);
+    doc.setLineDashPattern([], 0);
+    doc.setFontSize(7);
+    doc.setTextColor(40, 100, 190);
+    doc.text('0 / 0', box.x + model.x * scale, box.y + model.y * scale - 1);
+    for (const placement of view.placements) {
+      if (!placement.ink) continue;
+      const ink = placement.ink;
+      const x = box.x + ink.x * scale;
+      const top = box.y + ink.y * scale;
+      const w = ink.width * scale, h = ink.height * scale;
+      const cx = x + w / 2, cy = top + h / 2;
+      doc.setDrawColor(255, 90, 20);
+      doc.setLineWidth(0.25);
+      doc.rect(x, top, w, h);
+      doc.line(cx - 1.5, cy, cx + 1.5, cy);
+      doc.line(cx, cy - 1.5, cx, cy + 1.5);
+      doc.setFillColor(255, 255, 255);
+      doc.rect(x, Math.max(box.y, top - 4), 9, 4, 'F');
+      doc.setTextColor(170, 45, 0);
+      doc.setFontSize(8);
+      doc.text(`#${placement.number}`, x + 0.5, Math.max(box.y, top - 4) + 3);
+    }
+    y = box.y + box.size + 6;
+    text('ID | Mitte X / Y (%) | sichtbare Breite / Hoehe (%)', 8);
+    for (const placement of view.placements) {
+      if (!placement.relative) {
+        text(`#${placement.number}: In dieser Ansicht nicht sichtbar`, 7, [100, 110, 125]);
+        continue;
+      }
+      const r = placement.relative;
+      text(`#${placement.number} | X ${r.centerX.toFixed(1)} / Y ${r.centerY.toFixed(1)} | B ${r.width.toFixed(1)} / H ${r.height.toFixed(1)}`, 8);
+    }
+    text('Messung der sichtbaren, achsenparallelen Druckkontur aus dem Renderbild (Rastergenauigkeit ca. 1 Pixel). Verdeckte Teile sind hier nicht vermessen.', 7, [100, 110, 125]);
+  }
+  const pages = doc.getNumberOfPages();
+  for (let page = 1; page <= pages; page++) {
+    doc.setPage(page);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(110, 120, 135);
+    doc.text(`SOBRAL | Modellreferenz, keine physische Massfreigabe | ${page} / ${pages}`, 105, 290, { align: 'center' });
+  }
   return doc;
 }
 
-/**
- * Trigger browser download of the generated PDF
- */
 export async function downloadProductionPdf(viewer, state, sizeMatrix = null) {
   const doc = await generateProductionPdf(viewer, state, sizeMatrix);
   const safeTitle = (state.activeProduct?.name || 'Sobral_Workwear').replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -417,4 +192,3 @@ export async function downloadProductionPdf(viewer, state, sizeMatrix = null) {
   doc.save(filename);
   return filename;
 }
-

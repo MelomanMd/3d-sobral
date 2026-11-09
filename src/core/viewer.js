@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { resolveAssetUrl } from './products.js';
+import { getMaterialColorControls } from './materialColors.js';
+import { ModelLoadingIndicator } from '../components/modelLoading.js';
 import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';
 import { FabricTextureGenerator } from './fabricTexture.js';
 import { ModelStorage } from './modelStorage.js';
@@ -70,6 +74,7 @@ export class ShirtViewer {
       this.currentBackground = localStorage.getItem('sobral_viewer_bg') || 'dark';
     } catch (e) {}
 
+    this.loadingIndicator = new ModelLoadingIndicator(this.container, () => this.loadModel(this.lastRequestedModelUrl));
     this.init();
   }
 
@@ -192,6 +197,10 @@ export class ShirtViewer {
   loadModel(modelUrl = '/shirt_baked.glb') {
     this._loadId = (this._loadId || 0) + 1;
     const currentLoadId = this._loadId;
+    this.lastRequestedModelUrl = modelUrl;
+    this.pendingReadyLoadId = null;
+    this.isModelLoading = true;
+    this.loadingIndicator.show();
 
     if (this.shirtGroup) {
       this.scene.remove(this.shirtGroup);
@@ -200,7 +209,10 @@ export class ShirtViewer {
           if (node.geometry) node.geometry.dispose();
           if (node.material) {
             const mats = Array.isArray(node.material) ? node.material : [node.material];
-            mats.forEach(m => m.dispose());
+            mats.forEach(m => {
+              m._sobralTintMap?.dispose();
+              m.dispose();
+            });
           }
         }
       });
@@ -208,15 +220,30 @@ export class ShirtViewer {
       this.shirtMesh = null;
     }
     this.productMeshes = [];
+    this.loadedModelUrl = null;
     this.materialGroups.clear();
     this.clonedMaterials.clear();
 
     const loader = new GLTFLoader();
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath(resolveAssetUrl('/draco/'));
+    loader.setDRACOLoader(dracoLoader);
     loader.load(
       modelUrl,
-      (gltf) => {
-        if (this._loadId !== currentLoadId) return;
-
+      async (gltf) => {
+        dracoLoader.dispose();
+        if (this._loadId !== currentLoadId) {
+          this.disposeUnloadedModel(gltf.scene);
+          return;
+        }
+        this.loadingIndicator.prepare();
+        // Paint the preparation indicator before CPU-heavy mesh/texture work.
+        await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
+        if (this._loadId !== currentLoadId) {
+          this.disposeUnloadedModel(gltf.scene);
+          return;
+        }
+        try {
         const root = gltf.scene;
 
         const meshesInGltf = [];
@@ -380,7 +407,8 @@ export class ShirtViewer {
             this.controls.update();
           }
 
-          // Apply product colors from state
+          // Expose actual material capabilities only after this model is ready.
+          this.loadedModelUrl = modelUrl;
           this.updateMaterialColor(this.getState().colors);
           this.updateDecals();
           this.setComponentVisibility(this.componentVisibility);
@@ -468,101 +496,109 @@ export class ShirtViewer {
             this.controls.update();
           }
         }
+        this.loadedModelUrl = modelUrl;
+        this.container.dispatchEvent(new CustomEvent('model-loaded'));
+        // animate() hides the indicator only after rendering the first frame.
+        this.pendingReadyLoadId = currentLoadId;
+        } catch (error) {
+          this.failModelLoad(currentLoadId, error);
+        }
       },
-      undefined,
+      (event) => {
+        if (this._loadId === currentLoadId) this.loadingIndicator.update(event);
+      },
       (error) => {
-        console.error('Error loading 3D model:', error);
+        dracoLoader.dispose();
+        this.failModelLoad(currentLoadId, error);
       }
     );
+  }
+
+  disposeUnloadedModel(root) {
+    root.traverse(node => {
+      if (!node.isMesh) return;
+      node.geometry?.dispose();
+      for (const material of Array.isArray(node.material) ? node.material : [node.material]) {
+        if (!material) continue;
+        for (const value of Object.values(material)) if (value?.isTexture) value.dispose();
+        material.dispose();
+      }
+    });
+  }
+
+  failModelLoad(loadId, error) {
+    if (this._loadId !== loadId) return;
+    this.isModelLoading = false;
+    this.pendingReadyLoadId = null;
+    this.loadedModelUrl = null;
+    this.loadingIndicator.fail();
+    console.error('Error loading 3D model:', error);
+  }
+
+  getColorControls() {
+    const product = this.getState().activeProduct;
+    if (!product || this.loadedModelUrl !== product.modelUrl) return [];
+    return getMaterialColorControls(product, this.materialGroups.keys());
+  }
+
+  // Remove the baked base hue, not surface detail. A dark/blue source texture
+  // otherwise multiplies the picker color and prevents white/red recoloring.
+  prepareTintTexture(material) {
+    if (!material.map || material._sobralTintMap) return;
+    const source = material.map;
+    const image = source.image;
+    if (!image?.width || !image?.height) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    context.drawImage(image, 0, 0);
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < pixels.data.length; i += 4) {
+      const luminance = (0.2126 * pixels.data[i] + 0.7152 * pixels.data[i + 1] + 0.0722 * pixels.data[i + 2]) / 255;
+      const value = Math.round(96 + 159 * Math.sqrt(luminance));
+      pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = value;
+    }
+    context.putImageData(pixels, 0, 0);
+    const texture = source.clone();
+    texture.source = new THREE.Source(canvas);
+    texture.needsUpdate = true;
+    material._sobralTintMap = texture;
+    material.map = texture;
+    material.needsUpdate = true;
   }
 
   updateMaterialColor(colors) {
     if (!colors) return;
     if (this.isMultiMesh) {
-      const primaryColor = colors.primary || '#1b2034';
-      const accentColor = colors.accent || primaryColor;
-      const collarColor = colors.collar || colors.accent || primaryColor;
-
-      // Helper: for worker model colorable zones, strip the photorealistic texture
-      // so material.color becomes the sole color source (no multiplicative darkening).
-      const setColorClean = (mat, hex) => {
-        mat.color.set(hex);
-        // If this material still has a photorealistic base-color map that would
-        // multiply with the color, remove it.  We detect "worker" materials by
-        // checking if we stored the original map during first load.
-        if (mat.map && !mat._sobralTexNeutralised) {
-          // Save original map so we could restore later if needed
-          mat._sobralOrigMap = mat.map;
-          mat.map = null;
-          mat.needsUpdate = true;
-          mat._sobralTexNeutralised = true;
+      const product = this.getState().activeProduct;
+      if (this.loadedModelUrl !== product?.modelUrl) return;
+      for (const control of this.getColorControls()) {
+        for (const role of control.roles) {
+          for (const material of this.materialGroups.get(role) || []) {
+            if (product.colorMaterials) {
+              this.prepareTintTexture(material);
+            } else if (product.silhouette === 'worker' && material.map) {
+              // Keep the original worker's established separate-part coloring.
+              material.map = null;
+              material.needsUpdate = true;
+            }
+            material.color.set(colors[control.id] || '#ffffff');
+          }
         }
-      };
-
-      // Detect whether the active product is the worker mannequin
-      const state = this.getState();
-      const isWorker = state?.activeProduct?.silhouette === 'worker';
-
-      // Primary Body / Shell Roles (includes helmet shell)
-      ['fabric_primary', 'shell_primary', 'knit_shell', 'trousers_mainshell', 'shirt'].forEach(role => {
-        const group = this.materialGroups.get(role);
-        if (group) group.forEach(mat => {
-          if (isWorker) { setColorClean(mat, primaryColor); } else { mat.color.set(primaryColor); }
-        });
-      });
-
-      // Accent / Secondary / Hood / Hardware Roles
-      ['fabric_secondary', 'shell_secondary', 'hood_lining', 'stretch_panels', 'reinforcement', 'hardware_orange', 'emboss_white'].forEach(role => {
-        const group = this.materialGroups.get(role);
-        if (group) group.forEach(mat => {
-          if (isWorker) { setColorClean(mat, accentColor); } else { mat.color.set(accentColor); }
-        });
-      });
-
-      const trousersCol = colors.trousers || '#1a2232';
-      ['trousers'].forEach(role => {
-        const group = this.materialGroups.get(role);
-        if (group) group.forEach(mat => {
-          if (isWorker) { setColorClean(mat, trousersCol); } else { mat.color.set(trousersCol); }
-        });
-      });
-
-      // Dedicated Helmet Shell Role
-      const helmetColor = colors.helmet || '#ffffff';
-      ['helmet'].forEach(role => {
-        const group = this.materialGroups.get(role);
-        if (group) group.forEach(mat => {
-          if (isWorker) { setColorClean(mat, helmetColor); } else { mat.color.set(helmetColor); }
-        });
-      });
-
-      // Dedicated Boots / Shoes Role
-      const bootsColor = colors.boots || '#1a1a1a';
-      ['boots'].forEach(role => {
-        const group = this.materialGroups.get(role);
-        if (group) group.forEach(mat => {
-          if (isWorker) { setColorClean(mat, bootsColor); } else { mat.color.set(bootsColor); }
-        });
-      });
-
-      // Photorealistic Neutral Roles (face, skin, gloves) - always pure neutral
-      // For neutral zones we KEEP the original texture so they remain photorealistic
-      ['neutral', 'skin'].forEach(role => {
-        const group = this.materialGroups.get(role);
-        if (group) group.forEach(mat => mat.color.set(0xffffff));
-      });
-
-      // Collar / Rib trim / Straps / Headband Roles
-      ['rib_trim', 'collar', 'lining', 'shirt_trim', 'strap_webbing', 'headband', 'hardware_black'].forEach(role => {
-        const group = this.materialGroups.get(role);
-        if (group) group.forEach(mat => mat.color.set(collarColor));
-      });
+      }
+      // Face, skin and gloves are never recolored.
+      for (const role of ['neutral', 'skin']) {
+        this.materialGroups.get(role)?.forEach(material => material.color.set(0xffffff));
+      }
     } else if (this.shirtMaterial) {
       this.shirtMaterial.color.set(0xffffff);
     }
   }
 
-  async updateDecals() {
+  async updateDecals(stateOverride = null) {
+    const updateId = this._decalUpdateId = (this._decalUpdateId || 0) + 1;
+    const loadId = this._loadId;
     // Clear previous decals
     while (this.decalGroup.children.length > 0) {
       const obj = this.decalGroup.children[0];
@@ -576,7 +612,7 @@ export class ShirtViewer {
 
     if (!this.isAiModel && !this.isMultiMesh) return;
 
-    const state = this.getState();
+    const state = stateOverride || this.getState();
     const activeProduct = state.activeProduct;
     const targetMeshes = this.isMultiMesh ? this.productMeshes : (this.shirtMesh ? [this.shirtMesh] : []);
     if (!targetMeshes.length) return;
@@ -624,6 +660,7 @@ export class ShirtViewer {
         return new Promise(r => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => r(i); i.onerror = () => r(null); i.src = src; });
       };
       const img = await loadImageFn(logo.src);
+      if (updateId !== this._decalUpdateId || loadId !== this._loadId) return;
       if (!img) continue;
 
       const logoTex = new THREE.CanvasTexture(img);
@@ -1263,6 +1300,12 @@ export class ShirtViewer {
     }
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
+    if (this.pendingReadyLoadId === this._loadId) {
+      this.pendingReadyLoadId = null;
+      this.isModelLoading = false;
+      this.loadingIndicator.hide();
+      this.container.dispatchEvent(new CustomEvent('model-ready'));
+    }
   }
 
   // Capture angle snapshot with clean texture (no gizmos)

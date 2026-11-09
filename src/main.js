@@ -318,9 +318,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     productSwitcher = new ProductSwitcher(
       productSwitcherRoot,
       catalog,
-      (newProd) => {
-        onProductSwitched(newProd);
-      },
       () => {
         creationScreen.open(true);
       }
@@ -381,6 +378,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.colors.boots = prod.colors?.boots || '#1a1a1a';
 
     await textureEngine.render(state);
+    // A newer selection may have happened while fabric/photo rendering awaited.
+    if (state.activeProduct !== prod) return;
 
     if (viewer) {
       viewer.loadModel(prod.modelUrl || '/shirt_baked.glb');
@@ -470,6 +469,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderActivePanel();
   };
 
+  // Material capabilities are known only once the asynchronous GLB load ends.
+  canvasContainer.addEventListener('model-loaded', () => {
+    if (activeTab === 'colors') colorPanel?.render();
+  });
   renderActivePanel();
   isAppReady = true;
 

@@ -454,6 +454,46 @@ body {
   cursor: grabbing;
 }
 
+.model-load-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  background: rgba(12, 18, 27, 0.42);
+  cursor: wait;
+}
+.model-load-overlay[hidden] { display: none; }
+.model-load-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: min(320px, 85%);
+  padding: 26px;
+  border-radius: 16px;
+  background: #18212e;
+  color: #f8fafc;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+.model-load-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #64748b;
+  border-top-color: #ff6b35;
+  border-radius: 50%;
+  animation: model-load-spin 0.9s linear infinite;
+}
+.model-load-progress { width: 100%; accent-color: #ff6b35; }
+.model-load-detail { font-size: 12px; color: #cbd5e1; }
+.model-load-retry { padding: 8px 14px; border-radius: 8px; background: #ff6b35; color: #111827; cursor: pointer; }
+.model-load-retry[hidden], .model-load-progress[hidden] { display: none; }
+.model-load-overlay[data-state="error"] { cursor: default; }
+.model-load-overlay[data-state="error"] .model-load-spinner { display: none; }
+@keyframes model-load-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .model-load-spinner { animation: none; } }
+
 /* Floating 3D Controls Bar */
 .floating-view-bar {
   position: absolute;
