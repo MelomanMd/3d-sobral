@@ -1,7 +1,6 @@
 import { PATTERNS } from '../core/patterns.js';
 import { t } from '../core/i18n.js';
 import { ICONS } from '../core/icons.js';
-import { openPhotoComparisonDialog } from './exportModal.js';
 
 export const SPORT_PALETTES = [
   { name: 'Navy Dunkelblau', hex: '#1b2034' },
@@ -193,36 +192,6 @@ export class ColorPanel {
         </div>
       ` : '')}
 
-      <!-- Darstellung & Studio (Background, Wireframe & Reset) -->
-      <div class="panel-section" style="padding-top: 8px;">
-        <div class="section-title">
-          <span class="title-icon-svg">${ICONS.sun}</span>
-          <span>${t('display_settings')}</span>
-        </div>
-        <div class="display-settings-card">
-          <div class="display-row">
-            <label class="display-label" for="select-panel-bg">${t('bg_label')}</label>
-            <select id="select-panel-bg" class="custom-select-sm">
-              <option value="light" ${(this.viewer?.currentBackground || 'light') === 'light' ? 'selected' : ''}>☀️ ${t('bg_studio_light')}</option>
-              <option value="white" ${(this.viewer?.currentBackground) === 'white' ? 'selected' : ''}>⚪ ${t('bg_white')}</option>
-              <option value="dark" ${(this.viewer?.currentBackground) === 'dark' ? 'selected' : ''}>🌙 ${t('bg_studio_dark')}</option>
-            </select>
-          </div>
-          <div class="display-row">
-            <label class="display-label" for="switch-panel-wireframe">Drahtgitter / Wireframe</label>
-            <input type="checkbox" id="switch-panel-wireframe" class="custom-toggle" ${this.viewer?.isWireframe ? 'checked' : ''}>
-          </div>
-          ${this.state.activeProduct?.comparisonPhoto ? `
-            <button class="btn-sm btn-outline-glass" id="btn-sidebar-comparison" style="width: 100%; justify-content: center; gap: 8px; margin-top: 4px; padding: 9px 12px; font-size: 12px;">
-              <span class="btn-icon-svg">${ICONS.eye}</span>
-              <span>${t('photo_comparison_view')}</span>
-            </button>
-          ` : ''}
-          <button class="reset-link-btn" id="btn-panel-reset">
-            ${t('reset_view')}
-          </button>
-        </div>
-      </div>
     `;
 
     this.bindEvents();
@@ -291,47 +260,6 @@ export class ColorPanel {
       });
     });
 
-    // Background selection
-    const selectBg = this.container.querySelector('#select-panel-bg');
-    if (selectBg) {
-      selectBg.addEventListener('change', (e) => {
-        if (this.viewer) {
-          this.viewer.setBackground(e.target.value);
-        }
-      });
-    }
-
-    // Wireframe toggle
-    const switchWireframe = this.container.querySelector('#switch-panel-wireframe');
-    if (switchWireframe) {
-      switchWireframe.addEventListener('change', (e) => {
-        if (this.viewer) {
-          this.viewer.setWireframe(e.target.checked);
-        }
-      });
-    }
-
-    // Panel Reset View
-    const btnReset = this.container.querySelector('#btn-panel-reset');
-    if (btnReset) {
-      btnReset.addEventListener('click', () => {
-        if (this.viewer) {
-          this.viewer.resetView();
-          this.render();
-        }
-      });
-    }
-
-    // Sidebar Comparison Dialog Button
-    const btnComp = this.container.querySelector('#btn-sidebar-comparison');
-    if (btnComp) {
-      btnComp.addEventListener('click', () => {
-        const photoUrl = this.state.activeProduct?.comparisonPhoto;
-        if (photoUrl) {
-          openPhotoComparisonDialog(photoUrl);
-        }
-      });
-    }
   }
 
   updateState(newState) {

@@ -48,6 +48,7 @@ try {
     await page.waitForFunction(previous => window.appViewer._loadId > previous && window.appViewer.loadedModelUrl && window.appViewer.shirtGroup, { timeout: 60000 }, loadId);
     const visibleZones = await page.$$eval('.mini-native-picker', inputs => inputs.map(input => input.dataset.pickerZone));
     assert.deepEqual(visibleZones, zones, `${id}: only supported color controls`);
+    assert.equal(await page.$('.display-settings-card'), null, `${id}: right-side Darstellung & Studio block removed`);
     if (id !== 'sobral_workwear_tshirt') assert.equal(await page.$('.compact-pattern-card'), null, `${id}: no unsupported texture patterns`);
     if (id === 'sobral_whe00113') {
       assert.ok(await page.$('#switch-straps'), 'original segmented helmet retains component toggles');
