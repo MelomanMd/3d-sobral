@@ -120,9 +120,8 @@ export class LogoPanel {
             </div>
 
             <!-- Accordion Button: Größe / Position anpassen + -->
-            <button class="figma-accordion-btn" id="btn-toggle-advanced">
-              <span>Größe / Position anpassen</span>
-              <span class="acc-icon">${this.isAdvancedOpen ? '−' : '+'}</span>
+            <button type="button" class="figma-accordion-btn" id="btn-toggle-advanced">
+              Größe / Position anpassen ${this.isAdvancedOpen ? '−' : '+'}
             </button>
 
             <!-- Advanced Sliders Container -->
@@ -132,9 +131,12 @@ export class LogoPanel {
                 <div class="figma-stepper-box">
                   <label class="figma-stepper-label">SKALIERUNG</label>
                   <div class="figma-stepper-controls">
-                    <button class="btn-step" data-action="dec-scale">−</button>
                     <span class="step-val">${Math.round((activeItem.scale || 1.0) * 100)} %</span>
-                    <button class="btn-step" data-action="inc-scale">+</button>
+                    <div class="figma-stepper-btns">
+                      <button type="button" class="btn-step" data-action="dec-scale">−</button>
+                      <span class="step-sep">/</span>
+                      <button type="button" class="btn-step" data-action="inc-scale">+</button>
+                    </div>
                   </div>
                 </div>
 
@@ -142,9 +144,12 @@ export class LogoPanel {
                 <div class="figma-stepper-box">
                   <label class="figma-stepper-label">DREHWINKEL</label>
                   <div class="figma-stepper-controls">
-                    <button class="btn-step" data-action="dec-rot">−</button>
                     <span class="step-val">${activeItem.rotation || 0}°</span>
-                    <button class="btn-step" data-action="inc-rot">+</button>
+                    <div class="figma-stepper-btns">
+                      <button type="button" class="btn-step" data-action="dec-rot">−</button>
+                      <span class="step-sep">/</span>
+                      <button type="button" class="btn-step" data-action="inc-rot">+</button>
+                    </div>
                   </div>
                 </div>
 
@@ -152,9 +157,12 @@ export class LogoPanel {
                 <div class="figma-stepper-box">
                   <label class="figma-stepper-label">VERSATZ X</label>
                   <div class="figma-stepper-controls">
-                    <button class="btn-step" data-action="dec-ox">−</button>
                     <span class="step-val">${Math.round(activeItem.offsetX || 0)}</span>
-                    <button class="btn-step" data-action="inc-ox">+</button>
+                    <div class="figma-stepper-btns">
+                      <button type="button" class="btn-step" data-action="dec-ox">−</button>
+                      <span class="step-sep">/</span>
+                      <button type="button" class="btn-step" data-action="inc-ox">+</button>
+                    </div>
                   </div>
                 </div>
 
@@ -162,9 +170,12 @@ export class LogoPanel {
                 <div class="figma-stepper-box">
                   <label class="figma-stepper-label">VERSATZ Y</label>
                   <div class="figma-stepper-controls">
-                    <button class="btn-step" data-action="dec-oy">−</button>
                     <span class="step-val">${Math.round(activeItem.offsetY || 0)}</span>
-                    <button class="btn-step" data-action="inc-oy">+</button>
+                    <div class="figma-stepper-btns">
+                      <button type="button" class="btn-step" data-action="dec-oy">−</button>
+                      <span class="step-sep">/</span>
+                      <button type="button" class="btn-step" data-action="inc-oy">+</button>
+                    </div>
                   </div>
                 </div>
               </div>

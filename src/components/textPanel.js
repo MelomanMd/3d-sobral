@@ -183,9 +183,12 @@ export class TextPanel {
               <div class="figma-stepper-box">
                 <label class="figma-stepper-label">SCHRIFTGRÖSSE</label>
                 <div class="figma-stepper-controls">
-                  <button class="btn-step" data-action="dec-size">−</button>
                   <span class="step-val" id="val-fontsize">${activeItem.fontSize}</span>
-                  <button class="btn-step" data-action="inc-size">+</button>
+                  <div class="figma-stepper-btns">
+                    <button type="button" class="btn-step" data-action="dec-size">−</button>
+                    <span class="step-sep">/</span>
+                    <button type="button" class="btn-step" data-action="inc-size">+</button>
+                  </div>
                 </div>
               </div>
 
@@ -193,9 +196,12 @@ export class TextPanel {
               <div class="figma-stepper-box">
                 <label class="figma-stepper-label">KONTURSTÄRKE</label>
                 <div class="figma-stepper-controls">
-                  <button class="btn-step" data-action="dec-stroke">−</button>
                   <span class="step-val" id="val-stroke">${activeItem.strokeWidth || 0} px</span>
-                  <button class="btn-step" data-action="inc-stroke">+</button>
+                  <div class="figma-stepper-btns">
+                    <button type="button" class="btn-step" data-action="dec-stroke">−</button>
+                    <span class="step-sep">/</span>
+                    <button type="button" class="btn-step" data-action="inc-stroke">+</button>
+                  </div>
                 </div>
               </div>
 
@@ -203,9 +209,7 @@ export class TextPanel {
               <div class="figma-stepper-box">
                 <label class="figma-stepper-label">KONTURFARBE</label>
                 <div class="figma-stepper-controls">
-                  <span class="figma-color-dot" style="background-color: ${activeItem.strokeColor || '#000000'};"></span>
-                  <input type="color" class="figma-color-native" id="input-stroke-color" value="${activeItem.strokeColor || '#000000'}">
-                  <span class="step-val">${activeItem.strokeWidth ? 'Schwarz' : 'Keine'}</span>
+                  <span class="step-val" id="val-strokecolor">${activeItem.strokeWidth ? 'Schwarz' : 'Keine'}</span>
                 </div>
               </div>
 
@@ -213,9 +217,12 @@ export class TextPanel {
               <div class="figma-stepper-box">
                 <label class="figma-stepper-label">BOGENWÖLBUNG</label>
                 <div class="figma-stepper-controls">
-                  <button class="btn-step" data-action="dec-arc">−</button>
                   <span class="step-val" id="val-arc">${activeItem.arc || 0} %</span>
-                  <button class="btn-step" data-action="inc-arc">+</button>
+                  <div class="figma-stepper-btns">
+                    <button type="button" class="btn-step" data-action="dec-arc">−</button>
+                    <span class="step-sep">/</span>
+                    <button type="button" class="btn-step" data-action="inc-arc">+</button>
+                  </div>
                 </div>
               </div>
 
@@ -223,9 +230,12 @@ export class TextPanel {
               <div class="figma-stepper-box">
                 <label class="figma-stepper-label">DREHWINKEL</label>
                 <div class="figma-stepper-controls">
-                  <button class="btn-step" data-action="dec-rot">−</button>
                   <span class="step-val" id="val-rot">${activeItem.rotation || 0}°</span>
-                  <button class="btn-step" data-action="inc-rot">+</button>
+                  <div class="figma-stepper-btns">
+                    <button type="button" class="btn-step" data-action="dec-rot">−</button>
+                    <span class="step-sep">/</span>
+                    <button type="button" class="btn-step" data-action="inc-rot">+</button>
+                  </div>
                 </div>
               </div>
 
@@ -233,9 +243,12 @@ export class TextPanel {
               <div class="figma-stepper-box">
                 <label class="figma-stepper-label">VERSATZ X / Y</label>
                 <div class="figma-stepper-controls">
-                  <button class="btn-step" data-action="dec-offset">−</button>
                   <span class="step-val" id="val-offset">${Math.round(activeItem.offsetX || 0)} / ${Math.round(activeItem.offsetY || 0)}</span>
-                  <button class="btn-step" data-action="inc-offset">+</button>
+                  <div class="figma-stepper-btns">
+                    <button type="button" class="btn-step" data-action="dec-offset">−</button>
+                    <span class="step-sep">/</span>
+                    <button type="button" class="btn-step" data-action="inc-offset">+</button>
+                  </div>
                 </div>
               </div>
             </div>

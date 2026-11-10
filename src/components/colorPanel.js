@@ -9,10 +9,10 @@ export const OUTFIT_ELEMENTS = [
     defaultColorName: 'Gelb',
     palette: [
       { name: 'Gelb', hex: '#FFCF24' },
-      { name: 'Blau', hex: '#283B79' },
+      { name: 'Blau', hex: '#4D9CFF' },
       { name: 'Weiss', hex: '#FFFFFF' },
-      { name: 'Orange', hex: '#F98900' },
-      { name: 'Grün', hex: '#1C5600' }
+      { name: 'Orange', hex: '#FF7A00' },
+      { name: 'Grün', hex: '#1E5E1E' }
     ]
   },
   {
@@ -24,9 +24,9 @@ export const OUTFIT_ELEMENTS = [
       { name: '8894 Marineblau / Grau', hex: '#242935' },
       { name: 'Weiss / Dunkelgrau', hex: '#FFFFFF' },
       { name: 'Rot / Schwarz', hex: '#C3303C' },
-      { name: 'Kornblumenblau / Schwarz', hex: '#334B97' },
-      { name: 'Dunkelmarineblau / Schwarz', hex: '#222337' },
-      { name: 'Grau / Schwarz', hex: '#656A70' }
+      { name: 'Kornblumenblau / Schwarz', hex: '#284282' },
+      { name: 'Dunkelmarineblau / Schwarz', hex: '#1B2034' },
+      { name: 'Grau / Schwarz', hex: '#70757E' }
     ]
   },
   {
@@ -36,11 +36,11 @@ export const OUTFIT_ELEMENTS = [
     defaultColorName: '8600 Marineblau',
     palette: [
       { name: '8600 Marineblau', hex: '#242935' },
-      { name: 'Grau', hex: '#656A70' },
+      { name: 'Grau', hex: '#5A6069' },
       { name: 'Schwarz', hex: '#1D1D1B' },
-      { name: 'Waldgrün', hex: '#1C5600' },
-      { name: 'Kornblumenblau', hex: '#334B97' },
-      { name: 'Braun / Sand', hex: '#8C7355' }
+      { name: 'Waldgrün', hex: '#2D4436' },
+      { name: 'Kornblumenblau', hex: '#284282' },
+      { name: 'Braun / Sand', hex: '#7D6246' }
     ]
   },
   {
@@ -50,7 +50,7 @@ export const OUTFIT_ELEMENTS = [
     defaultColorName: 'Schwarz',
     palette: [
       { name: 'Schwarz', hex: '#1D1D1B' },
-      { name: 'Grau', hex: '#656A70' },
+      { name: 'Grau', hex: '#5A6069' },
       { name: 'Braun', hex: '#5C3D24' }
     ]
   }
@@ -73,7 +73,7 @@ export class ColorPanel {
     const el = OUTFIT_ELEMENTS.find(e => e.id === zoneId);
     if (!el) return hex;
     const match = el.palette.find(p => p.hex.toLowerCase() === (hex || '').toLowerCase());
-    return match ? match.name : hex;
+    return match ? match.name : el.defaultColorName;
   }
 
   setActiveZone(zone) {
@@ -90,14 +90,12 @@ export class ColorPanel {
           <p class="figma-panel-subtitle">Wähle Produkte und passende Farben für deinen Look.</p>
         </div>
 
-        <!-- 4 Outfit Cards with Inline Swatches (Figma Frame 1876:7821) -->
+        <!-- 4 Outfit Cards with Inline Swatches (Figma 01_produkte_farben.png) -->
         <div class="figma-outfit-cards-list">
           ${OUTFIT_ELEMENTS.map(el => {
-            const isSelected = this.activeZone === el.id;
-            const currentHex = this.state.colors[el.id] || el.palette[0].hex;
+            const currentHex = (this.state.colors[el.id] || el.palette[0].hex).toLowerCase();
             const currentColorName = this.getColorName(el.id, currentHex);
 
-            // Dynamic brand title if different active product
             let brandText = el.brandModel;
             if (el.id === 'primary' && this.state.activeProduct?.name) {
               if (this.state.activeProduct.silhouette !== 'worker') {
@@ -106,7 +104,7 @@ export class ColorPanel {
             }
 
             return `
-              <div class="figma-outfit-card ${isSelected ? 'active' : ''}" data-zone="${el.id}">
+              <div class="figma-outfit-card" data-zone="${el.id}">
                 <div class="figma-card-header">
                   <div class="figma-card-name">${el.name}</div>
                   <div class="figma-card-brand">${brandText}</div>
@@ -118,15 +116,15 @@ export class ColorPanel {
 
                 <!-- Row of square swatches -->
                 <div class="figma-swatches-row">
-                  ${el.palette.map(sw => {
-                    const isSwatchActive = (currentHex || '').toLowerCase() === sw.hex.toLowerCase();
+                  ${el.palette.map((sw, idx) => {
+                    const isSwatchActive = currentHex === sw.hex.toLowerCase() || (idx === 0 && !el.palette.some(p => p.hex.toLowerCase() === currentHex));
                     return `
                       <button class="figma-square-swatch ${isSwatchActive ? 'active' : ''}" 
                               data-zone="${el.id}" 
                               data-hex="${sw.hex}" 
                               data-name="${sw.name}"
                               style="background-color: ${sw.hex};" 
-                              title="${sw.name} (${sw.hex})">
+                              title="${sw.name}">
                       </button>
                     `;
                   }).join('')}
@@ -147,7 +145,6 @@ export class ColorPanel {
       card.addEventListener('click', (e) => {
         if (e.target.closest('.figma-square-swatch')) return;
         this.activeZone = card.dataset.zone;
-        this.render();
       });
     });
 

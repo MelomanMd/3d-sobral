@@ -39,42 +39,32 @@ export class QuoteModal {
     modal.className = 'modal-backdrop';
     modal.id = 'quote-modal-root';
     modal.innerHTML = `
-      <div class="modal-card figma-quote-card" style="max-width: 580px; background: #ffffff; border-radius: 12px; box-shadow: 0 25px 60px rgba(0,0,0,0.35); overflow: hidden;">
-        <div class="modal-header" style="padding: 24px 28px 16px 28px; border-bottom: none; display: flex; align-items: flex-start; justify-content: space-between; background: #ffffff;">
-          <div class="modal-title-group">
-            <h2 class="modal-title" style="margin: 0; font-size: 20px; font-weight: 700; color: #1d1d1b; font-family: 'Neue DIN', sans-serif; letter-spacing: 0.5px;">ANGEBOT ANFORDERN</h2>
-            <p style="margin: 4px 0 0 0; font-size: 13px; color: #6b7280;">Kontaktdaten für dein individuelles Angebot.</p>
+      <div class="modal-card figma-quote-card" style="max-width: 520px; width: 100%; background: #ffffff; border-radius: 2px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); padding: 32px 36px 36px 36px; overflow: hidden;">
+        <div class="modal-title-group" style="margin-bottom: 24px;">
+          <h2 class="modal-title" style="margin: 0; font-size: 20px; font-weight: 700; color: #1d1d1b; font-family: 'Neue DIN', sans-serif; letter-spacing: 0.5px;">ANGEBOT ANFORDERN</h2>
+          <p style="margin: 6px 0 0 0; font-size: 13px; color: #6b7280;">Kontaktdaten für dein individuelles Angebot.</p>
+        </div>
+
+        <form id="quote-request-form" style="display: flex; flex-direction: column; gap: 20px;">
+          <!-- E-MAIL Field -->
+          <div class="figma-field-group">
+            <label class="figma-label">E-MAIL</label>
+            <input type="email" id="quote-email" value="${customer.email || 'name@firma.ch'}" placeholder="name@firma.ch" required class="figma-input" style="height: 44px; border-radius: 2px;">
           </div>
-          <button class="modal-close-btn" id="quote-btn-close" style="width: 34px; height: 34px; border-radius: 50%; border: 1px solid #e5e7eb; background: #ffffff; color: #1d1d1b; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-            ✕
-          </button>
-        </div>
 
-        <div class="modal-body" style="padding: 10px 28px 24px 28px; background: #ffffff;">
-          <form id="quote-request-form" style="display: flex; flex-direction: column; gap: 16px;">
-            <!-- E-MAIL Field -->
-            <div class="figma-field-group">
-              <label class="figma-label">E-MAIL</label>
-              <input type="email" id="quote-email" value="${customer.email || ''}" placeholder="name@firma.ch" required class="figma-input">
-            </div>
+          <!-- FIRMA Field -->
+          <div class="figma-field-group">
+            <label class="figma-label">FIRMA</label>
+            <input type="text" id="quote-company" value="${customer.company || 'Dein Unternehmen'}" placeholder="Dein Unternehmen" required class="figma-input" style="height: 44px; border-radius: 2px;">
+          </div>
 
-            <!-- FIRMA Field -->
-            <div class="figma-field-group">
-              <label class="figma-label">FIRMA</label>
-              <input type="text" id="quote-company" value="${customer.company || ''}" placeholder="Dein Unternehmen" required class="figma-input">
-            </div>
-
-            <!-- Button ZURÜCK ZUM ENTWURF -->
-            <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
-              <button type="submit" class="btn-figma-orange-action" id="btn-quote-submit" style="width: 100%; height: 46px; font-size: 14px; font-weight: 700; border-radius: 6px; border: none; background: #ff4400; color: #ffffff; cursor: pointer; font-family: 'Neue DIN', sans-serif;">
-                ANGEBOT JETZT ABSENDEN
-              </button>
-              <button type="button" class="btn-figma-white-action" id="btn-quote-back" style="width: 100%; height: 44px; font-size: 13px; font-weight: 700; border-radius: 6px; border: 1px solid #d1d5db; background: #ffffff; color: #1d1d1b; cursor: pointer; font-family: 'Neue DIN', sans-serif;">
-                ZURÜCK ZUM ENTWURF
-              </button>
-            </div>
-          </form>
-        </div>
+          <!-- Button ZURÜCK ZUM ENTWURF -->
+          <div style="margin-top: 8px;">
+            <button type="button" class="btn-figma-white-action" id="btn-quote-back" style="width: 100%; height: 44px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; border-radius: 2px; border: 1px solid #d1d5db; background: #ffffff; color: #1d1d1b; cursor: pointer; font-family: 'Neue DIN', sans-serif; text-transform: uppercase;">
+              ZURÜCK ZUM ENTWURF
+            </button>
+          </div>
+        </form>
       </div>
     `;
 
@@ -82,7 +72,6 @@ export class QuoteModal {
     this.modalEl = modal;
 
     // Events
-    modal.querySelector('#quote-btn-close').addEventListener('click', () => this.close());
     modal.querySelector('#btn-quote-back').addEventListener('click', () => this.close());
     modal.addEventListener('click', (e) => {
       if (e.target === modal) this.close();

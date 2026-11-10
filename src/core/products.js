@@ -308,10 +308,10 @@ export const DEFAULT_PRODUCTS = [
     baseColor: '#243249',
     accentColor: '#ff4400',
     colors: {
-      helmet: '#ffffff',
-      primary: '#243249',
-      trousers: '#1b2034',
-      boots: '#1a1a1a',
+      helmet: '#ffcf24',
+      primary: '#242935',
+      trousers: '#242935',
+      boots: '#1d1d1b',
       accent: '#ff4400',
       collar: '#243249',
       secondary: '#ffffff'
@@ -327,7 +327,7 @@ export const DEFAULT_PRODUCTS = [
       helmet_left: { name: 'Schutzhelm Links', isFront: true, defaultScale: 0.22, rayOrigin: [0.35, 0.375, 0.005], rayDir: [-1, 0, 0], targetMesh: 'worker_helmet' },
       helmet_right: { name: 'Schutzhelm Rechts', isFront: true, defaultScale: 0.22, rayOrigin: [-0.35, 0.375, 0.005], rayDir: [1, 0, 0], targetMesh: 'worker_helmet' },
       chest_center: { name: 'Brustmitte (Jacke)', isFront: true, defaultScale: 0.85, rayOrigin: [0.0, 0.12, 0.5], rayDir: [0, 0, -1], targetMesh: 'worker_fabric_primary' },
-      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.55, rayOrigin: [0.06, 0.14, 0.5], rayDir: [-0.05, 0, -1], targetMesh: 'worker_fabric_primary' },
+      chest_left: { name: 'Linke Brust (Logo)', isFront: true, defaultScale: 0.95, rayOrigin: [0.038, 0.11, 0.5], rayDir: [0, 0, -1], targetMesh: 'worker_fabric_primary' },
       chest_right: { name: 'Rechte Brust', isFront: true, defaultScale: 0.55, rayOrigin: [-0.06, 0.14, 0.5], rayDir: [0.05, 0, -1], targetMesh: 'worker_fabric_primary' },
       back_center: { name: 'Rückenprint (Jacke)', isFront: false, defaultScale: 0.95, rayOrigin: [0.0, 0.12, -0.5], rayDir: [0, 0, 1], targetMesh: 'worker_fabric_primary' },
       sleeve_left: { name: 'Linker Ärmel (Jacke)', isFront: true, defaultScale: 0.50, rayOrigin: [0.18, 0.15, 0.0], rayDir: [-1, 0, 0], targetMesh: 'worker_fabric_primary' },

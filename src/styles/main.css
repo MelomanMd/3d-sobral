@@ -220,9 +220,9 @@ body.sobral-theme-2026 {
 .hud-title-sub {
   font-family: 'Neue DIN', sans-serif;
   font-size: 11px;
-  font-weight: 700;
-  color: #ff4400;
-  letter-spacing: 1px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.5px;
   text-transform: uppercase;
 }
 
@@ -468,33 +468,34 @@ body.sobral-theme-2026 {
 }
 
 .btn-sidebar-close {
-  background: #f7f8f9;
-  border: 1px solid #e5e7eb;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
+  background: transparent !important;
+  border: none !important;
+  font-size: 26px !important;
+  color: #1d1d1b !important;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity 0.15s ease;
+  width: auto;
+  height: auto;
   flex-shrink: 0;
   margin-left: 12px;
 }
 
 .btn-sidebar-close:hover {
-  background: #f1f3f5;
-  color: #1d1d1b;
-  border-color: #cbd5e1;
+  opacity: 0.6;
 }
 
 /* Stepper Navigation */
 .config-stepper {
   display: flex;
-  border-bottom: 1px solid #e5e7eb;
+  gap: 8px;
   background: #ffffff;
-  padding: 0 16px;
+  padding: 16px 20px 0 20px;
+  border-bottom: none !important;
 }
 
 .stepper-tab {
@@ -502,43 +503,36 @@ body.sobral-theme-2026 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 14px 6px;
-  background: transparent;
-  border: none;
-  border-bottom: 3px solid transparent;
+  padding: 12px 10px;
+  background: #f4f5f7 !important;
+  border: none !important;
+  border-radius: 4px;
   font-family: 'Neue DIN', sans-serif;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .stepper-num {
-  font-size: 13px;
-  font-weight: 700;
-  color: #9ca3af;
-  transition: color 0.2s;
+  display: none;
 }
 
 .stepper-label {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
-  color: #6b7280;
+  color: #1d1d1b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: color 0.2s;
   white-space: nowrap;
 }
 
-.stepper-tab:hover .stepper-label {
-  color: #1d1d1b;
+.stepper-tab:hover {
+  background: #eceef1 !important;
 }
 
 .stepper-tab.active {
-  border-bottom-color: #ff4400;
-}
-
-.stepper-tab.active .stepper-num {
-  color: #ff4400;
+  background: #fff5ee !important;
+  box-shadow: inset 0 -3px 0 0 #ff4400 !important;
 }
 
 .stepper-tab.active .stepper-label {
@@ -4371,44 +4365,47 @@ dialog.comparison-dialog-root::backdrop {
   color: #1D1D1B;
   font-family: 'Neue DIN', sans-serif;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: 0.5px;
-  padding: 10px 18px;
-  border-radius: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 4px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.15s ease;
 }
 
 .btn-hud-change-product-figma:hover {
   background: #F4F5F7;
-  transform: translateY(-1px);
 }
 
 .btn-hud-action-sq {
-  background: #FFFFFF;
-  color: #1D1D1B;
-  width: 38px;
-  height: 38px;
-  border-radius: 6px;
+  background: #FFFFFF !important;
+  color: #1D1D1B !important;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.15s ease;
 }
 
 .btn-hud-action-sq:hover:not(:disabled) {
   background: #F4F5F7;
-  transform: translateY(-1px);
 }
 
 .btn-hud-action-sq:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
+  opacity: 1 !important;
+  color: #9CA3AF !important;
+  cursor: default;
 }
 
 /* Bottom Camera Controls Bar from Figma */
@@ -4439,14 +4436,18 @@ dialog.comparison-dialog-root::backdrop {
   color: #1D1D1B;
   font-family: 'Neue DIN', sans-serif;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: 0.5px;
-  padding: 10px 20px;
-  border-radius: 6px;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 4px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .figma-cam-btn:hover {
@@ -4460,12 +4461,13 @@ dialog.comparison-dialog-root::backdrop {
 
 .figma-cam-zoom-box {
   background: #FFFFFF;
-  border-radius: 6px;
+  border-radius: 4px;
+  height: 38px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  padding: 0 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .figma-zoom-btn {
@@ -4617,27 +4619,26 @@ dialog.comparison-dialog-root::backdrop {
 }
 
 .figma-outfit-card {
-  background: #F9FAFB;
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
+  background: #F8F9FA;
+  border: none !important;
+  border-radius: 6px;
   padding: 14px 18px;
-  cursor: pointer;
-  transition: all 0.15s ease;
+  cursor: default;
+  transition: background-color 0.15s ease;
 }
 
 .figma-outfit-card:hover {
-  border-color: #CBD5E1;
-  background: #F3F4F6;
+  background: #F4F5F7;
 }
 
 .figma-outfit-card.active {
-  border-color: #FF4400;
-  background: #FFF5EE;
+  border: none !important;
+  background: #F8F9FA;
 }
 
 .figma-card-name {
   font-family: 'Neue DIN', sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: #1D1D1B;
   margin-bottom: 2px;
@@ -4645,21 +4646,20 @@ dialog.comparison-dialog-root::backdrop {
 
 .figma-card-brand {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   color: #6B7280;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   margin-bottom: 6px;
 }
 
 .figma-card-color-status {
-  font-size: 12px;
-  color: #374151;
+  font-size: 11.5px;
+  color: #1D1D1B;
+  font-weight: 600;
   margin-bottom: 8px;
 }
 
 .figma-color-status-name {
-  font-weight: 700;
+  font-weight: 600;
   color: #1D1D1B;
 }
 
@@ -4671,23 +4671,24 @@ dialog.comparison-dialog-root::backdrop {
 }
 
 .figma-square-swatch {
-  width: 22px;
-  height: 22px;
-  border-radius: 3px;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   cursor: pointer;
   padding: 0;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: outline 0.15s ease;
 }
 
 .figma-square-swatch:hover {
-  transform: scale(1.15);
+  outline: 1.5px solid #6B7280;
+  outline-offset: 1px;
 }
 
 .figma-square-swatch.active {
-  outline: 2px solid #1D1D1B;
-  outline-offset: 1px;
-  transform: scale(1.1);
+  outline: 2px solid #FF4400 !important;
+  outline-offset: 1.5px !important;
+  transform: none !important;
 }
 
 /* Tab 02 & Tab 03 Forms and Grid */
@@ -4916,64 +4917,76 @@ dialog.comparison-dialog-root::backdrop {
   font-family: 'Neue DIN', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #6B7280;
+  color: #1D1D1B;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  margin-top: 6px;
+  margin-top: 10px;
+  margin-bottom: 2px;
 }
 
 .figma-steppers-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 10px;
 }
 
 .figma-stepper-box {
-  background: #F9FAFB;
-  border: 1px solid #E5E7EB;
-  border-radius: 4px;
-  padding: 8px 10px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
 .figma-stepper-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  color: #6B7280;
+  color: #4B5563;
   text-transform: uppercase;
 }
 
 .figma-stepper-controls {
+  height: 38px;
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  border-radius: 2px;
+  padding: 0 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.btn-step {
-  width: 22px;
-  height: 22px;
-  background: #FFFFFF;
-  border: 1px solid #D1D5DB;
-  border-radius: 3px;
-  font-weight: 700;
+.figma-stepper-controls .step-val {
+  font-family: 'Neue DIN', sans-serif;
   font-size: 13px;
-  cursor: pointer;
+  font-weight: 500;
+  color: #1D1D1B;
+}
+
+.figma-stepper-btns {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 3px;
+  font-size: 13px;
+}
+
+.btn-step {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1D1D1B;
+  cursor: pointer;
+  padding: 0 3px;
+  line-height: 1;
 }
 
 .btn-step:hover {
-  background: #F3F4F6;
+  color: #FF4400;
 }
 
-.step-val {
-  font-family: 'Neue DIN', sans-serif;
+.step-sep {
+  color: #9CA3AF;
   font-size: 12px;
-  font-weight: 700;
-  color: #1D1D1B;
+  user-select: none;
 }
 
 .figma-accordion-btn {
@@ -4981,19 +4994,21 @@ dialog.comparison-dialog-root::backdrop {
   height: 38px;
   background: #FFFFFF;
   border: 1px solid #D1D5DB;
-  border-radius: 4px;
+  border-radius: 2px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 6px;
   padding: 0 14px;
   font-family: 'Neue DIN', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 500;
   color: #1D1D1B;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .figma-accordion-btn:hover {
-  background: #F9FAFB;
+  background: #F8F9FA;
   border-color: #9CA3AF;
 }

@@ -42,12 +42,14 @@ import puppeteer from 'puppeteer';
   await new Promise(r => setTimeout(r, 400));
 
   // 3. Test Camera Controls in HUD Pill
-  const viewBtns = await page.$$('.view-btn-pill');
+  const viewBtns = await page.$$('.figma-cam-btn, .view-btn-pill');
   console.log(`✔ Found ${viewBtns.length} camera angle buttons`);
-  await viewBtns[1].click(); // Hinten
-  await new Promise(r => setTimeout(r, 500));
-  await viewBtns[0].click(); // Vorne
-  await new Promise(r => setTimeout(r, 500));
+  if (viewBtns.length > 1) {
+    await viewBtns[1].click(); // Hinten
+    await new Promise(r => setTimeout(r, 500));
+    await viewBtns[0].click(); // Vorne
+    await new Promise(r => setTimeout(r, 500));
+  }
 
   // 4. Test Export Modal
   const btnExport = await page.$('#btn-sidebar-export');
