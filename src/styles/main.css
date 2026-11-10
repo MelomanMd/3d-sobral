@@ -160,6 +160,7 @@ body.sobral-theme-2026 {
   top: 0;
   left: 0;
   cursor: grab;
+  z-index: 2;
 }
 
 .configurator-modal-window #canvas-container:active {
@@ -4346,15 +4347,15 @@ dialog.comparison-dialog-root::backdrop {
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
 }
 
 .stage-watermark-logo {
-  width: 55%;
-  max-width: 440px;
-  opacity: 0.12;
+  width: 65%;
+  max-width: 520px;
+  opacity: 0.14;
   filter: contrast(160%) brightness(140%);
-  transform: translateY(50px);
+  transform: translateY(115px);
 }
 
 /* Top-Right Stage Controls */
