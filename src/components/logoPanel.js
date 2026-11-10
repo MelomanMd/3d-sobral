@@ -92,7 +92,12 @@ export class LogoPanel {
 
         <!-- 3. Horizontal Cards for Logo Layers -->
         <div class="figma-items-cards-grid">
-          ${this.state.logos.map((item, idx) => {
+          ${this.state.logos.length === 0 ? `
+            <div style="grid-column: 1 / -1; padding: 28px 16px; text-align: center; background: #f8f9fa; border-radius: 6px; border: 1px dashed #d1d5db; color: #6b7280;">
+              <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: #1d1d1b; font-family: 'Neue DIN', sans-serif;">Keine Logos vorhanden</p>
+              <span style="font-size: 12px;">Klicke oben auf „+ LOGO HOCHLADEN“ oder „MEINE LOGO-BIBLIOTHEK“.</span>
+            </div>
+          ` : this.state.logos.map((item, idx) => {
             const isActive = item.id === (activeItem ? activeItem.id : '');
             return `
               <div class="figma-layer-card ${isActive ? 'active' : ''}" data-id="${item.id}">
@@ -108,11 +113,9 @@ export class LogoPanel {
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
                     `}
                   </button>
-                  ${this.state.logos.length > 1 ? `
-                    <button class="btn-figma-icon btn-delete-logo" title="Löschen" data-id="${item.id}">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                    </button>
-                  ` : ''}
+                  <button class="btn-figma-icon btn-delete-logo" title="Löschen" data-id="${item.id}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  </button>
                 </div>
               </div>
             `;
