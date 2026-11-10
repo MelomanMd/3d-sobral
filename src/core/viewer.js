@@ -677,25 +677,30 @@ export class ShirtViewer {
       }
 
       if (!hit) {
+        const isHelmetLogo = logo.targetArticle === 'helmet' || logo.zone?.includes('helmet') || logo.zone === 'crown';
+        const isTrousersLogo = logo.targetArticle === 'trousers' || logo.zone?.includes('trousers') || logo.zone?.includes('thigh');
+        const defaultYLogo = isHelmetLogo ? 0.74 : (isTrousersLogo ? -0.32 : 0.08);
+        const targetRoleLogo = isHelmetLogo ? 'Worker_helmet' : (isTrousersLogo ? 'Worker_trousers' : 'Worker_fabric_primary');
+
         const isFront = !logo.zone?.includes('back');
         const isLeft = logo.zone?.includes('left');
         const isRight = logo.zone?.includes('right');
 
         let origin, dir;
         if (isLeft) {
-          origin = new THREE.Vector3(0.5, 0.10 - (logo.offsetY || 0) * 0.002, (logo.offsetX || 0) * 0.002);
+          origin = new THREE.Vector3(0.5, defaultYLogo - (logo.offsetY || 0) * 0.002, (logo.offsetX || 0) * 0.002);
           dir = new THREE.Vector3(-1, 0, 0);
         } else if (isRight) {
-          origin = new THREE.Vector3(-0.5, 0.10 - (logo.offsetY || 0) * 0.002, (logo.offsetX || 0) * 0.002);
+          origin = new THREE.Vector3(-0.5, defaultYLogo - (logo.offsetY || 0) * 0.002, (logo.offsetX || 0) * 0.002);
           dir = new THREE.Vector3(1, 0, 0);
         } else if (isFront) {
-          origin = new THREE.Vector3((logo.offsetX || 0) * 0.002, 0.08 - (logo.offsetY || 0) * 0.002, 0.6);
+          origin = new THREE.Vector3((logo.offsetX || 0) * 0.002, defaultYLogo - (logo.offsetY || 0) * 0.002, 0.6);
           dir = new THREE.Vector3(0, 0, -1);
         } else {
-          origin = new THREE.Vector3(-(logo.offsetX || 0) * 0.002, 0.08 - (logo.offsetY || 0) * 0.002, -0.6);
+          origin = new THREE.Vector3(-(logo.offsetX || 0) * 0.002, defaultYLogo - (logo.offsetY || 0) * 0.002, -0.6);
           dir = new THREE.Vector3(0, 0, 1);
         }
-        hit = raycastSurface(origin, dir, zoneDef?.targetMesh || zoneDef?.role);
+        hit = raycastSurface(origin, dir, zoneDef?.targetMesh || targetRoleLogo);
       }
 
       if (hit && hit.face) {
@@ -777,14 +782,19 @@ export class ShirtViewer {
       }
 
       if (!hit) {
+        const isHelmetText = textItem.targetArticle === 'helmet' || textItem.zone?.includes('helmet') || textItem.zone === 'crown';
+        const isTrousersText = textItem.targetArticle === 'trousers' || textItem.zone?.includes('trousers') || textItem.zone?.includes('thigh');
+        const defaultYText = isHelmetText ? 0.74 : (isTrousersText ? -0.32 : 0.10);
+        const targetRoleText = isHelmetText ? 'Worker_helmet' : (isTrousersText ? 'Worker_trousers' : 'Worker_fabric_primary');
+
         const isFront = !textItem.zone?.includes('back');
         const origin = new THREE.Vector3(
           (textItem.offsetX || 0) * 0.002,
-          0.10 - (textItem.offsetY || 0) * 0.002,
+          defaultYText - (textItem.offsetY || 0) * 0.002,
           isFront ? 0.6 : -0.6
         );
         const dir = new THREE.Vector3(0, 0, isFront ? -1 : 1);
-        hit = raycastSurface(origin, dir, zoneDef?.targetMesh || zoneDef?.role);
+        hit = raycastSurface(origin, dir, zoneDef?.targetMesh || targetRoleText);
       }
 
       if (hit && hit.face) {
