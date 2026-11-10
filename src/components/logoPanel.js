@@ -2,10 +2,13 @@ import { PLACEMENT_ZONES, getZoneName } from '../core/textureEngine.js';
 import { t } from '../core/i18n.js';
 import { ICONS } from '../core/icons.js';
 import { ARTICLE_TARGETS, ARTICLE_ZONES } from './textPanel.js';
+import { DEFAULT_LOGOS, getLogoDataUrl } from '../core/defaultLogos.js';
 
 export const SOBRAL_PRESET_LOGOS = [
-  { id: 'logo_sobral_main', name: 'SOBRAL WORKWEAR (Official)', src: './images/sobral-workwear-logo.svg', type: 'vector' },
-  { id: 'logo_sobral_icon', name: 'SOBRAL Emblem Circle', src: './images/sobral-workwear-logo.svg', type: 'vector' }
+  { id: 'logo_sobral_main', name: 'SOBRAL WORKWEAR (Official)', src: getLogoDataUrl(DEFAULT_LOGOS[0]), type: 'vector' },
+  { id: 'logo_sobral_crest', name: 'SOBRAL Emblem Circle', src: getLogoDataUrl(DEFAULT_LOGOS[1]), type: 'vector' },
+  { id: 'logo_sobral_wings', name: 'Aero Speed Wings', src: getLogoDataUrl(DEFAULT_LOGOS[2]), type: 'vector' },
+  { id: 'logo_sobral_shield', name: 'Cyber Shield Pro', src: getLogoDataUrl(DEFAULT_LOGOS[3]), type: 'vector' }
 ];
 
 export class LogoPanel {
@@ -183,44 +186,122 @@ export class LogoPanel {
 
           </div>
         ` : ''}
-
-        <!-- 5. Modal: MEINE LOGO-BIBLIOTHEK (Figma Frame 1876:8870) -->
-        <div class="logo-library-modal-backdrop" id="logo-library-modal" style="${this.isLibraryOpen ? 'display: flex;' : 'display: none;'}">
-          <div class="logo-library-card">
-            <div class="logo-library-header">
-              <div>
-                <span class="modal-badge" style="background: rgba(255, 68, 0, 0.1); color: #ff4400; border: 1px solid rgba(255, 68, 0, 0.25);">
-                  VEKTOR-ARCHIV
-                </span>
-                <h3 class="logo-library-title">MEINE LOGO-BIBLIOTHEK</h3>
-              </div>
-              <button class="btn-sidebar-close" id="btn-close-library">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </div>
-
-            <div class="logo-library-body">
-              <input type="text" class="library-search-input" id="library-search-input" placeholder="Nach Vektorgrafiken und Logos suchen...">
-              
-              <div class="library-logos-grid" id="library-logos-grid">
-                ${SOBRAL_PRESET_LOGOS.map(logo => `
-                  <button class="library-logo-card" data-id="${logo.id}">
-                    <div class="library-logo-thumb">
-                      <img src="${logo.src}" alt="${logo.name}">
-                    </div>
-                    <span class="library-logo-name">${logo.name}</span>
-                    <span class="library-logo-badge">Vektor SVG</span>
-                  </button>
-                `).join('')}
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
     `;
 
     this.bindEvents();
+  }
+
+  openLibraryModal() {
+    this.closeLibraryModal();
+
+    const modal = document.createElement('div');
+    modal.className = 'logo-library-modal-backdrop';
+    modal.id = 'logo-library-modal';
+    modal.innerHTML = `
+      <div class="logo-library-modal-window">
+        <div class="library-modal-header">
+          <div>
+            <span class="modal-badge" style="background: rgba(255, 68, 0, 0.1); color: #ff4400; border: 1px solid rgba(255, 68, 0, 0.25); display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px;">
+              VEKTOR-ARCHIV
+            </span>
+            <h3 class="library-modal-title">MEINE LOGO-BIBLIOTHEK</h3>
+            <p class="library-modal-sub">Wähle ein offizielles Sobral Vektorlogo für dein Outfit.</p>
+          </div>
+          <button type="button" class="modal-close-btn" id="btn-close-library" style="background: transparent; border: none; font-size: 24px; color: #1d1d1b; cursor: pointer; padding: 4px; line-height: 1;">
+            ✕
+          </button>
+        </div>
+
+        <div class="library-search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="library-search-input" id="library-search-input" placeholder="Nach Vektorgrafiken und Logos suchen...">
+        </div>
+
+        <div class="library-logos-grid" id="library-logos-grid">
+          ${SOBRAL_PRESET_LOGOS.map(logo => `
+            <button type="button" class="library-logo-card" data-id="${logo.id}">
+              <div class="library-card-thumb">
+                <img src="${logo.src}" alt="${logo.name}">
+              </div>
+              <span class="library-card-name">${logo.name}</span>
+              <span class="library-card-badge">Vektor SVG</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    this.libraryModalEl = modal;
+
+    modal.querySelector('#btn-close-library')?.addEventListener('click', () => this.closeLibraryModal());
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) this.closeLibraryModal();
+    });
+
+    const searchInput = modal.querySelector('#library-search-input');
+    const grid = modal.querySelector('#library-logos-grid');
+    if (searchInput && grid) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const filtered = SOBRAL_PRESET_LOGOS.filter(l => l.name.toLowerCase().includes(query));
+        grid.innerHTML = filtered.map(logo => `
+          <button type="button" class="library-logo-card" data-id="${logo.id}">
+            <div class="library-card-thumb">
+              <img src="${logo.src}" alt="${logo.name}">
+            </div>
+            <span class="library-card-name">${logo.name}</span>
+            <span class="library-card-badge">Vektor SVG</span>
+          </button>
+        `).join('');
+        this.bindLibraryCardClicks(modal);
+      });
+    }
+
+    this.bindLibraryCardClicks(modal);
+  }
+
+  closeLibraryModal() {
+    if (this.libraryModalEl) {
+      this.libraryModalEl.remove();
+      this.libraryModalEl = null;
+    }
+  }
+
+  bindLibraryCardClicks(modal) {
+    modal.querySelectorAll('.library-logo-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const id = card.dataset.id;
+        const preset = SOBRAL_PRESET_LOGOS.find(p => p.id === id);
+        if (preset) {
+          const activeItem = this.state.logos.find(l => l.id === this.activeLogoId);
+          if (activeItem) {
+            activeItem.name = preset.name;
+            activeItem.src = preset.src;
+          } else {
+            const newLogo = {
+              id: 'logo_' + Date.now(),
+              name: preset.name,
+              src: preset.src,
+              targetArticle: 'primary',
+              zone: 'chest_left',
+              scale: 0.45,
+              rotation: 0,
+              offsetX: 0,
+              offsetY: 0,
+              opacity: 1.0,
+              visible: true
+            };
+            this.state.logos.push(newLogo);
+            this.activeLogoId = newLogo.id;
+          }
+          this.closeLibraryModal();
+          if (this.onUpdate) this.onUpdate();
+          this.render();
+        }
+      });
+    });
   }
 
   bindEvents() {
@@ -235,20 +316,11 @@ export class LogoPanel {
       });
     }
 
-    // Open/Close library modal
+    // Open library modal
     const btnLib = this.container.querySelector('#btn-open-library');
     if (btnLib) {
       btnLib.addEventListener('click', () => {
-        this.isLibraryOpen = true;
-        this.render();
-      });
-    }
-
-    const btnCloseLib = this.container.querySelector('#btn-close-library');
-    if (btnCloseLib) {
-      btnCloseLib.addEventListener('click', () => {
-        this.isLibraryOpen = false;
-        this.render();
+        this.openLibraryModal();
       });
     }
 
@@ -298,32 +370,6 @@ export class LogoPanel {
       });
     });
 
-    // Library preset logo click
-    this.container.querySelectorAll('.library-logo-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const id = card.dataset.id;
-        const preset = SOBRAL_PRESET_LOGOS.find(p => p.id === id);
-        if (preset) {
-          const newLogo = {
-            id: 'logo_' + Date.now(),
-            name: preset.name,
-            src: preset.src,
-            targetArticle: 'primary',
-            zone: 'chest_left',
-            scale: 0.55,
-            rotation: 0,
-            offsetX: 0,
-            offsetY: 0,
-            visible: true
-          };
-          this.state.logos.push(newLogo);
-          this.activeLogoId = newLogo.id;
-          this.isLibraryOpen = false;
-          if (this.onUpdate) this.onUpdate();
-          this.render();
-        }
-      });
-    });
 
     const activeItem = this.state.logos.find(l => l.id === this.activeLogoId) || this.state.logos[0];
     if (!activeItem) return;
