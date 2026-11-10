@@ -337,3 +337,20 @@ graph TD
   - Шаг 9: Прямой экспорт (Кнопка DOWNLOAD) (PASSED).
   - **Ошибок в консоли:** 0.
   - **Production Build:** Сборка `npm run build` прошла успешно (exit code 0).
+
+### Запись: Динамическая адаптация блоков закраски для всех товаров (10.11.2026)
+- **Проблема:** В Табе 01 («Elemente & Farben») жестко отображались все 4 карточки экипировки (`Kopfschutz`, `Oberteil`, `Arbeitshose`, `Sicherheitsschuhe`) для абсолютно любого выбранного товара. При переходе к отдельной толстовке, куртке, футболке, брюкам или каске в сайдбаре отображались «фантомные» блоки закраски несуществующих на 3D-сцене предметов.
+- **Решение:**
+  1. В [`src/components/colorPanel.js`](file:///Volumes/WORK/var/www/3d-sobral-v2/src/components/colorPanel.js) реализован динамический метод `getVisibleCards()`:
+     - Для комплекта `sobral_worker` (Komplett-Look) выводятся все 4 карточки аутфита.
+     - Для отдельных товаров запрашиваются реальные роли материалов из 3D-сцены (`viewer.getColorControls()`) и метаданных каталога (`getMaterialColorControls`).
+     - Для скан-моделей из единого материала (свитшот 3340, куртки 3362/4890, брюки 1750/1751, поло) выводится ровно **1 блок** с названием конкретного товара и соответствующей палитрой.
+     - Для составных моделей (футболка 3300, худи 3366, шапка 2003, каска WHE00113) выводятся только реально окрашиваемые части (`Hauptstoff`, `Kontraste & Einsätze`, `Bündchen & Details` или `Helmschale`, `Akzente`, `Kinnriemen`).
+  2. В шапке сайдбара заголовок и подзаголовок теперь динамически переключаются:
+     - При Komplett-Look: `DEIN KOMPLETT-OUTFIT` / `Produkte zusammenstellen und personalisieren`.
+     - При отдельном товаре: Название товара (напр. `SOBRAL T-SHIRT (3300)`, `SOBRAL KASK PRIMERO AIR`) и его категория.
+  3. В Табах 02 («Beschriftung») и 03 («Logo Upload») выпадающий список `ARTIKEL` теперь содержит только актуальные артикулы (при редактировании каски доступен только `Kopfschutz`, при брюках — только `Arbeitshose`, при верхе — `Oberteil`).
+- **Верификация:**
+  - Создан автоматический стресс-тест [`tests/test_all_products_color_blocks.mjs`](file:///Volumes/WORK/var/www/3d-sobral-v2/tests/test_all_products_color_blocks.mjs), проверивший все 12 товаров каталога.
+  - Пройдено: 12/12 (100%), 0 лишних/фантомных карточек.
+  - Сквозной аудит [`tests/test_complete_audit.mjs`](file:///Volumes/WORK/var/www/3d-sobral-v2/tests/test_complete_audit.mjs) также пройден с 0 ошибок.
