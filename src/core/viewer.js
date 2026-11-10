@@ -391,8 +391,10 @@ export class ShirtViewer {
           this.shirtGroup = root;
 
           if (this.shadowMesh) {
-            this.shadowMesh.position.y = -0.32;
-            this.shadowMesh.scale.set(1.0, 1.0, 1.0);
+            const isWorker = this.getState().activeProduct?.silhouette === 'worker';
+            const bbox = new THREE.Box3().setFromObject(root);
+            this.shadowMesh.position.y = bbox.min.y + 0.002;
+            this.shadowMesh.scale.set(isWorker ? 1.5 : 1.0, isWorker ? 1.5 : 1.0, isWorker ? 1.5 : 1.0);
           }
 
           if (this.controls) {
@@ -480,8 +482,10 @@ export class ShirtViewer {
           this.shirtGroup = root;
 
           if (this.shadowMesh) {
-            this.shadowMesh.position.y = -0.32;
-            this.shadowMesh.scale.set(1.0, 1.0, 1.0);
+            const isWorker = this.getState().activeProduct?.silhouette === 'worker';
+            const bbox = new THREE.Box3().setFromObject(root);
+            this.shadowMesh.position.y = bbox.min.y + 0.002;
+            this.shadowMesh.scale.set(isWorker ? 1.5 : 1.0, isWorker ? 1.5 : 1.0, isWorker ? 1.5 : 1.0);
           }
 
           if (this.controls) {
@@ -1171,14 +1175,26 @@ export class ShirtViewer {
       if (isQuickClick) {
         const hit = getRaycastHit(e);
         if (hit) {
-          if (this.isMultiMesh && hit.object?.material) {
-            const role = (hit.object.material.userData?.sobralRole || hit.object.material.name || '').toLowerCase();
+          if (this.isMultiMesh && hit.object) {
+            const objName = (hit.object.name || '').toLowerCase();
+            const matName = (hit.object.material?.name || '').toLowerCase();
+            const role = (hit.object.material?.userData?.sobralRole || '').toLowerCase();
+
             let clickedPart = 'primary';
-            if (role.includes('rib') || role.includes('collar') || role.includes('lining') || role.includes('zipper')) {
+            if (objName.includes('helmet') || matName.includes('helmet') || role.includes('helmet')) {
+              clickedPart = 'helmet';
+            } else if (objName.includes('trouser') || matName.includes('trouser') || role.includes('trouser')) {
+              clickedPart = 'trousers';
+            } else if (objName.includes('boot') || matName.includes('boot') || role.includes('boot') || objName.includes('shoe') || matName.includes('shoe')) {
+              clickedPart = 'boots';
+            } else if (role.includes('rib') || role.includes('collar') || role.includes('lining') || role.includes('zipper')) {
               clickedPart = 'collar';
             } else if (role.includes('secondary') || role.includes('hood') || role.includes('stretch') || role.includes('reinforcement')) {
               clickedPart = 'accent';
+            } else {
+              clickedPart = 'primary';
             }
+
             if (this.onPartClick) {
               this.onPartClick(clickedPart);
             }

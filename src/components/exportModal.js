@@ -96,27 +96,58 @@ export class ExportModal {
                 <span class="spec-key">${t('section_pattern')}:</span>
                 <span class="spec-val highlight">${patternName}</span>
               </div>
-              <div class="spec-item">
-                <span class="spec-key">${t('zone_primary')}:</span>
-                <div class="spec-color-val">
-                  <span class="mini-swatch" style="background-color: ${this.state.colors.primary}"></span>
-                  <code>${this.state.colors.primary}</code>
+              ${this.state.colors.helmet || this.state.colors.trousers ? `
+                <div class="spec-item">
+                  <span class="spec-key">Kopfschutz:</span>
+                  <div class="spec-color-val">
+                    <span class="mini-swatch" style="background-color: ${this.state.colors.helmet || '#ffffff'}"></span>
+                    <code>${this.state.colors.helmet || '#ffffff'}</code>
+                  </div>
                 </div>
-              </div>
-              <div class="spec-item">
-                <span class="spec-key">${t('zone_accent')}:</span>
-                <div class="spec-color-val">
-                  <span class="mini-swatch" style="background-color: ${this.state.colors.accent}"></span>
-                  <code>${this.state.colors.accent}</code>
+                <div class="spec-item">
+                  <span class="spec-key">Arbeitsjacke:</span>
+                  <div class="spec-color-val">
+                    <span class="mini-swatch" style="background-color: ${this.state.colors.primary || '#243249'}"></span>
+                    <code>${this.state.colors.primary || '#243249'}</code>
+                  </div>
                 </div>
-              </div>
-              <div class="spec-item">
-                <span class="spec-key">${t('zone_collar')}:</span>
-                <div class="spec-color-val">
-                  <span class="mini-swatch" style="background-color: ${this.state.colors.collar}"></span>
-                  <code>${this.state.colors.collar}</code>
+                <div class="spec-item">
+                  <span class="spec-key">Arbeitshose:</span>
+                  <div class="spec-color-val">
+                    <span class="mini-swatch" style="background-color: ${this.state.colors.trousers || '#1b2034'}"></span>
+                    <code>${this.state.colors.trousers || '#1b2034'}</code>
+                  </div>
                 </div>
-              </div>
+                <div class="spec-item">
+                  <span class="spec-key">Sicherheitsschuhe:</span>
+                  <div class="spec-color-val">
+                    <span class="mini-swatch" style="background-color: ${this.state.colors.boots || '#1a1a1a'}"></span>
+                    <code>${this.state.colors.boots || '#1a1a1a'}</code>
+                  </div>
+                </div>
+              ` : `
+                <div class="spec-item">
+                  <span class="spec-key">${t('zone_primary')}:</span>
+                  <div class="spec-color-val">
+                    <span class="mini-swatch" style="background-color: ${this.state.colors.primary}"></span>
+                    <code>${this.state.colors.primary}</code>
+                  </div>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-key">${t('zone_accent')}:</span>
+                  <div class="spec-color-val">
+                    <span class="mini-swatch" style="background-color: ${this.state.colors.accent}"></span>
+                    <code>${this.state.colors.accent}</code>
+                  </div>
+                </div>
+                <div class="spec-item">
+                  <span class="spec-key">${t('zone_collar')}:</span>
+                  <div class="spec-color-val">
+                    <span class="mini-swatch" style="background-color: ${this.state.colors.collar}"></span>
+                    <code>${this.state.colors.collar}</code>
+                  </div>
+                </div>
+              `}
             </div>
 
             <div class="spec-card">

@@ -11,6 +11,7 @@ export class HistoryManager {
     this.currentSnapshot = this.clone(initialState);
 
     this.initKeyboardShortcuts();
+    this.notifyChange();
   }
 
   clone(obj) {
