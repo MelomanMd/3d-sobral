@@ -354,3 +354,12 @@ graph TD
   - Создан автоматический стресс-тест [`tests/test_all_products_color_blocks.mjs`](file:///Volumes/WORK/var/www/3d-sobral-v2/tests/test_all_products_color_blocks.mjs), проверивший все 12 товаров каталога.
   - Пройдено: 12/12 (100%), 0 лишних/фантомных карточек.
   - Сквозной аудит [`tests/test_complete_audit.mjs`](file:///Volumes/WORK/var/www/3d-sobral-v2/tests/test_complete_audit.mjs) также пройден с 0 ошибок.
+
+### Запись: Возможность удаления последнего логотипа и текста (10.11.2026)
+- **Проблема:** В Табе 03 («Logo Upload») и Табе 02 («Beschriftung») кнопка удаления (корзина) скрывалась, если оставался только 1 слой (`logos.length > 1` / `texts.length > 1`), лишая пользователя возможности очистить одежду от всех логотипов или надписей.
+- **Решение:**
+  1. В [`src/components/logoPanel.js`](file:///Volumes/WORK/var/www/3d-sobral-v2/src/components/logoPanel.js) и [`src/components/textPanel.js`](file:///Volumes/WORK/var/www/3d-sobral-v2/src/components/textPanel.js) убрано условие `length > 1`: кнопка удаления с иконкой мусорной корзины теперь всегда доступна на каждой карточке слоя.
+  2. Добавлен аккуратный пустой статус (`Empty State`) при 0 логотипов или 0 текстов с подсказкой и пунктирной рамкой в стиле Figma.
+  3. Декали мгновенно удаляются из сцены в 3D через `viewer.updateDecals()`.
+- **Верификация:**
+  - Созданы и пройдены тесты [`tests/test_single_logo_delete.mjs`](file:///Volumes/WORK/var/www/3d-sobral-v2/tests/test_single_logo_delete.mjs) и [`tests/test_single_text_delete.mjs`](file:///Volumes/WORK/var/www/3d-sobral-v2/tests/test_single_text_delete.mjs) (0 ошибок).
