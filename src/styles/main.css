@@ -4156,3 +4156,171 @@ dialog.comparison-dialog-root::backdrop {
   border-radius: var(--radius-sm);
 }
 
+
+/* ==========================================================================
+   PRODUCT CATALOG MODAL (PRODUKT WECHSELN)
+   ========================================================================== */
+
+.catalog-modal-backdrop {
+  z-index: 1000 !important;
+}
+
+.catalog-modal-card {
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.cat-filter-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #4b5563;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cat-filter-btn:hover {
+  border-color: #cbd5e1;
+  color: #1d1d1b;
+  background: #f8fafc;
+}
+
+.cat-filter-btn.active {
+  background: #ff4400;
+  border-color: #ff4400;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.product-catalog-card {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+
+.product-catalog-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+  border-color: #cbd5e1 !important;
+}
+
+.product-catalog-card.is-active:hover {
+  border-color: #ff4400 !important;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (MOBILE & TABLET BREAKPOINTS)
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+  .stage-hud-bottom-right {
+    display: none;
+  }
+  .stage-hud-bottom-left {
+    top: 24px;
+    right: 24px;
+    bottom: auto;
+    left: auto;
+  }
+}
+
+@media (max-width: 1024px) {
+  .configurator-modal-backdrop {
+    padding: 0;
+  }
+  .configurator-modal-window {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  .configurator-modal-window .sidebar-panel {
+    width: 400px;
+    min-width: 360px;
+  }
+  .stage-hud-bottom-left {
+    top: 20px;
+    right: 20px;
+    bottom: auto;
+    left: auto;
+  }
+}
+
+@media (max-width: 860px) {
+  .configurator-modal-window {
+    flex-direction: column;
+  }
+  .configurator-modal-window .viewport-area {
+    height: 44vh;
+    min-height: 280px;
+    flex: none;
+  }
+  .configurator-modal-window .sidebar-panel {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex: 1;
+    border-left: none;
+    border-top: 1px solid #e5e7eb;
+  }
+  .stage-hud-top-left {
+    top: 12px;
+    left: 12px;
+  }
+  .stage-hud-bottom-left {
+    top: 12px;
+    right: 12px;
+    bottom: auto;
+    left: auto;
+    gap: 6px;
+  }
+  .stage-hud-bottom-left .hud-history-controls {
+    display: none;
+  }
+  .btn-hud-change-product {
+    padding: 6px 12px;
+    font-size: 11px;
+    height: 34px;
+  }
+  #view-controls-root {
+    bottom: 10px;
+  }
+  .floating-view-bar-new {
+    padding: 3px 6px;
+    gap: 4px;
+  }
+  .view-zoom-group-new,
+  .view-pill-divider {
+    display: none;
+  }
+  .view-btn-pill {
+    padding: 5px 9px;
+    font-size: 11px;
+  }
+  .btn-reset-view-circle {
+    width: 28px;
+    height: 28px;
+  }
+  .stage-hud-bottom-right {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .hud-brand-text {
+    display: none;
+  }
+  .btn-hud-change-product span {
+    display: none;
+  }
+  .btn-hud-change-product {
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+  }
+}

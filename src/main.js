@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 4. Hydrate offline 3D models and photos from IndexedDB
   await catalog.hydrateOfflineModels();
   const urlParams = new URLSearchParams(window.location.search);
-  const requestedProdId = urlParams.get('product');
+  const requestedProdId = urlParams.get('product') || 'sobral_worker';
   const initialProd = (requestedProdId && catalog.getProductById(requestedProdId)) || catalog.getActiveProduct() || DEFAULT_PRODUCTS[0];
   state.activeProduct = initialProd;
   state.silhouette = initialProd.silhouette || 'tshirt';
