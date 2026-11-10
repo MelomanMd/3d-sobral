@@ -64,11 +64,15 @@ export class QuoteModal {
               <div style="font-size: 11px; font-weight: 700; color: #ff4400; text-transform: uppercase;">${artNumber}</div>
               <div style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 2px 0 6px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${prodName}</div>
               <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary);">
-                <span><b>Hauptfarbe:</b> ${getClosestColorSpec(this.state.colors.primary).ral}</span>
+                <span><b>Kopfschutz:</b> ${this.state.colors.helmet || '#FFFFFF'}</span>
                 <span>•</span>
-                <span><b>Akzent:</b> ${getClosestColorSpec(this.state.colors.accent).ral}</span>
+                <span><b>Oberteil:</b> ${this.state.colors.primary || '#242935'}</span>
                 <span>•</span>
-                <span><b>Logos:</b> ${(this.state.logos || []).filter(l => l.visible).length} Platziert</span>
+                <span><b>Hose:</b> ${this.state.colors.trousers || '#1B2034'}</span>
+                <span>•</span>
+                <span><b>Schuhe:</b> ${this.state.colors.boots || '#1D1D1B'}</span>
+                <span>•</span>
+                <span><b>Veredelung:</b> ${(this.state.texts || []).filter(t => t.visible).length + (this.state.logos || []).filter(l => l.visible).length} Positionen</span>
               </div>
             </div>
           </div>

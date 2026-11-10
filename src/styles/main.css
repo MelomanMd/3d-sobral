@@ -3126,6 +3126,46 @@ body.sobral-theme-2026 {
   animation: fadeIn 0.2s ease;
 }
 
+/* ==========================================================================
+   EXPORT FORMAT SWITCHER TABS (FIGMA KLICKDUMMY 10-13)
+   ========================================================================== */
+
+.export-format-nav {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f7f8f9;
+  padding: 0 16px;
+}
+
+.export-format-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-bottom: 3px solid transparent;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.export-format-tab:hover {
+  color: #1d1d1b;
+}
+
+.export-format-tab.active {
+  color: #ff4400;
+  border-bottom-color: #ff4400;
+  background: #ffffff;
+}
+
 .modal-card {
   width: 92%;
   max-width: 880px;
