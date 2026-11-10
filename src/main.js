@@ -662,6 +662,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // 17.1 Direct High-Res Download Button (Figma DOWNLOAD)
+  const btnSidebarDownload = document.getElementById('btn-sidebar-download');
+  if (btnSidebarDownload) {
+    btnSidebarDownload.addEventListener('click', async () => {
+      if (viewer) {
+        const url = await viewer.captureAngle('front', 1920, 1920, true);
+        const link = document.createElement('a');
+        link.download = `sobral-look-${Date.now()}.png`;
+        link.href = url;
+        link.click();
+      }
+    });
+  }
+
   // 17b. Direct Quote Request Modal
   const btnQuote = document.getElementById('btn-open-quote');
   if (btnQuote) {

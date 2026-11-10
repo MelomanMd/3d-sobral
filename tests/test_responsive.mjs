@@ -23,3 +23,4 @@ import puppeteer from 'puppeteer';
   await browser.close();
   console.log('Responsive screenshots generated!');
 })();
+

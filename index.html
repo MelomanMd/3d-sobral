@@ -22,6 +22,11 @@
       
       <!-- Left: 3D Scene Viewport -->
       <section class="viewport-area">
+        <!-- Background Stencil Logo Watermark -->
+        <div class="stage-watermark">
+          <img src="./images/sobral-workwear-logo.svg" alt="Sobral Workwear" class="stage-watermark-logo">
+        </div>
+
         <!-- Top-Left Branding HUD -->
         <div class="stage-hud-top-left">
           <div class="hud-brand-badge">
@@ -33,32 +38,24 @@
           </div>
         </div>
 
+        <!-- Top-Right Action HUD: Switch Product + Undo/Redo -->
+        <div class="stage-hud-top-right">
+          <button class="btn-hud-change-product-figma" id="btn-change-product" title="Anderes Produkt auswählen">
+            PRODUKT WECHSELN
+          </button>
+          <button class="btn-hud-action-sq" id="btn-undo" title="Rückgängig (Ctrl + Z)" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>
+          </button>
+          <button class="btn-hud-action-sq" id="btn-redo" title="Wiederholen (Ctrl + Y)" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"/></svg>
+          </button>
+        </div>
+
         <!-- 3D Canvas -->
         <div id="canvas-container"></div>
 
-        <!-- Bottom-Left Action HUD: Switch Product + Undo/Redo -->
-        <div class="stage-hud-bottom-left">
-          <button class="btn-hud-change-product" id="btn-change-product" title="Anderes Produkt auswählen">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-            <span>Produkt wechseln</span>
-          </button>
-          <div class="hud-history-controls">
-            <button class="btn-hud-circle" id="btn-undo" title="Rückgängig (Ctrl + Z)" disabled>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>
-            </button>
-            <button class="btn-hud-circle" id="btn-redo" title="Wiederholen (Ctrl + Y)" disabled>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"/></svg>
-            </button>
-          </div>
-        </div>
-
         <!-- Floating Camera Controls Root (Bottom-Center) -->
         <div id="view-controls-root"></div>
-
-        <!-- Bottom-Right Hint -->
-        <div class="stage-hud-bottom-right">
-          <span>Beispielvorschau des Komplettlooks</span>
-        </div>
       </section>
 
       <!-- Right: Configurator Sidebar (Figma White Light Theme) -->
@@ -74,18 +71,15 @@
           </button>
         </div>
 
-        <!-- Stepper Navigation (3 Steps) -->
+        <!-- Stepper Navigation (3 Steps from Figma) -->
         <nav class="config-stepper">
           <button class="stepper-tab active" data-tab="colors" id="tab-btn-colors">
-            <span class="stepper-num">01</span>
-            <span class="stepper-label">Elemente & FARBEN</span>
+            <span class="stepper-label">ELEMENTE & FARBEN</span>
           </button>
           <button class="stepper-tab" data-tab="text" id="tab-btn-text">
-            <span class="stepper-num">02</span>
-            <span class="stepper-label">Beschriftung</span>
+            <span class="stepper-label">BESCHRIFTUNG</span>
           </button>
           <button class="stepper-tab" data-tab="logos" id="tab-btn-logos">
-            <span class="stepper-num">03</span>
             <span class="stepper-label">LOGO UPLOAD</span>
           </button>
         </nav>
@@ -93,15 +87,16 @@
         <!-- Active Tab Container -->
         <div class="tab-content-container" id="tab-content-root"></div>
 
-        <!-- Persistent Sidebar Footer Actions -->
+        <!-- Persistent Sidebar Footer Actions (Figma 3-button layout) -->
         <div class="sidebar-footer-new">
-          <button class="btn-footer-export" id="btn-sidebar-export" title="Spezifikation ansehen & 3D-Mockup herunterladen">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span>Export / 3D-Mockup</span>
+          <button class="btn-footer-download" id="btn-sidebar-download" title="Direkter Download">
+            DOWNLOAD
           </button>
-          <button class="btn-footer-quote" id="btn-sidebar-quote" title="Unverbindliches Angebot mit Druckdaten anfordern">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            <span>Angebot anfordern</span>
+          <button class="btn-footer-draft" id="btn-sidebar-export" title="Entwurf speichern & Spezifikationen">
+            ENTWURF SPEICHERN
+          </button>
+          <button class="btn-footer-quote" id="btn-sidebar-quote" title="Unverbindliches Angebot anfordern">
+            ANGEBOT ANFORDERN
           </button>
         </div>
       </aside>

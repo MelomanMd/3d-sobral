@@ -1,8 +1,12 @@
-import { DEFAULT_LOGOS, getLogoDataUrl } from '../core/defaultLogos.js';
 import { PLACEMENT_ZONES, getZoneName } from '../core/textureEngine.js';
-import { ARTICLE_TARGETS, ARTICLE_ZONES } from './textPanel.js';
 import { t } from '../core/i18n.js';
 import { ICONS } from '../core/icons.js';
+import { ARTICLE_TARGETS, ARTICLE_ZONES } from './textPanel.js';
+
+export const SOBRAL_PRESET_LOGOS = [
+  { id: 'logo_sobral_main', name: 'SOBRAL WORKWEAR (Official)', src: './images/sobral-workwear-logo.svg', type: 'vector' },
+  { id: 'logo_sobral_icon', name: 'SOBRAL Emblem Circle', src: './images/sobral-workwear-logo.svg', type: 'vector' }
+];
 
 export class LogoPanel {
   constructor(containerElement, state, onUpdate) {
@@ -11,26 +15,20 @@ export class LogoPanel {
     this.onUpdate = onUpdate;
     this.activeLogoId = state.logos[0]?.id || null;
     this.isLibraryOpen = false;
+    this.isAdvancedOpen = false;
 
     this.render();
   }
 
-  getTintOptions() {
-    return [
-      { id: 'original', name: 'Original', color: 'transparent' },
-      { id: '#ffffff', name: 'Weiss', color: '#ffffff' },
-      { id: '#000000', name: 'Schwarz', color: '#000000' },
-      { id: '#ff4400', name: 'Orange', color: '#ff4400' },
-      { id: '#f59e0b', name: 'Gold', color: '#f59e0b' },
-      { id: '#283b79', name: 'Blau', color: '#283b79' }
-    ];
+  setActiveLogo(id) {
+    this.activeLogoId = id;
+    this.render();
   }
 
   render() {
     const activeItem = this.state.logos.find(l => l.id === this.activeLogoId) || this.state.logos[0];
     const targetArticle = activeItem?.targetArticle || 'primary';
     const availableZones = ARTICLE_ZONES[targetArticle] || ARTICLE_ZONES.primary;
-    const tintOptions = this.getTintOptions();
 
     const resolveZoneName = (item) => {
       const art = item.targetArticle || 'primary';
@@ -42,78 +40,68 @@ export class LogoPanel {
     const resolveArticleName = (item) => {
       const art = item.targetArticle || 'primary';
       const found = ARTICLE_TARGETS.find(a => a.id === art);
-      return found ? found.name.split(' ')[0] : 'Oberteil';
+      return found ? found.name : 'Oberteil';
     };
 
     this.container.innerHTML = `
-      <div class="logo-panel-wrapper">
-        <!-- 1. Header with Upload & Library Buttons (Figma Frame 1876:8549) -->
-        <div class="panel-section-header">
-          <span class="section-title-tag">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span>LOGO UPLOAD</span>
-          </span>
-          <div class="header-btns-group">
-            <button class="btn-figma-add-item" id="btn-open-upload-zone" title="Neues Logo hochladen">
-              <span>+ Logo hochladen</span>
-            </button>
-            <button class="btn-figma-secondary-item" id="btn-open-library" title="Meine Logo-Bibliothek">
-              <span>Bibliothek</span>
-            </button>
-          </div>
+      <div class="figma-subpanel-wrapper">
+        <!-- 1. Header (Figma 03_logo_upload.png) -->
+        <div class="figma-panel-header">
+          <h3 class="figma-panel-title">DEINE LOGOS</h3>
+          <p class="figma-panel-subtitle">Logos hinzufügen und auf deinem Outfit platzieren.</p>
         </div>
 
-        <!-- Hidden File Input for Direct Upload -->
+        <!-- 2. Action Buttons Row: + LOGO HOCHLADEN & MEINE LOGO-BIBLIOTHEK -->
+        <div class="figma-logo-actions-row">
+          <button class="btn-figma-black-action" id="btn-open-upload-zone">
+            + LOGO HOCHLADEN
+          </button>
+          <button class="btn-figma-white-action" id="btn-open-library">
+            MEINE LOGO-BIBLIOTHEK
+          </button>
+        </div>
+
+        <!-- Hidden File Input & Dropzone -->
         <input type="file" id="logo-file-input" accept="image/png,image/svg+xml,image/jpeg,image/webp" style="display:none">
-
-        <!-- Upload Dropzone (Collapsible or Shown on Demand) -->
         <div class="drop-zone-figma" id="logo-drop-zone" style="display: none;">
-          <div class="drop-content-figma">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff4400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <span class="drop-title">Datei hier ablegen oder durchsuchen</span>
-            <span class="drop-sub">SVG, PNG, JPG oder WebP (Vektorgrafiken empfohlen)</span>
-          </div>
+          <span>Datei hier ablegen (PNG, SVG, JPG, WebP)</span>
         </div>
 
-        <!-- 2. Logos List (Figma Frame 1867:5877) -->
-        <div class="logo-items-list">
-          ${this.state.logos.map((item, idx) => `
-            <div class="logo-item-card ${item.id === this.activeLogoId ? 'active' : ''}" data-id="${item.id}">
-              <div class="logo-thumb-box">
-                <img src="${item.src}" alt="${item.name || 'Logo'}" class="logo-thumb-img">
+        <!-- 3. Horizontal Cards for Logo Layers -->
+        <div class="figma-items-cards-grid">
+          ${this.state.logos.map((item, idx) => {
+            const isActive = item.id === (activeItem ? activeItem.id : '');
+            return `
+              <div class="figma-layer-card ${isActive ? 'active' : ''}" data-id="${item.id}">
+                <div class="figma-layer-card-text">
+                  <span class="figma-layer-name">${item.name || (idx === 0 ? 'FIRMENLOGO' : 'RÜCKENLOGO')}</span>
+                  <span class="figma-layer-meta">${resolveArticleName(item)} · ${resolveZoneName(item)}</span>
+                </div>
+                <div class="figma-layer-actions">
+                  <button class="btn-figma-icon btn-toggle-logo-vis" title="Sichtbarkeit" data-id="${item.id}">
+                    ${item.visible ? `
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    ` : `
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    `}
+                  </button>
+                  ${this.state.logos.length > 1 ? `
+                    <button class="btn-figma-icon btn-delete-logo" title="Löschen" data-id="${item.id}">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                  ` : ''}
+                </div>
               </div>
-              <div class="logo-item-main">
-                <span class="logo-item-index">LOGO ${idx + 1}</span>
-                <span class="logo-item-name">${item.name || 'Logo'}</span>
-                <span class="logo-item-meta">${resolveArticleName(item)} · ${resolveZoneName(item)}</span>
-              </div>
-              <div class="logo-item-actions">
-                <button class="btn-item-action btn-toggle-logo-vis" title="Sichtbarkeit" data-id="${item.id}">
-                  ${item.visible ? `
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  ` : `
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  `}
-                </button>
-                <button class="btn-item-action btn-delete-logo" title="Löschen" data-id="${item.id}">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                </button>
-              </div>
-            </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
 
-        <!-- 3. Fine-Tuning Editor (Figma Frame 1876:8700) -->
+        <!-- 4. Form Controls: ARTIKEL & PLATZIERUNG (Figma 03_logo_upload.png) -->
         ${activeItem ? `
-          <div class="active-item-editor-new">
-            <div class="editor-section-title">
-              <span>FEINJUSTIERUNG LOGO</span>
-            </div>
-
-            <!-- Target Article & Placement Selectors -->
-            <div class="figma-form-row">
-              <div class="figma-form-group">
-                <label class="figma-form-label">Artikel</label>
+          <div class="figma-form-body">
+            <div class="figma-grid-2col">
+              <div class="figma-field-group">
+                <label class="figma-label">ARTIKEL</label>
                 <select class="figma-select" id="select-logo-article">
                   ${ARTICLE_TARGETS.map(a => `
                     <option value="${a.id}" ${targetArticle === a.id ? 'selected' : ''}>${a.name}</option>
@@ -121,8 +109,8 @@ export class LogoPanel {
                 </select>
               </div>
 
-              <div class="figma-form-group">
-                <label class="figma-form-label">Platzierung</label>
+              <div class="figma-field-group">
+                <label class="figma-label">PLATZIERUNG</label>
                 <select class="figma-select" id="select-logo-zone">
                   ${availableZones.map(z => `
                     <option value="${z.key}" ${activeItem.zone === z.key ? 'selected' : ''}>${z.name}</option>
@@ -131,74 +119,89 @@ export class LogoPanel {
               </div>
             </div>
 
-            <!-- Farbanpassung / Tint Options -->
-            <div class="figma-form-group">
-              <label class="figma-form-label">Farbanpassung</label>
-              <div class="tint-buttons-row">
-                ${tintOptions.map(tOption => `
-                  <button class="tint-btn ${activeItem.tint === tOption.id ? 'active' : ''}" data-tint="${tOption.id}" title="${tOption.name}">
-                    <span class="tint-dot" style="background-color: ${tOption.color}; border: ${tOption.id === 'original' ? '1px dashed #64748b' : '1px solid rgba(0,0,0,0.1)'}"></span>
-                    <span class="tint-name">${tOption.name}</span>
-                  </button>
-                `).join('')}
-              </div>
-            </div>
+            <!-- Accordion Button: Größe / Position anpassen + -->
+            <button class="figma-accordion-btn" id="btn-toggle-advanced">
+              <span>Größe / Position anpassen</span>
+              <span class="acc-icon">${this.isAdvancedOpen ? '−' : '+'}</span>
+            </button>
 
-            <!-- Scale & Rotation Sliders -->
-            <div class="figma-form-row">
-              <div class="figma-form-group">
-                <div class="figma-slider-header">
-                  <label class="figma-form-label">Skalierung</label>
-                  <span class="figma-slider-value" id="val-logo-scale">${Math.round(activeItem.scale * 100)}%</span>
+            <!-- Advanced Sliders Container -->
+            <div class="figma-advanced-sliders" style="${this.isAdvancedOpen ? 'display: block;' : 'display: none;'}">
+              <div class="figma-steppers-grid" style="margin-top: 12px;">
+                <!-- Scale -->
+                <div class="figma-stepper-box">
+                  <label class="figma-stepper-label">SKALIERUNG</label>
+                  <div class="figma-stepper-controls">
+                    <button class="btn-step" data-action="dec-scale">−</button>
+                    <span class="step-val">${Math.round((activeItem.scale || 1.0) * 100)} %</span>
+                    <button class="btn-step" data-action="inc-scale">+</button>
+                  </div>
                 </div>
-                <input type="range" class="figma-slider" id="slider-logo-scale" min="0.2" max="2.4" step="0.05" value="${activeItem.scale}">
-              </div>
 
-              <div class="figma-form-group">
-                <div class="figma-slider-header">
-                  <label class="figma-form-label">Drehung</label>
-                  <span class="figma-slider-value" id="val-logo-rot">${activeItem.rotation || 0}°</span>
+                <!-- Rotation -->
+                <div class="figma-stepper-box">
+                  <label class="figma-stepper-label">DREHWINKEL</label>
+                  <div class="figma-stepper-controls">
+                    <button class="btn-step" data-action="dec-rot">−</button>
+                    <span class="step-val">${activeItem.rotation || 0}°</span>
+                    <button class="btn-step" data-action="inc-rot">+</button>
+                  </div>
                 </div>
-                <input type="range" class="figma-slider" id="slider-logo-rotation" min="-180" max="180" step="5" value="${activeItem.rotation || 0}">
+
+                <!-- Offset X -->
+                <div class="figma-stepper-box">
+                  <label class="figma-stepper-label">VERSATZ X</label>
+                  <div class="figma-stepper-controls">
+                    <button class="btn-step" data-action="dec-ox">−</button>
+                    <span class="step-val">${Math.round(activeItem.offsetX || 0)}</span>
+                    <button class="btn-step" data-action="inc-ox">+</button>
+                  </div>
+                </div>
+
+                <!-- Offset Y -->
+                <div class="figma-stepper-box">
+                  <label class="figma-stepper-label">VERSATZ Y</label>
+                  <div class="figma-stepper-controls">
+                    <button class="btn-step" data-action="dec-oy">−</button>
+                    <span class="step-val">${Math.round(activeItem.offsetY || 0)}</span>
+                    <button class="btn-step" data-action="inc-oy">+</button>
+                  </div>
+                </div>
               </div>
             </div>
 
           </div>
         ` : ''}
 
-        <!-- 4. Modal: MEINE LOGO-BIBLIOTHEK (Figma Frame 1876:8870) -->
+        <!-- 5. Modal: MEINE LOGO-BIBLIOTHEK (Figma Frame 1876:8870) -->
         <div class="logo-library-modal-backdrop" id="logo-library-modal" style="${this.isLibraryOpen ? 'display: flex;' : 'display: none;'}">
-          <div class="logo-library-modal-window">
-            <div class="library-modal-header">
-              <div class="library-header-text">
-                <h3 class="library-modal-title">MEINE LOGO-BIBLIOTHEK</h3>
-                <p class="library-modal-sub">Wählen Sie ein Firmenlogo oder laden Sie eine Vektordatei hoch</p>
+          <div class="logo-library-card">
+            <div class="logo-library-header">
+              <div>
+                <span class="modal-badge" style="background: rgba(255, 68, 0, 0.1); color: #ff4400; border: 1px solid rgba(255, 68, 0, 0.25);">
+                  VEKTOR-ARCHIV
+                </span>
+                <h3 class="logo-library-title">MEINE LOGO-BIBLIOTHEK</h3>
               </div>
               <button class="btn-sidebar-close" id="btn-close-library">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
 
-            <div class="library-search-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <div class="logo-library-body">
               <input type="text" class="library-search-input" id="library-search-input" placeholder="Nach Vektorgrafiken und Logos suchen...">
-            </div>
-
-            <div class="library-logos-grid" id="library-logos-grid">
-              ${DEFAULT_LOGOS.map(logo => `
-                <button class="library-logo-card" data-id="${logo.id}">
-                  <div class="library-card-thumb">
-                    <img src="${getLogoDataUrl(logo)}" alt="${logo.name}">
-                  </div>
-                  <span class="library-card-name">${logo.name}</span>
-                </button>
-              `).join('')}
-            </div>
-
-            <!-- Library Upload Dropzone -->
-            <div class="library-dropzone-box" id="library-dropzone">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff4400" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <span>+ Neues Firmenlogo hinzufügen (SVG, PNG, PDF)</span>
+              
+              <div class="library-logos-grid" id="library-logos-grid">
+                ${SOBRAL_PRESET_LOGOS.map(logo => `
+                  <button class="library-logo-card" data-id="${logo.id}">
+                    <div class="library-logo-thumb">
+                      <img src="${logo.src}" alt="${logo.name}">
+                    </div>
+                    <span class="library-logo-name">${logo.name}</span>
+                    <span class="library-logo-badge">Vektor SVG</span>
+                  </button>
+                `).join('')}
+              </div>
             </div>
           </div>
         </div>
@@ -210,55 +213,26 @@ export class LogoPanel {
   }
 
   bindEvents() {
-    // Open file upload
+    // Open upload file dialog
     const btnUpload = this.container.querySelector('#btn-open-upload-zone');
     const fileInput = this.container.querySelector('#logo-file-input');
-    const dropZone = this.container.querySelector('#logo-drop-zone');
-
-    if (btnUpload) {
-      btnUpload.addEventListener('click', () => {
-        if (dropZone) {
-          dropZone.style.display = dropZone.style.display === 'none' ? 'block' : 'none';
-        } else if (fileInput) {
-          fileInput.click();
-        }
-      });
-    }
-
-    if (dropZone && fileInput) {
-      dropZone.addEventListener('click', () => fileInput.click());
-      dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('dragover');
-      });
-      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-      dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('dragover');
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-          this.handleFile(e.dataTransfer.files[0]);
-        }
-      });
-    }
-
-    if (fileInput) {
+    if (btnUpload && fileInput) {
+      btnUpload.addEventListener('click', () => fileInput.click());
       fileInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-          this.handleFile(e.target.files[0]);
-        }
+        const file = e.target.files[0];
+        if (file) this.handleFileUpload(file);
       });
     }
 
-    // Open Library Modal
-    const btnOpenLib = this.container.querySelector('#btn-open-library');
-    if (btnOpenLib) {
-      btnOpenLib.addEventListener('click', () => {
+    // Open/Close library modal
+    const btnLib = this.container.querySelector('#btn-open-library');
+    if (btnLib) {
+      btnLib.addEventListener('click', () => {
         this.isLibraryOpen = true;
         this.render();
       });
     }
 
-    // Close Library Modal
     const btnCloseLib = this.container.querySelector('#btn-close-library');
     if (btnCloseLib) {
       btnCloseLib.addEventListener('click', () => {
@@ -267,54 +241,25 @@ export class LogoPanel {
       });
     }
 
-    // Library logo cards
-    this.container.querySelectorAll('.library-logo-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const logoId = card.dataset.id;
-        const logoItem = DEFAULT_LOGOS.find(l => l.id === logoId);
-        if (!logoItem) return;
-
-        const newId = 'logo_' + Date.now();
-        const dataUrl = getLogoDataUrl(logoItem);
-
-        this.state.logos.push({
-          id: newId,
-          name: logoItem.name,
-          src: dataUrl,
-          targetArticle: 'primary',
-          zone: 'chest_left',
-          scale: 1.0,
-          rotation: 0,
-          opacity: 1.0,
-          tint: 'original',
-          offsetX: 0,
-          offsetY: 0,
-          visible: true
-        });
-
-        this.activeLogoId = newId;
-        this.isLibraryOpen = false;
+    // Toggle advanced sliders accordion
+    const btnToggleAdv = this.container.querySelector('#btn-toggle-advanced');
+    if (btnToggleAdv) {
+      btnToggleAdv.addEventListener('click', () => {
+        this.isAdvancedOpen = !this.isAdvancedOpen;
         this.render();
-        this.onUpdate();
       });
-    });
-
-    // Library dropzone
-    const libDropzone = this.container.querySelector('#library-dropzone');
-    if (libDropzone && fileInput) {
-      libDropzone.addEventListener('click', () => fileInput.click());
     }
 
-    // Select Logo Card
-    this.container.querySelectorAll('.logo-item-card').forEach(card => {
+    // Select logo layer card
+    this.container.querySelectorAll('.figma-layer-card').forEach(card => {
       card.addEventListener('click', (e) => {
-        if (e.target.closest('.logo-item-actions')) return;
+        if (e.target.closest('.btn-figma-icon')) return;
         this.activeLogoId = card.dataset.id;
         this.render();
       });
     });
 
-    // Toggle Logo Visibility
+    // Toggle logo visibility
     this.container.querySelectorAll('.btn-toggle-logo-vis').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -322,13 +267,13 @@ export class LogoPanel {
         const item = this.state.logos.find(l => l.id === id);
         if (item) {
           item.visible = !item.visible;
+          if (this.onUpdate) this.onUpdate();
           this.render();
-          this.onUpdate();
         }
       });
     });
 
-    // Delete Logo
+    // Delete logo
     this.container.querySelectorAll('.btn-delete-logo').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -337,136 +282,117 @@ export class LogoPanel {
         if (this.activeLogoId === id) {
           this.activeLogoId = this.state.logos[0]?.id || null;
         }
+        if (this.onUpdate) this.onUpdate();
         this.render();
-        this.onUpdate();
       });
     });
 
-    const activeItem = this.state.logos.find(l => l.id === this.activeLogoId);
+    // Library preset logo click
+    this.container.querySelectorAll('.library-logo-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const id = card.dataset.id;
+        const preset = SOBRAL_PRESET_LOGOS.find(p => p.id === id);
+        if (preset) {
+          const newLogo = {
+            id: 'logo_' + Date.now(),
+            name: preset.name,
+            src: preset.src,
+            targetArticle: 'primary',
+            zone: 'chest_left',
+            scale: 0.55,
+            rotation: 0,
+            offsetX: 0,
+            offsetY: 0,
+            visible: true
+          };
+          this.state.logos.push(newLogo);
+          this.activeLogoId = newLogo.id;
+          this.isLibraryOpen = false;
+          if (this.onUpdate) this.onUpdate();
+          this.render();
+        }
+      });
+    });
+
+    const activeItem = this.state.logos.find(l => l.id === this.activeLogoId) || this.state.logos[0];
     if (!activeItem) return;
 
-    // Target Article Selector
-    const selectArticle = this.container.querySelector('#select-logo-article');
-    if (selectArticle) {
-      selectArticle.addEventListener('change', (e) => {
+    // Article select
+    const selArticle = this.container.querySelector('#select-logo-article');
+    if (selArticle) {
+      selArticle.addEventListener('change', (e) => {
         activeItem.targetArticle = e.target.value;
-        const defaultZones = ARTICLE_ZONES[e.target.value] || ARTICLE_ZONES.primary;
+        const defaultZones = ARTICLE_ZONES[activeItem.targetArticle] || ARTICLE_ZONES.primary;
         activeItem.zone = defaultZones[0].key;
+        if (this.onUpdate) this.onUpdate();
         this.render();
-        this.onUpdate();
       });
     }
 
-    // Target Zone Selector
-    const selectZone = this.container.querySelector('#select-logo-zone');
-    if (selectZone) {
-      selectZone.addEventListener('change', (e) => {
+    // Zone select
+    const selZone = this.container.querySelector('#select-logo-zone');
+    if (selZone) {
+      selZone.addEventListener('change', (e) => {
         activeItem.zone = e.target.value;
+        if (this.onUpdate) this.onUpdate();
         this.render();
-        this.onUpdate();
       });
     }
 
-    // Tint Buttons
-    this.container.querySelectorAll('.tint-btn').forEach(btn => {
+    // Advanced Stepper Buttons (+ / -)
+    this.container.querySelectorAll('.btn-step').forEach(btn => {
       btn.addEventListener('click', () => {
-        activeItem.tint = btn.dataset.tint;
+        const action = btn.dataset.action;
+        if (action === 'inc-scale') {
+          activeItem.scale = Math.min(2.4, +( (activeItem.scale || 1.0) + 0.1 ).toFixed(2));
+        } else if (action === 'dec-scale') {
+          activeItem.scale = Math.max(0.2, +( (activeItem.scale || 1.0) - 0.1 ).toFixed(2));
+        } else if (action === 'inc-rot') {
+          activeItem.rotation = ((activeItem.rotation || 0) + 5) % 360;
+        } else if (action === 'dec-rot') {
+          activeItem.rotation = ((activeItem.rotation || 0) - 5) % 360;
+        } else if (action === 'inc-ox') {
+          activeItem.offsetX = (activeItem.offsetX || 0) + 5;
+        } else if (action === 'dec-ox') {
+          activeItem.offsetX = (activeItem.offsetX || 0) - 5;
+        } else if (action === 'inc-oy') {
+          activeItem.offsetY = (activeItem.offsetY || 0) + 5;
+        } else if (action === 'dec-oy') {
+          activeItem.offsetY = (activeItem.offsetY || 0) - 5;
+        }
+
+        if (this.onUpdate) this.onUpdate();
         this.render();
-        this.onUpdate();
       });
     });
-
-    // Scale Slider
-    const sliderScale = this.container.querySelector('#slider-logo-scale');
-    const valScale = this.container.querySelector('#val-logo-scale');
-    if (sliderScale && valScale) {
-      sliderScale.addEventListener('input', (e) => {
-        const val = parseFloat(e.target.value);
-        activeItem.scale = val;
-        valScale.textContent = `${Math.round(val * 100)}%`;
-        this.onUpdate();
-      });
-    }
-
-    // Rotation Slider
-    const sliderRot = this.container.querySelector('#slider-logo-rotation');
-    const valRot = this.container.querySelector('#val-logo-rot');
-    if (sliderRot && valRot) {
-      sliderRot.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value);
-        activeItem.rotation = val;
-        valRot.textContent = `${val}°`;
-        this.onUpdate();
-      });
-    }
   }
 
-  handleFile(file) {
-    if (!file) return;
+  handleFileUpload(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
-      const newId = 'logo_' + Date.now();
-      const defaultZone = 'chest_left';
-
-      this.state.logos.push({
-        id: newId,
-        name: file.name.replace(/\.[^/.]+$/, ''),
-        src: e.target.result,
+      const src = e.target.result;
+      const newLogo = {
+        id: 'logo_' + Date.now(),
+        name: file.name.replace(/\.[^/.]+$/, ""),
+        src,
         targetArticle: 'primary',
-        zone: defaultZone,
-        scale: 1.0,
+        zone: 'chest_left',
+        scale: 0.55,
         rotation: 0,
-        opacity: 1.0,
-        tint: 'original',
         offsetX: 0,
         offsetY: 0,
         visible: true
-      });
-
-      this.activeLogoId = newId;
-      this.isLibraryOpen = false;
+      };
+      this.state.logos.push(newLogo);
+      this.activeLogoId = newLogo.id;
+      if (this.onUpdate) this.onUpdate();
       this.render();
-      this.onUpdate();
     };
     reader.readAsDataURL(file);
   }
 
-  setActiveLogo(itemId) {
-    this.activeLogoId = itemId;
-    this.render();
-  }
-
-  updateZone(itemId, newZone) {
-    const item = this.state.logos.find(l => l.id === itemId);
-    if (item) item.zone = newZone;
-    this.render();
-  }
-
-  updateOffsets(itemId, offsetX, offsetY) {
-    const item = this.state.logos.find(l => l.id === itemId);
-    if (item) {
-      item.offsetX = offsetX;
-      item.offsetY = offsetY;
-    }
-  }
-
-  updateScale(itemId, newScale) {
-    const item = this.state.logos.find(l => l.id === itemId);
-    if (item) item.scale = newScale;
-    this.render();
-  }
-
-  updateRotation(itemId, newAngle) {
-    const item = this.state.logos.find(l => l.id === itemId);
-    if (item) item.rotation = newAngle;
-    this.render();
-  }
-
   updateState(newState) {
     this.state = newState;
-    if (!this.state.logos.find(l => l.id === this.activeLogoId)) {
-      this.activeLogoId = this.state.logos[0]?.id || null;
-    }
     this.render();
   }
 }
