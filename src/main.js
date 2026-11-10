@@ -288,6 +288,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 6. Create 3D Viewer with state getter
   viewer = new ShirtViewer(canvasContainer, textureEngine, () => state);
+  window.__viewer = viewer;
+  window.__appState = state;
   viewer.setTheme(currentTheme);
   window.appViewer = viewer;
   window.appCatalog = catalog;
@@ -430,6 +432,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       viewControls.setMode('3d');
     }
     if (productSwitcher) productSwitcher.render();
+
+    // Update Sidebar Header dynamically for Komplett-Outfit vs Single Garment
+    const isWorker = prod?.silhouette === 'worker' || prod?.category === 'outfits';
+    const titleEl = document.querySelector('.sidebar-title-main');
+    const subEl = document.querySelector('.sidebar-title-sub');
+    if (titleEl) {
+      titleEl.textContent = isWorker ? 'DEIN KOMPLETT-OUTFIT' : prod.name.toUpperCase();
+    }
+    if (subEl) {
+      subEl.textContent = isWorker ? 'Produkte zusammenstellen und personalisieren' : (prod.categoryName || 'Farben und Personalisierung anpassen');
+    }
+
     setActiveTab('colors');
     historyManager.push(state);
   };

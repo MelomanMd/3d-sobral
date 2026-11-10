@@ -28,9 +28,29 @@ export class LogoPanel {
     this.render();
   }
 
+  getTargetArticles() {
+    const activeProduct = this.state.activeProduct || { silhouette: 'worker' };
+    const isWorker = activeProduct.silhouette === 'worker' || activeProduct.category === 'outfits';
+    if (isWorker) {
+      return ARTICLE_TARGETS;
+    }
+    if (activeProduct.silhouette === 'helmet' || activeProduct.category === 'headwear') {
+      return [{ id: 'helmet', name: 'Kopfschutz' }];
+    }
+    if (activeProduct.silhouette === 'trousers' || activeProduct.category === 'bottoms') {
+      return [{ id: 'trousers', name: 'Arbeitshose' }];
+    }
+    return [{ id: 'primary', name: 'Oberteil' }];
+  }
+
   render() {
     const activeItem = this.state.logos.find(l => l.id === this.activeLogoId) || this.state.logos[0];
-    const targetArticle = activeItem?.targetArticle || 'primary';
+    const activeTargets = this.getTargetArticles();
+    let targetArticle = activeItem?.targetArticle || activeTargets[0].id;
+    if (!activeTargets.some(t => t.id === targetArticle)) {
+      targetArticle = activeTargets[0].id;
+      if (activeItem) activeItem.targetArticle = targetArticle;
+    }
     const availableZones = ARTICLE_ZONES[targetArticle] || ARTICLE_ZONES.primary;
 
     const resolveZoneName = (item) => {
@@ -106,7 +126,7 @@ export class LogoPanel {
               <div class="figma-field-group">
                 <label class="figma-label">ARTIKEL</label>
                 <select class="figma-select" id="select-logo-article">
-                  ${ARTICLE_TARGETS.map(a => `
+                  ${activeTargets.map(a => `
                     <option value="${a.id}" ${targetArticle === a.id ? 'selected' : ''}>${a.name}</option>
                   `).join('')}
                 </select>
