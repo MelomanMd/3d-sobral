@@ -40,9 +40,14 @@ export class QuoteModal {
     modal.id = 'quote-modal-root';
     modal.innerHTML = `
       <div class="modal-card figma-quote-card" style="max-width: 520px; width: 100%; background: #ffffff; border-radius: 2px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); padding: 32px 36px 36px 36px; overflow: hidden;">
-        <div class="modal-title-group" style="margin-bottom: 24px;">
-          <h2 class="modal-title" style="margin: 0; font-size: 20px; font-weight: 700; color: #1d1d1b; font-family: 'Neue DIN', sans-serif; letter-spacing: 0.5px;">ANGEBOT ANFORDERN</h2>
-          <p style="margin: 6px 0 0 0; font-size: 13px; color: #6b7280;">Kontaktdaten für dein individuelles Angebot.</p>
+        <div class="modal-title-group" style="margin-bottom: 24px; display: flex; align-items: flex-start; justify-content: space-between;">
+          <div>
+            <h2 class="modal-title" style="margin: 0; font-size: 20px; font-weight: 700; color: #1d1d1b; font-family: 'Neue DIN', sans-serif; letter-spacing: 0.5px;">ANGEBOT ANFORDERN</h2>
+            <p style="margin: 6px 0 0 0; font-size: 13px; color: #6b7280;">Kontaktdaten für dein individuelles Angebot.</p>
+          </div>
+          <button type="button" class="modal-close-btn" id="btn-quote-close" style="background: transparent; border: none; font-size: 24px; color: #1d1d1b; cursor: pointer; padding: 4px; line-height: 1;">
+            ✕
+          </button>
         </div>
 
         <form id="quote-request-form" style="display: flex; flex-direction: column; gap: 20px;">
@@ -58,8 +63,11 @@ export class QuoteModal {
             <input type="text" id="quote-company" value="${customer.company || 'Dein Unternehmen'}" placeholder="Dein Unternehmen" required class="figma-input" style="height: 44px; border-radius: 2px;">
           </div>
 
-          <!-- Button ZURÜCK ZUM ENTWURF -->
-          <div style="margin-top: 8px;">
+          <!-- Actions: Submit & Back -->
+          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 10px;">
+            <button type="submit" class="btn-sidebar-quote" id="btn-quote-submit" style="width: 100%; height: 44px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; border-radius: 2px; background: #993311; color: #ffffff; border: none; cursor: pointer; font-family: 'Neue DIN', sans-serif; text-transform: uppercase;">
+              ANGEBOT JETZT ANFORDERN
+            </button>
             <button type="button" class="btn-figma-white-action" id="btn-quote-back" style="width: 100%; height: 44px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; border-radius: 2px; border: 1px solid #d1d5db; background: #ffffff; color: #1d1d1b; cursor: pointer; font-family: 'Neue DIN', sans-serif; text-transform: uppercase;">
               ZURÜCK ZUM ENTWURF
             </button>
@@ -72,6 +80,7 @@ export class QuoteModal {
     this.modalEl = modal;
 
     // Events
+    modal.querySelector('#btn-quote-close')?.addEventListener('click', () => this.close());
     modal.querySelector('#btn-quote-back').addEventListener('click', () => this.close());
     modal.addEventListener('click', (e) => {
       if (e.target === modal) this.close();
