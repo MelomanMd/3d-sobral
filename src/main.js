@@ -5,7 +5,7 @@ import { ColorPanel, SPORT_PALETTES } from './components/colorPanel.js';
 import { TextPanel } from './components/textPanel.js';
 import { LogoPanel } from './components/logoPanel.js';
 import { ViewControls } from './components/viewControls.js';
-import { ExportModal } from './components/exportModal.js';
+import { ExportModal, DiscardModal } from './components/exportModal.js';
 import { QuoteModal } from './components/quoteModal.js';
 import { CreationScreen } from './components/creationScreen.js';
 import { ProductCatalog } from './core/products.js';
@@ -617,13 +617,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 12.2. Close Configurator Button
+  // 12.2. Close Configurator Button (Figma Frame 1876:9611 Discard Modal)
   const btnCloseConfigurator = document.getElementById('btn-close-configurator');
   if (btnCloseConfigurator) {
     btnCloseConfigurator.addEventListener('click', () => {
-      if (confirm('Möchten Sie den Konfigurator wirklich verlassen? Nicht gespeicherte Änderungen gehen verloren.')) {
-        window.location.href = '/';
-      }
+      const discardModal = new DiscardModal(
+        () => {
+          const exportModal = new ExportModal(viewer, state);
+          exportModal.open();
+        },
+        () => {
+          window.location.href = '/';
+        }
+      );
+      discardModal.open();
     });
   }
 

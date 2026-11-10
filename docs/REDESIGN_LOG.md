@@ -363,3 +363,27 @@ graph TD
   3. Декали мгновенно удаляются из сцены в 3D через `viewer.updateDecals()`.
 - **Верификация:**
   - Созданы и пройдены тесты [`tests/test_single_logo_delete.mjs`](file:///Volumes/WORK/var/www/3d-sobral-v2/tests/test_single_logo_delete.mjs) и [`tests/test_single_text_delete.mjs`](file:///Volumes/WORK/var/www/3d-sobral-v2/tests/test_single_text_delete.mjs) (0 ошибок).
+
+### Запись: Исправление действия кнопки «ENTWURF SPEICHERN» и приведение к эталону Figma (10.11.2026)
+- **Проблема:** Кнопка «ENTWURF SPEICHERN» в футере сайдбара открывала старое устаревшее темное модальное окно с двумя огромными 3D-рендерами переда/спинки, блоками спецификаций, сохранением в аккаунт и кнопками GLB/JSON, что полностью противоречило макету Figma 2026 (Фреймы `1876:9135`–`1876:9492`).
+- **Решение:**
+  1. В [`src/components/exportModal.js`](file:///Volumes/WORK/var/www/3d-sobral-v2/src/components/exportModal.js) реализовано новое модальное окно «ENTWURF SPEICHERN», 100% соответствующее фреймам Figma:
+     - Лаконичная белая карточка шириной `620px` со строгой типографикой `Neue DIN`.
+     - Заголовок `ENTWURF SPEICHERN`, подзаголовок `Wähle das gewünschte Dateiformat.`.
+     - 3 равношироких таба выбора формата: `PDF` | `PNG` | `JPG` (активный — сплошной черный `#000000` с белым текстом, неактивные — белые с серой рамкой).
+     - Динамическое описание и кнопка действия в зависимости от выбранного формата:
+       - `PDF`: «PDF · Übersicht mit Outfit und Personalisierungen» → кнопка `ALS PDF SPEICHERN`
+       - `PNG`: «PNG · Bild mit transparentem Hintergrund» → кнопка `ALS PNG SPEICHERN`
+       - `JPG`: «JPG · Kompaktes Bild mit Hintergrund» → кнопка `ALS JPG SPEICHERN`
+     - Кнопка отмены `ABBRECHEN`.
+  2. При нажатии на кнопку сохранения:
+     - Конфигурация сохраняется в локальное хранилище браузера (`localStorage: sobral_saved_designs`).
+     - Выполняется реальная генерация и скачивание файла выбранного формата (производственный A4 PDF / прозрачный PNG 1920x1920 / 3D сцена JPG).
+     - Запускается салют конфетти.
+     - Окно переходит в экран успеха «EXPORT VORBEREITET» (Фрейм `1876:9492`) с описанием и кнопками `WEITER BEARBEITEN` и `KONFIGURATOR SCHLIESSEN`.
+  3. Реализовано модальное окно подтверждения закрытия «ENTWURF VERWERFEN?» (Фрейм `1876:9611`):
+     - При нажатии на крестик в шапке сайдбара (`✕`) вместо нативного alert/confirm браузера открывается модальное окно в стиле Figma с кнопками `ZURÜCK ZUM ENTWURF`, `ZUERST SPEICHERN` (вызывающей модалку экспорта) и `OHNE SPEICHERN SCHLIESSEN`.
+- **Верификация:**
+  - Создан автоматический тест [`tests/test_entwurf_speichern_button.mjs`](file:///Volumes/WORK/var/www/3d-sobral-v2/tests/test_entwurf_speichern_button.mjs), проверивший открытие модалки, переключение всех табов, экспорт, переход в статус успеха и диалог подтверждения закрытия (0 ошибок).
+  - Сквозной комплексный аудит [`tests/test_complete_audit.mjs`](file:///Volumes/WORK/var/www/3d-sobral-v2/tests/test_complete_audit.mjs) пройден со 100% успехом (0 ошибок).
+  - Сборка `npm run build` успешна.

@@ -1,6 +1,5 @@
 import { t } from '../core/i18n.js';
 import { ICONS } from '../core/icons.js';
-import { openPhotoComparisonDialog } from './exportModal.js';
 
 export class ViewControls {
   constructor(containerElement, viewer, onModeChange) {

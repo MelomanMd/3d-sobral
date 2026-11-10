@@ -290,8 +290,8 @@ const BRAIN_DIR = '/Users/lis/.gemini/antigravity/brain/5cc41ec3-eebb-4988-b2fa-
   const exportModal = await page.$('#export-modal-root');
   console.log(`  ✔ Export Modal opened: ${!!exportModal}`);
 
-  // Format tabs (PDF, PNG, JPG)
-  const formatTabs = await page.$$('.export-format-tab');
+  // Format tabs (PDF, PNG, JPG) from Figma
+  const formatTabs = await page.$$('.figma-draft-format-btn');
   console.log(`  ✔ Export format tabs: ${formatTabs.length} (expected 3)`);
   if (formatTabs.length >= 3) {
     await formatTabs[1].click(); // PNG
@@ -305,7 +305,7 @@ const BRAIN_DIR = '/Users/lis/.gemini/antigravity/brain/5cc41ec3-eebb-4988-b2fa-
   await page.screenshot({ path: `${BRAIN_DIR}/audit_07_modal_export_open.png` });
 
   // Close export modal
-  await page.click('#modal-btn-close');
+  await page.click('#btn-draft-x');
   await new Promise(r => setTimeout(r, 500));
   console.log('  ✔ Export Modal closed.');
 

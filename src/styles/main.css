@@ -5020,3 +5020,185 @@ dialog.comparison-dialog-root::backdrop {
   background: #F8F9FA;
   border-color: #9CA3AF;
 }
+
+/* ==========================================================================
+   FIGMA REDESIGN 2026: ENTWURF SPEICHERN & DISCARD MODALS (Frames 1876:9135 - 1876:9611)
+   ========================================================================== */
+.figma-draft-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: figmaFadeIn 0.2s ease-out;
+}
+
+.figma-draft-card {
+  width: 100%;
+  max-width: 620px;
+  background: #FFFFFF;
+  border-radius: 2px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+  padding: 40px;
+  position: relative;
+  box-sizing: border-box;
+  animation: figmaScaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.figma-draft-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  color: #6B7280;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.15s ease;
+}
+
+.figma-draft-close:hover {
+  color: #1D1D1B;
+}
+
+.figma-draft-title {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1D1D1B;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin: 0 0 8px 0;
+}
+
+.figma-draft-subtitle {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #4B5563;
+  margin: 0 0 24px 0;
+  line-height: 1.4;
+}
+
+.figma-draft-format-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.figma-draft-format-btn {
+  height: 54px;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border-radius: 2px;
+  border: 1px solid #D1D5DB;
+  background: #FFFFFF;
+  color: #1D1D1B;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.figma-draft-format-btn:hover {
+  border-color: #9CA3AF;
+  background: #F9FAFB;
+}
+
+.figma-draft-format-btn.active {
+  background: #000000;
+  color: #FFFFFF;
+  border-color: #000000;
+}
+
+.figma-draft-desc-box {
+  margin-bottom: 32px;
+  min-height: 48px;
+}
+
+.figma-draft-desc-lead {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1D1D1B;
+  margin-bottom: 6px;
+}
+
+.figma-draft-desc-sub {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: #6B7280;
+  line-height: 1.4;
+}
+
+.figma-btn-primary-orange {
+  width: 100%;
+  height: 48px;
+  background: #FF4400;
+  color: #FFFFFF;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+}
+
+.figma-btn-primary-orange:hover {
+  background: #E63E00;
+}
+
+.figma-btn-primary-orange:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.figma-btn-outline-white {
+  width: 100%;
+  height: 48px;
+  background: #FFFFFF;
+  color: #1D1D1B;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid #D1D5DB;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.figma-btn-outline-white:last-child {
+  margin-bottom: 0;
+}
+
+.figma-btn-outline-white:hover {
+  background: #F9FAFB;
+  border-color: #9CA3AF;
+}
