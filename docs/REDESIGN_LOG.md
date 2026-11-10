@@ -150,3 +150,22 @@ graph TD
 4. **Сборка и проверка:**
    - `npm run build` проходит без единой ошибки за 3.2 сек.
    - Запущен локальный сервер на `http://localhost:5173/`. Сгенерирован скриншот `preview_step1.png`.
+
+### [2026-11-10] Выполнен Шаг 2: Вкладка 01 «Elemente & FARBEN» (4 элемента экипировки и палитры Figma)
+1. **Карточки элементов экипировки (Комплект):**
+   - `Kopfschutz` (Helmschale / Kask Superplasma)
+   - `Oberteil` (Jacke & Ärmel / Blåkläder Softshell)
+   - `Arbeitshose` (Hose & Beine / Blåkläder 1750 Stretch)
+   - `Sicherheitsschuhe` (Sicherheitsschuhe / Sobral Pro Safety S3)
+   - На каждой карточке выводится квадратный свотч текущего цвета и плашка с hex-кодом (`#FFFFFF`, `#242935`, `#1B2034`, `#1D1D1B`), а также встроенный `input type="color"` для точной настройки.
+   - Активный элемент подсвечивается синей рамкой с мягким свечением.
+2. **Секция «SCHNELLAUSWAHL»:**
+   - Заголовок динамически адаптируется под выбранный товар (например, `SCHNELLAUSWAHL (OBERTEIL)`).
+   - Сетка карточек цветов с точными hex-кодами из Figma (фреймы `1884:*`):
+     - Каска: Gelb (`#FFCF24`), Blau (`#283B79`), Weiss (`#FFFFFF`), Orange (`#F98900`), Grün (`#1C5600`).
+     - Куртка: Marineblau/Grau (`#242935`), Weiss/Dunkelgrau (`#FFFFFF`), Rot/Schwarz (`#C3303C`), Kornblumenblau/Schwarz (`#334B97`), Dunkelmarineblau/Schwarz (`#222337`), Grau/Schwarz (`#656A70`).
+     - Штаны: Marineblau (`#242935`), Grau (`#656A70`), Schwarz (`#1D1D1B`), Marineblau/Schwarz, Waldgrün/Schwarz (`#1C5600`), Kornblumenblau/Schwarz (`#334B97`).
+     - Обувь: Schwarz (`#1D1D1B`), Grau (`#656A70`), Braun (`#836338`).
+3. **Сборка и версионирование:**
+   - Сборка `npm run build` успешна (3.04s).
+   - Коммит `0c596f7` в ветке `feature/redesign-2026`.

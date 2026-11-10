@@ -755,6 +755,262 @@ body.sobral-theme-2026 {
   text-overflow: ellipsis;
 }
 
+/* ==========================================================================
+   FIGMA 2026 REDESIGN - TAB 02 BESCHRIFTUNG (TEXT & NUMMER)
+   ========================================================================== */
+
+.text-panel-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.btn-figma-add-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #1d1d1b;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-figma-add-item:hover {
+  background: #f7f8f9;
+  border-color: #cbd5e1;
+  color: #ff4400;
+}
+
+.text-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.text-item-card {
+  background: #f7f8f9;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.text-item-card:hover {
+  background: #f1f3f5;
+  border-color: #cbd5e1;
+}
+
+.text-item-card.active {
+  background: #ffffff;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15);
+}
+
+.text-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.text-item-index {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #9ca3af;
+  letter-spacing: 0.5px;
+}
+
+.text-item-preview {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1d1d1b;
+}
+
+.text-item-meta {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 11.5px;
+  color: #6b7280;
+}
+
+.text-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-item-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-item-action:hover {
+  background: #e5e7eb;
+  color: #1d1d1b;
+}
+
+/* Detail Editor */
+.active-item-editor-new {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #f0f2f5;
+}
+
+.editor-section-title {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #6b7280;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.figma-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.figma-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.figma-form-label {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.figma-input-text {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #1d1d1b;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.figma-input-text:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.figma-select {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #1d1d1b;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.figma-select:focus {
+  border-color: #3b82f6;
+}
+
+.figma-color-swatches-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.figma-text-color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.figma-text-color-swatch:hover {
+  transform: scale(1.12);
+}
+
+.figma-text-color-swatch.active {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #ff4400;
+}
+
+.figma-custom-color-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px dashed #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f7f8f9;
+}
+
+.figma-native-color-picker {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 50px;
+  height: 50px;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.figma-slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.figma-slider-value {
+  font-family: 'Neue DIN', monospace, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.figma-slider {
+  width: 100%;
+  accent-color: #ff4400;
+  cursor: pointer;
+}
+
+
 
 /* Sidebar Footer Actions */
 .sidebar-footer-new {
