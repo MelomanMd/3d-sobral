@@ -148,3 +148,4 @@ if (!fs.existsSync(DOWNLOAD_DIR)) fs.mkdirSync(DOWNLOAD_DIR, { recursive: true }
 
   await browser.close();
 })();
+

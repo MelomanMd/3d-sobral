@@ -105,18 +105,12 @@ export class ExportModal {
       } else if (this.activeFormat === 'png') {
         if (this.viewer) {
           const url = await this.viewer.captureAngle('front', 1920, 1920, true);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `sobral-design-${Date.now()}.png`;
-          a.click();
+          await this.triggerFileDownload(url, `sobral-design-${Date.now()}.png`, 'image/png');
         }
       } else if (this.activeFormat === 'jpg') {
         if (this.viewer) {
           const url = await this.viewer.captureAngle('front', 1920, 1920, false);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `sobral-scene-${Date.now()}.jpg`;
-          a.click();
+          await this.triggerFileDownload(url, `sobral-scene-${Date.now()}.jpg`, 'image/jpeg');
         }
       }
 
@@ -132,6 +126,38 @@ export class ExportModal {
         actionBtn.textContent = `ALS ${this.activeFormat.toUpperCase()} SPEICHERN`;
       }
     }
+  }
+
+  async triggerFileDownload(dataUrl, filename, mimeType) {
+    let blob;
+    if (mimeType === 'image/jpeg') {
+      const img = new Image();
+      await new Promise((res) => { img.onload = res; img.src = dataUrl; });
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#222337'; // 3D stage background color
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
+    } else {
+      const resp = await fetch(dataUrl);
+      blob = await resp.blob();
+    }
+
+    if (!blob) return;
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      if (a.parentNode) a.parentNode.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    }, 1500);
   }
 
   renderSuccessState() {

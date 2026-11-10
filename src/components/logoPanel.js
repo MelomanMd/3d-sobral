@@ -252,6 +252,14 @@ export class LogoPanel {
             </button>
           `).join('')}
         </div>
+
+        <!-- Figma Frame 1876:8870: Upload new logo from within library -->
+        <div class="library-modal-footer" style="margin-top: 6px; padding-top: 14px; border-top: 1px solid #e5e7eb;">
+          <input type="file" id="library-upload-file-input" accept="image/png,image/svg+xml,image/jpeg,image/webp" style="display: none;">
+          <button type="button" class="btn-figma-black-action" id="btn-library-upload-new" style="width: 100%; height: 44px; font-weight: 700; font-family: 'Neue DIN', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+            + NEUES LOGO HOCHLADEN
+          </button>
+        </div>
       </div>
     `;
 
@@ -262,6 +270,46 @@ export class LogoPanel {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) this.closeLibraryModal();
     });
+
+    // Wire + NEUES LOGO HOCHLADEN button inside library
+    const libUploadBtn = modal.querySelector('#btn-library-upload-new');
+    const libFileInput = modal.querySelector('#library-upload-file-input');
+    if (libUploadBtn && libFileInput) {
+      libUploadBtn.addEventListener('click', () => libFileInput.click());
+      libFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          this.handleFileUpload(file);
+          this.closeLibraryModal();
+        }
+      });
+    }
+
+    // Drag & drop support directly on library modal window
+    const modalWindow = modal.querySelector('.logo-library-modal-window');
+    if (modalWindow) {
+      ['dragenter', 'dragover'].forEach(eventName => {
+        modalWindow.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          modalWindow.style.borderColor = '#FF4400';
+        });
+      });
+      ['dragleave', 'drop'].forEach(eventName => {
+        modalWindow.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          modalWindow.style.borderColor = '#e5e7eb';
+        });
+      });
+      modalWindow.addEventListener('drop', (e) => {
+        const files = e.dataTransfer?.files;
+        if (files && files.length > 0) {
+          this.handleFileUpload(files[0]);
+          this.closeLibraryModal();
+        }
+      });
+    }
 
     const searchInput = modal.querySelector('#library-search-input');
     const grid = modal.querySelector('#library-logos-grid');
@@ -298,6 +346,10 @@ export class LogoPanel {
         const id = card.dataset.id;
         const preset = SOBRAL_PRESET_LOGOS.find(p => p.id === id);
         if (preset) {
+          const targetArticle = this.getTargetArticles()[0]?.id || 'primary';
+          const defaultZones = ARTICLE_ZONES[targetArticle] || ARTICLE_ZONES.primary;
+          const targetZone = defaultZones[0]?.id || 'chest_left';
+
           const activeItem = this.state.logos.find(l => l.id === this.activeLogoId);
           if (activeItem) {
             activeItem.name = preset.name;
@@ -307,8 +359,8 @@ export class LogoPanel {
               id: 'logo_' + Date.now(),
               name: preset.name,
               src: preset.src,
-              targetArticle: 'primary',
-              zone: 'chest_left',
+              targetArticle,
+              zone: targetZone,
               scale: 0.45,
               rotation: 0,
               offsetX: 0,
@@ -336,6 +388,31 @@ export class LogoPanel {
       fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) this.handleFileUpload(file);
+      });
+    }
+
+    // Drag & drop support for Tab 03
+    const panelWrap = this.container.querySelector('.figma-subpanel-wrapper');
+    if (panelWrap) {
+      ['dragenter', 'dragover'].forEach(eventName => {
+        panelWrap.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          panelWrap.style.borderColor = '#FF4400';
+        });
+      });
+      ['dragleave', 'drop'].forEach(eventName => {
+        panelWrap.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          panelWrap.style.borderColor = 'transparent';
+        });
+      });
+      panelWrap.addEventListener('drop', (e) => {
+        const files = e.dataTransfer?.files;
+        if (files && files.length > 0) {
+          this.handleFileUpload(files[0]);
+        }
       });
     }
 
@@ -448,19 +525,25 @@ export class LogoPanel {
   }
 
   handleFileUpload(file) {
+    if (!file) return;
     const reader = new FileReader();
     reader.onload = (e) => {
       const src = e.target.result;
+      const targetArticle = this.getTargetArticles()[0]?.id || 'primary';
+      const defaultZones = ARTICLE_ZONES[targetArticle] || ARTICLE_ZONES.primary;
+      const targetZone = defaultZones[0]?.id || 'chest_left';
+
       const newLogo = {
         id: 'logo_' + Date.now(),
-        name: file.name.replace(/\.[^/.]+$/, ""),
+        name: file.name.replace(/\.[^/.]+$/, "") || 'Eigenes Logo',
         src,
-        targetArticle: 'primary',
-        zone: 'chest_left',
+        targetArticle,
+        zone: targetZone,
         scale: 0.55,
         rotation: 0,
         offsetX: 0,
         offsetY: 0,
+        opacity: 1.0,
         visible: true
       };
       this.state.logos.push(newLogo);

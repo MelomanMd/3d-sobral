@@ -77,6 +77,16 @@ export const DEFAULT_LOGOS = [
 
 // Convert SVG strings to usable Image objects or Data URLs
 export function getLogoDataUrl(logoItem) {
-  const encoded = encodeURIComponent(logoItem.svg);
+  let svg = logoItem.svg || '';
+  // Ensure valid width and height attributes so browsers and Three.js can size the canvas/image
+  if (svg.includes('<svg')) {
+    if (!svg.includes('width=')) {
+      svg = svg.replace('<svg', '<svg width="200"');
+    }
+    if (!svg.includes('height=')) {
+      svg = svg.replace('<svg', '<svg height="200"');
+    }
+  }
+  const encoded = encodeURIComponent(svg);
   return `data:image/svg+xml;charset=utf-8,${encoded}`;
 }

@@ -387,3 +387,16 @@ graph TD
   - Создан автоматический тест [`tests/test_entwurf_speichern_button.mjs`](file:///Volumes/WORK/var/www/3d-sobral-v2/tests/test_entwurf_speichern_button.mjs), проверивший открытие модалки, переключение всех табов, экспорт, переход в статус успеха и диалог подтверждения закрытия (0 ошибок).
   - Сквозной комплексный аудит [`tests/test_complete_audit.mjs`](file:///Volumes/WORK/var/www/3d-sobral-v2/tests/test_complete_audit.mjs) пройден со 100% успехом (0 ошибок).
   - Сборка `npm run build` успешна.
+
+### Запись: Исправление импорта и отображения картинок/логотипов в модалках (10.11.2026)
+- **Проблема:** В модальном окне «MEINE LOGO-BIBLIOTHEK» (а также при экспорте картинок) миниатюры SVG схлопывались до 0×0 пикселей из-за отсутствия явных атрибутов `width` и `height` в теге `<svg>`, карточки пресетов отображались пустыми белыми квадратами (скриншот `media_1794342419207_a2c8c64c.png`), отсутствовала кнопка загрузки своего файла внутри библиотеки и поддержка Drag-and-Drop. При экспорте картинок вызов `a.click()` без добавления в DOM мог блокироваться браузером.
+- **Решение:**
+  1. В [`src/core/defaultLogos.js`](file:///Volumes/WORK/var/www/3d-sobral-v2/src/core/defaultLogos.js) функция `getLogoDataUrl` дополнена автоматической нормализацией размеров: гарантированно внедряются атрибуты `width="200" height="200"`, что устранило схлопывание SVG в 0×0.
+  2. В [`src/components/logoPanel.js`](file:///Volumes/WORK/var/www/3d-sobral-v2/src/components/logoPanel.js):
+     - В модалку библиотеки добавлена кнопка `+ NEUES LOGO HOCHLADEN` (Фрейм `1876:8870`) со скрытым инпутом, позволяющая загрузить и нанести любое пользовательское изображение прямо из библиотеки.
+     - Добавлена полноценная поддержка Drag-and-Drop: перетаскивание картинки на окно библиотеки или сайдбар мгновенно импортирует и наносит изображение на 3D модель.
+     - Корректно рассчитываются целевые зоны нанесения (`targetArticle` и `zone`) под текущий товар (каска, штаны или куртка).
+  3. В [`src/components/exportModal.js`](file:///Volumes/WORK/var/www/3d-sobral-v2/src/components/exportModal.js) экспорт картинок PNG и JPG переведен на работу через бинарные Blob и `URL.createObjectURL`, с добавлением элемента в `document.body` перед кликом и конвертацией JPG через холст сцены.
+- **Верификация:**
+  - Создан стресс-тест [`tests/test_image_import_export.mjs`](file:///Volumes/WORK/var/www/3d-sobral-v2/tests/test_image_import_export.mjs), проверивший рендеринг всех 4 миниатюр библиотеки (`naturalWidth > 0`, `naturalHeight > 0`), выбор пресета, загрузку своего файла из модалки и реальное скачивание файлов PNG/JPG.
+  - Все тесты пройдены со 100% успехом (0 ошибок).
