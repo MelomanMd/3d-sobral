@@ -553,6 +553,209 @@ body.sobral-theme-2026 {
   padding: 20px;
 }
 
+/* ==========================================================================
+   FIGMA 2026 REDESIGN - TAB 01 ELEMENTE & FARBEN
+   ========================================================================== */
+
+.color-panel-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1d1d1b;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.section-title-tag svg {
+  color: #ff4400;
+}
+
+/* 4 Outfit Items Cards */
+.outfit-elements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.outfit-part-card {
+  background: #f7f8f9;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.outfit-part-card:hover {
+  background: #f1f3f5;
+  border-color: #cbd5e1;
+}
+
+.outfit-part-card.active {
+  background: #ffffff;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15);
+}
+
+.outfit-part-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.outfit-part-name {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1d1d1b;
+  letter-spacing: 0.2px;
+}
+
+.outfit-part-sub {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.outfit-color-preview-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.outfit-color-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.15s ease;
+}
+
+.outfit-color-box:hover {
+  transform: scale(1.06);
+}
+
+.outfit-native-picker {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 50px;
+  height: 50px;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.outfit-hex-label {
+  font-family: 'Neue DIN', monospace, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  background: #ffffff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  letter-spacing: 0.5px;
+  min-width: 60px;
+  text-align: center;
+}
+
+.outfit-part-card.active .outfit-hex-label {
+  color: #3b82f6;
+  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+/* Palette Selection Grid */
+.palette-selection-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f2f5;
+}
+
+.palette-section-title {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #6b7280;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.figma-swatches-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.figma-swatch-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.figma-swatch-card:hover {
+  background: #f7f8f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.figma-swatch-card.active {
+  border: 2px solid #ff4400;
+  background: #fff8f5;
+  box-shadow: 0 2px 8px rgba(255, 68, 0, 0.2);
+}
+
+.swatch-color-fill {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.swatch-color-name {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #1d1d1b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
 /* Sidebar Footer Actions */
 .sidebar-footer-new {
   padding: 16px 20px;

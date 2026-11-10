@@ -1,64 +1,64 @@
-import { PATTERNS } from '../core/patterns.js';
 import { t } from '../core/i18n.js';
 import { ICONS } from '../core/icons.js';
 
-export const SPORT_PALETTES = [
-  { name: 'Navy Dunkelblau', hex: '#1b2034' },
-  { name: 'Stahlgrau', hex: '#5b6c84' },
-  { name: 'Stealth Black', hex: '#121316' },
-  { name: 'Pure White', hex: '#f8fafc' },
-  { name: 'Crimson Red', hex: '#dc2626' },
-  { name: 'Royal Blue', hex: '#1d4ed8' },
-  { name: 'Neon Lime', hex: '#84cc16' },
-  { name: 'Cyber Purple', hex: '#7c3aed' },
-  { name: 'Sunset Gold', hex: '#f59e0b' },
-  { name: 'Racing Orange', hex: '#ea580c' },
-  { name: 'Aqua Cyan', hex: '#06b6d4' },
-  { name: 'Titanium Grey', hex: '#475569' }
-];
+// Official Figma 2026 Color Palettes from Frame 1884:*
+export const FIGMA_OUTFIT_PALETTES = {
+  helmet: [
+    { name: 'Gelb', hex: '#FFCF24' },
+    { name: 'Blau', hex: '#283B79' },
+    { name: 'Weiss', hex: '#FFFFFF' },
+    { name: 'Orange', hex: '#F98900' },
+    { name: 'Grün', hex: '#1C5600' }
+  ],
+  primary: [ // Oberteil (Jacke & Ärmel)
+    { name: 'Marineblau / Grau', hex: '#242935' },
+    { name: 'Weiss / Dunkelgrau', hex: '#FFFFFF' },
+    { name: 'Rot / Schwarz', hex: '#C3303C' },
+    { name: 'Kornblumenblau / Schwarz', hex: '#334B97' },
+    { name: 'Dunkelmarineblau / Schwarz', hex: '#222337' },
+    { name: 'Grau / Schwarz', hex: '#656A70' }
+  ],
+  trousers: [ // Arbeitshose (Hose & Beine)
+    { name: 'Marineblau', hex: '#242935' },
+    { name: 'Grau', hex: '#656A70' },
+    { name: 'Schwarz', hex: '#1D1D1B' },
+    { name: 'Marineblau / Schwarz', hex: '#1b2034' },
+    { name: 'Waldgrün / Schwarz', hex: '#1C5600' },
+    { name: 'Kornblumenblau / Schwarz', hex: '#334B97' }
+  ],
+  boots: [ // Sicherheitsschuhe
+    { name: 'Schwarz', hex: '#1D1D1B' },
+    { name: 'Grau', hex: '#656A70' },
+    { name: 'Braun', hex: '#836338' }
+  ]
+};
 
-export const HELMET_SAFETY_PALETTES = [
-  { name: 'Original Weiss', hex: '#ffffff' },
-  { name: 'Signalgelb', hex: '#f5ce32' },
-  { name: 'Warnorange', hex: '#f07730' },
-  { name: 'Royalblau', hex: '#2768ad' },
-  { name: 'Anthrazit / Schwarz', hex: '#272d33' },
-  { name: 'Leuchtorange', hex: '#ff5500' }
-];
+export const SPORT_PALETTES = FIGMA_OUTFIT_PALETTES.primary;
 
-export const BOOT_PALETTES = [
-  { name: 'Stealth Black', hex: '#1a1a1a' },
-  { name: 'Dunkelbraun Leder', hex: '#3d2514' },
-  { name: 'Anthrazit', hex: '#2d3139' },
-  { name: 'Coyote / Sand', hex: '#8c7355' },
-  { name: 'Warnorange', hex: '#ea580c' },
-  { name: 'Marineblau', hex: '#1b2034' }
-];
-
-export const GARMENT_ELEMENTS = [
+export const OUTFIT_ELEMENTS = [
+  {
+    id: 'helmet',
+    name: 'Kopfschutz',
+    sub: 'Helmschale',
+    category: 'KASK Superplasma PL'
+  },
   {
     id: 'primary',
-    name: 'Hauptkörper (Body)',
-    sub: 'Brust & Rücken',
-    icon: 'shirt'
+    name: 'Oberteil',
+    sub: 'Jacke & Ärmel',
+    category: 'Blåkläder Softshell'
   },
   {
-    id: 'accent',
-    name: 'Kontrastfarbe',
-    sub: 'Einsätze & Muster',
-    icon: 'layers'
+    id: 'trousers',
+    name: 'Arbeitshose',
+    sub: 'Hose & Beine',
+    category: 'Blåkläder 1750 Stretch'
   },
   {
-    id: 'collar',
-    name: 'Kragen (Bündchen)',
-    sub: 'Halsausschnitt',
-    icon: 'sparkles'
-  },
-  {
-    id: 'secondary',
-    name: 'Weitere Musterfarbe',
-    sub: 'Zierlinien / Verlauf',
-    icon: 'palette'
+    id: 'boots',
+    name: 'Sicherheitsschuhe',
+    sub: 'Sicherheitsschuhe',
+    category: 'Sobral Pro Safety S3'
   }
 ];
 
@@ -75,13 +75,13 @@ export class ColorPanel {
 
   getGarmentElements() {
     const product = this.state.activeProduct;
-    if (!this.viewer || this.viewer.loadedModelUrl !== product?.modelUrl) return [];
-    // Procedural zones depend on the selected pattern, not just the garment.
-    if (!this.viewer.isMultiMesh) {
-      const pattern = PATTERNS.find(pattern => pattern.id === this.state.patternId) || PATTERNS[0];
-      return GARMENT_ELEMENTS.filter(element => pattern.colorZones.includes(element.id));
+    if (this.viewer && this.viewer.isMultiMesh) {
+      const controls = this.viewer.getColorControls();
+      if (controls && controls.length) {
+        return controls;
+      }
     }
-    return this.viewer.getColorControls();
+    return OUTFIT_ELEMENTS;
   }
 
   setActiveZone(zone) {
@@ -89,177 +89,129 @@ export class ColorPanel {
     this.render();
   }
 
+  getActiveZoneName() {
+    const el = OUTFIT_ELEMENTS.find(e => e.id === this.activeZone);
+    return el ? el.name : 'Element';
+  }
+
   render() {
     const elements = this.getGarmentElements();
     if (!elements.some(element => element.id === this.activeZone)) {
       this.activeZone = elements[0]?.id || 'primary';
     }
-    const prod = this.state.activeProduct || {};
-    const sil = prod.silhouette || '';
-    const isHelmetProd = sil === 'helmet' || prod.articleNumber === 'WHE00113';
-    const isHelmet = isHelmetProd || this.activeZone === 'helmet';
-    const isBoots = this.activeZone === 'boots';
-    const activePalette = isHelmet ? HELMET_SAFETY_PALETTES : (isBoots ? BOOT_PALETTES : SPORT_PALETTES);
-    const compVis = this.viewer?.componentVisibility || { prints: true, straps: true, inside: true };
-    const hidePatterns = !elements.length || this.viewer?.isMultiMesh;
+
+    const activePalette = FIGMA_OUTFIT_PALETTES[this.activeZone] || FIGMA_OUTFIT_PALETTES.primary;
+    const currentColor = (this.state.colors[this.activeZone] || '#ffffff').toUpperCase();
 
     this.container.innerHTML = `
-      <!-- 1. Compact Garment / Helmet Parts List with Inline Pickers -->
-      <div class="panel-section" style="padding-bottom: 8px;">
-        <div class="section-title">
-          <span class="title-icon-svg">${ICONS.layers}</span>
-          <span>Elemente & Farben</span>
+      <div class="color-panel-wrapper">
+        <!-- 1. Section Header: ELEMENTE & FARBEN -->
+        <div class="panel-section-header">
+          <span class="section-title-tag">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 4.9V17L12 22l-9-4.9V7z"/></svg>
+            <span>ELEMENTE & FARBEN</span>
+          </span>
         </div>
 
-        <div class="compact-elements-list">
+        <!-- 2. 4 Outfit Items List (Cards with Color Preview & Hex Tag) -->
+        <div class="outfit-elements-list">
           ${elements.map(el => {
             const isSelected = this.activeZone === el.id;
-            const elColor = this.state.colors[el.id] || '#1b2034';
+            const elColor = (this.state.colors[el.id] || '#ffffff').toUpperCase();
             return `
-              <div class="compact-part-card ${isSelected ? 'active' : ''}" data-zone="${el.id}">
-                <div class="compact-part-info">
-                  <span class="part-title">${el.name}</span>
-                  <span class="part-sub">${el.sub}</span>
+              <div class="outfit-part-card ${isSelected ? 'active' : ''}" data-zone="${el.id}">
+                <div class="outfit-part-info">
+                  <span class="outfit-part-name">${el.name}</span>
+                  <span class="outfit-part-sub">${el.sub}</span>
                 </div>
                 
-                <div class="compact-color-ctrl">
-                  <div class="mini-picker-wrap" style="background-color: ${elColor};" title="Farbe wählen">
-                    <input type="color" class="mini-native-picker" data-picker-zone="${el.id}" value="${elColor}">
+                <div class="outfit-color-preview-wrap">
+                  <div class="outfit-color-box" style="background-color: ${elColor};" title="Farbe wählen">
+                    <input type="color" class="outfit-native-picker" data-picker-zone="${el.id}" value="${elColor}">
                   </div>
-                  <span class="compact-hex-tag">${elColor.toUpperCase()}</span>
+                  <span class="outfit-hex-label">${elColor}</span>
                 </div>
               </div>
             `;
           }).join('')}
         </div>
+
+        <!-- 3. Dynamic Quick Palette Selection for Active Item -->
+        <div class="palette-selection-section">
+          <div class="palette-section-title">
+            <span>SCHNELLAUSWAHL (${this.getActiveZoneName().toUpperCase()})</span>
+          </div>
+
+          <div class="figma-swatches-grid">
+            ${activePalette.map(p => {
+              const isActive = (this.state.colors[this.activeZone] || '').toLowerCase() === p.hex.toLowerCase();
+              return `
+                <button class="figma-swatch-card ${isActive ? 'active' : ''}" 
+                        data-hex="${p.hex}" 
+                        title="${p.name} (${p.hex})">
+                  <span class="swatch-color-fill" style="background-color: ${p.hex};"></span>
+                  <span class="swatch-color-name">${p.name}</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
       </div>
-
-      <!-- 2. Quick Palette Swatches Strip -->
-      <div class="panel-section" style="padding-top: 8px; padding-bottom: 12px;">
-        <div class="section-header-row" style="margin-bottom: 8px;">
-          <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
-            ${isHelmet ? t('helmet_safety_colors') : `Schnellauswahl (${this.getActiveZoneName()})`}
-          </span>
-        </div>
-        <div class="compact-swatches-row">
-          ${(elements.length ? activePalette : []).map(p => `
-            <button class="mini-swatch-btn ${(this.state.colors[this.activeZone] || '').toLowerCase() === p.hex.toLowerCase() ? 'active' : ''}" 
-                    data-hex="${p.hex}" 
-                    title="${p.name} (${p.hex})" 
-                    style="background-color: ${p.hex}">
-            </button>
-          `).join('')}
-        </div>
-      </div>
-
-      ${isHelmetProd && !prod.colorMaterials ? `
-        <!-- Helmet Bauteile & Sichtbarkeit Switches -->
-        <div class="panel-section" style="padding-top: 8px;">
-          <div class="section-title">
-            <span class="title-icon-svg">${ICONS.layers}</span>
-            <span>${t('helmet_components')}</span>
-          </div>
-          <div class="helmet-switches-list">
-            <label class="switch-row-card" for="switch-prints">
-              <span class="switch-label">${t('helmet_prints')}</span>
-              <input type="checkbox" id="switch-prints" class="custom-toggle" data-comp="prints" ${compVis.prints ? 'checked' : ''}>
-            </label>
-            <label class="switch-row-card" for="switch-straps">
-              <span class="switch-label">${t('helmet_straps')}</span>
-              <input type="checkbox" id="switch-straps" class="custom-toggle" data-comp="straps" ${compVis.straps ? 'checked' : ''}>
-            </label>
-            <label class="switch-row-card" for="switch-inside">
-              <span class="switch-label">${t('helmet_inside')}</span>
-              <input type="checkbox" id="switch-inside" class="custom-toggle" data-comp="inside" ${compVis.inside ? 'checked' : ''}>
-            </label>
-          </div>
-        </div>
-      ` : (!hidePatterns ? `
-        <!-- 3. Pattern / Cut Selector for Garments -->
-        <div class="panel-section" style="padding-top: 8px;">
-          <div class="section-title">
-            <span class="title-icon-svg">${ICONS.sparkles}</span>
-            <span>${t('section_pattern')}</span>
-          </div>
-          <div class="compact-pattern-grid">
-            ${PATTERNS.map(p => `
-              <button class="compact-pattern-card ${this.state.patternId === p.id ? 'active' : ''}" data-pattern="${p.id}">
-                <div class="pattern-preview pattern-${p.id}"></div>
-                <span class="pattern-name">${p.getName ? p.getName() : p.name}</span>
-              </button>
-            `).join('')}
-          </div>
-        </div>
-      ` : '')}
-
     `;
 
     this.bindEvents();
   }
 
-  getActiveZoneName() {
-    const elements = this.getGarmentElements();
-    const el = elements.find(e => e.id === this.activeZone) || GARMENT_ELEMENTS.find(e => e.id === this.activeZone);
-    return el ? el.name.split(' ')[0] : 'Element';
-  }
-
   bindEvents() {
     // Select Element Part Card
-    this.container.querySelectorAll('.compact-part-card').forEach(card => {
+    this.container.querySelectorAll('.outfit-part-card').forEach(card => {
       card.addEventListener('click', (e) => {
-        if (e.target.closest('.mini-picker-wrap')) return;
+        if (e.target.closest('.outfit-color-box')) return;
         this.activeZone = card.dataset.zone;
         this.render();
       });
     });
 
-    // Inline Color Picker for each part
-    this.container.querySelectorAll('.mini-native-picker').forEach(picker => {
+    // Native Color Picker input
+    this.container.querySelectorAll('.outfit-native-picker').forEach(picker => {
       picker.addEventListener('input', (e) => {
         const zone = picker.dataset.pickerZone;
         const hex = e.target.value;
         this.state.colors[zone] = hex;
         this.activeZone = zone;
 
-        const wrap = picker.closest('.mini-picker-wrap');
-        if (wrap) wrap.style.backgroundColor = hex;
-        const hexTag = picker.closest('.compact-part-card')?.querySelector('.compact-hex-tag');
-        if (hexTag) hexTag.textContent = hex.toUpperCase();
+        // Live update label and box background
+        const card = picker.closest('.outfit-part-card');
+        if (card) {
+          const hexLabel = card.querySelector('.outfit-hex-label');
+          if (hexLabel) hexLabel.textContent = hex.toUpperCase();
+          const colorBox = card.querySelector('.outfit-color-box');
+          if (colorBox) colorBox.style.backgroundColor = hex;
+        }
 
-        this.onUpdate();
+        if (this.onUpdate) this.onUpdate();
+      });
+
+      picker.addEventListener('change', () => {
+        this.render();
       });
     });
 
-    // Quick Swatches
-    this.container.querySelectorAll('.mini-swatch-btn').forEach(btn => {
+    // Click Swatch from Quick Selection Grid
+    this.container.querySelectorAll('.figma-swatch-card').forEach(btn => {
       btn.addEventListener('click', () => {
         const hex = btn.dataset.hex;
         this.state.colors[this.activeZone] = hex;
-        this.render();
-        this.onUpdate();
-      });
-    });
 
-    // Pattern Selection
-    this.container.querySelectorAll('.compact-pattern-card').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const patternId = btn.dataset.pattern;
-        this.state.patternId = patternId;
-        this.render();
-        this.onUpdate();
-      });
-    });
-
-    // Helmet Component Visibility Toggles
-    this.container.querySelectorAll('.custom-toggle[data-comp]').forEach(chk => {
-      chk.addEventListener('change', (e) => {
-        const comp = e.target.dataset.comp;
-        if (this.viewer && comp) {
-          this.viewer.setComponentVisibility({ [comp]: e.target.checked });
+        if (this.viewer) {
+          this.viewer.updateMaterialColor(this.state.colors);
         }
+
+        if (this.onUpdate) this.onUpdate();
+        this.render();
       });
     });
-
   }
 
   updateState(newState) {
