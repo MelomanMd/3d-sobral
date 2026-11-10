@@ -1,5 +1,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
+@font-face {
+  font-family: 'Neue DIN';
+  src: url('/fonts/NeueDIN-RegularWeb.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue DIN';
+  src: url('/fonts/NeueDIN-MediumWeb.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue DIN';
+  src: url('/fonts/NeueDIN-BoldWeb.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* SOBRAL.CH Official Brand Palette */
   --accent-primary: #ff4400;
@@ -10,23 +34,39 @@
   --radius-lg: 10px;
   --radius-full: 9999px;
   --shadow-main: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
-  --sidebar-width: 440px;
+  --sidebar-width: 580px;
+
+  /* Figma 2026 Redesign Tokens */
+  --figma-bg-stage: #222337;
+  --figma-bg-stage-radial: radial-gradient(ellipse at 50% 45%, #2a2c3c 0%, #1c1e2b 100%);
+  --figma-bg-sidebar: #ffffff;
+  --figma-bg-card: #f7f8f9;
+  --figma-bg-card-hover: #eef1f4;
+  --figma-border: #e5e7eb;
+  --figma-border-subtle: #edf0f2;
+  --figma-text-primary: #1d1d1b;
+  --figma-text-secondary: #656a70;
+  --figma-text-muted: #8c9299;
+  --figma-brand-orange: #ff4400;
+  --figma-brand-orange-light: #fff0e8;
+  --figma-brand-orange-hover: #e63d00;
+  --font-brand: 'Neue DIN', 'Space Grotesk', -apple-system, sans-serif;
 
   /* Theme Backgrounds & Surfaces (SOBRAL.CH Original Design) */
-  --bg-dark: #000000;
-  --bg-surface: #111111;
-  --bg-card: #181818;
-  --bg-card-hover: #222222;
-  --border-glass: rgba(255, 255, 255, 0.12);
+  --bg-dark: #222337;
+  --bg-surface: #ffffff;
+  --bg-card: #f7f8f9;
+  --bg-card-hover: #eef1f4;
+  --border-glass: #e5e7eb;
   --border-glass-active: #ff4400;
-  --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
-  --viewport-bg: radial-gradient(circle at center, #1a1a1a 0%, #000000 85%);
-  --header-bg: #000000;
-  --floating-bar-bg: rgba(20, 20, 20, 0.95);
-  --modal-bg: #111111;
-  --modal-card-bg: #181818;
+  --text-primary: #1d1d1b;
+  --text-secondary: #656a70;
+  --text-muted: #8c9299;
+  --viewport-bg: radial-gradient(ellipse at 50% 45%, #2a2c3c 0%, #1c1e2b 100%);
+  --header-bg: #1c1e2b;
+  --floating-bar-bg: rgba(255, 255, 255, 0.95);
+  --modal-bg: #ffffff;
+  --modal-card-bg: #f7f8f9;
 }
 
 * {
@@ -55,7 +95,521 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* 1. Main Studio Header Navigation */
+/* ==========================================================================
+   FIGMA 2026 REDESIGN - MODAL WINDOW & STAGE HUD (OVERLAY 1280x820)
+   ========================================================================== */
+
+body.sobral-theme-2026 {
+  background-color: #111319;
+  font-family: 'Neue DIN', 'Space Grotesk', -apple-system, sans-serif;
+  color: var(--figma-text-primary);
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shop-background-backdrop {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(26, 30, 44, 0.85) 0%, rgba(10, 12, 18, 0.96) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.configurator-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.configurator-modal-window {
+  width: min(1320px, 98vw);
+  height: min(840px, 94vh);
+  background: #222337;
+  border-radius: 20px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  position: relative;
+  z-index: 20;
+}
+
+/* --- Left Stage & Viewport --- */
+.configurator-modal-window .viewport-area {
+  flex: 1;
+  position: relative;
+  background: radial-gradient(ellipse at 50% 45%, #2a2c3c 0%, #1c1e2b 100%) !important;
+  overflow: hidden;
+}
+
+.configurator-modal-window #canvas-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: grab;
+}
+
+.configurator-modal-window #canvas-container:active {
+  cursor: grabbing;
+}
+
+/* Stage HUD: Top-Left Branding */
+.stage-hud-top-left {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.hud-brand-badge {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+}
+
+.hud-sobral-logo {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+.hud-logo-text {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 1px;
+}
+
+.hud-brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hud-title-main {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.hud-title-sub {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ff4400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Stage HUD: Bottom-Left Actions */
+.stage-hud-bottom-left {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.btn-hud-change-product {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-hud-change-product:hover {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.hud-history-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-hud-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-hud-circle:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-hud-circle:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Stage HUD: Bottom-Center Floating Camera Pill */
+#view-controls-root {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  pointer-events: auto;
+}
+
+.floating-view-bar-new {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 5px 8px;
+  border-radius: 9999px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.view-preset-group-new {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.view-btn-pill {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1d1d1b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-btn-pill:hover {
+  background: #f1f3f5;
+}
+
+.view-btn-pill.active {
+  background: #ff4400;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.view-pill-divider {
+  width: 1px;
+  height: 20px;
+  background: #e5e7eb;
+  margin: 0 2px;
+}
+
+.view-zoom-group-new {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+}
+
+.btn-zoom-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  background: #f7f8f9;
+  color: #1d1d1b;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.btn-zoom-circle:hover {
+  background: #e9ecef;
+  border-color: #cbd5e1;
+}
+
+.zoom-level-text {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  min-width: 44px;
+  text-align: center;
+}
+
+.btn-reset-view-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-reset-view-circle:hover {
+  color: #1d1d1b;
+  background: #f1f3f5;
+}
+
+/* Stage HUD: Bottom-Right Hint */
+.stage-hud-bottom-right {
+  position: absolute;
+  bottom: 28px;
+  right: 24px;
+  z-index: 25;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* --- Right Sidebar (Figma White Light Theme) --- */
+.configurator-modal-window .sidebar-panel {
+  width: 480px;
+  min-width: 440px;
+  max-width: 520px;
+  background: #ffffff !important;
+  color: #1d1d1b !important;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #e5e7eb;
+  position: relative;
+  z-index: 30;
+}
+
+.sidebar-header-new {
+  padding: 22px 24px 16px 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.sidebar-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sidebar-title-main {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1d1d1b;
+  margin: 0;
+  letter-spacing: -0.2px;
+  text-transform: uppercase;
+}
+
+.sidebar-title-sub {
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.btn-sidebar-close {
+  background: #f7f8f9;
+  border: 1px solid #e5e7eb;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.btn-sidebar-close:hover {
+  background: #f1f3f5;
+  color: #1d1d1b;
+  border-color: #cbd5e1;
+}
+
+/* Stepper Navigation */
+.config-stepper {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding: 0 16px;
+}
+
+.stepper-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 6px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-family: 'Neue DIN', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.stepper-num {
+  font-size: 13px;
+  font-weight: 700;
+  color: #9ca3af;
+  transition: color 0.2s;
+}
+
+.stepper-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.stepper-tab:hover .stepper-label {
+  color: #1d1d1b;
+}
+
+.stepper-tab.active {
+  border-bottom-color: #ff4400;
+}
+
+.stepper-tab.active .stepper-num {
+  color: #ff4400;
+}
+
+.stepper-tab.active .stepper-label {
+  color: #1d1d1b;
+}
+
+/* Tab Content Root */
+.configurator-modal-window .tab-content-container {
+  flex: 1;
+  overflow-y: auto;
+  background: #ffffff;
+  padding: 20px;
+}
+
+/* Sidebar Footer Actions */
+.sidebar-footer-new {
+  padding: 16px 20px;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-footer-export {
+  flex: 1;
+  height: 46px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #1d1d1b;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-footer-export:hover {
+  background: #f7f8f9;
+  border-color: #cbd5e1;
+}
+
+.btn-footer-quote {
+  flex: 1.2;
+  height: 46px;
+  border-radius: 8px;
+  border: none;
+  background: #ff4400;
+  color: #ffffff;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(255, 68, 0, 0.3);
+}
+
+.btn-footer-quote:hover {
+  background: #e63d00;
+  box-shadow: 0 6px 18px rgba(255, 68, 0, 0.4);
+}
+
 .app-header {
   height: 60px;
   background: #000000;

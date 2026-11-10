@@ -463,7 +463,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const setActiveTab = async (tabName) => {
     activeTab = tabName;
-    document.querySelectorAll('.tab-btn').forEach(btn => {
+    document.querySelectorAll('.stepper-tab, .tab-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.tab === tabName);
     });
     renderActivePanel();
@@ -551,12 +551,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     historyManager.push(state);
   };
 
-  // 12. Tab Navigation Buttons
-  document.querySelectorAll('.tab-btn').forEach(btn => {
+  // 12. Stepper Tab Navigation Buttons
+  document.querySelectorAll('.stepper-tab, .tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       setActiveTab(btn.dataset.tab);
     });
   });
+
+  // 12.1. Change Product HUD Button
+  const btnChangeProduct = document.getElementById('btn-change-product');
+  if (btnChangeProduct) {
+    btnChangeProduct.addEventListener('click', () => {
+      // Toggle product switcher dropdown or open modal
+      if (productSwitcher) {
+        productSwitcher.toggleDropdown();
+      }
+    });
+  }
+
+  // 12.2. Close Configurator Button
+  const btnCloseConfigurator = document.getElementById('btn-close-configurator');
+  if (btnCloseConfigurator) {
+    btnCloseConfigurator.addEventListener('click', () => {
+      if (confirm('Möchten Sie den Konfigurator wirklich verlassen? Nicht gespeicherte Änderungen gehen verloren.')) {
+        window.location.href = '/';
+      }
+    });
+  }
 
   // 13. Randomize Design Button
   const btnRandomize = document.getElementById('btn-randomize');

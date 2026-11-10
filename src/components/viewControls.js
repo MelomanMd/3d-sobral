@@ -30,64 +30,40 @@ export class ViewControls {
     const fsTitle = this.isFullscreen ? t('fullscreen_exit') : t('fullscreen_enter');
     const fsIcon = this.isFullscreen ? ICONS.minimize : ICONS.maximize;
 
+    this.zoomPercent = 100;
     this.container.innerHTML = `
-      <div class="floating-view-bar">
+      <div class="floating-view-bar-new">
         <!-- 3D Camera Angles -->
-        <div class="view-preset-group">
-          <button class="view-btn ${this.currentView === 'perspective' ? 'active' : ''}" data-view="perspective" title="${t('view_perspective')}">
-            <span class="btn-label">${t('view_perspective')}</span>
+        <div class="view-preset-group-new">
+          <button class="view-btn-pill ${this.currentView === 'front' ? 'active' : ''}" data-view="front" title="Vorne">
+            <span>Vorne</span>
           </button>
-          <button class="view-btn ${this.currentView === 'front' ? 'active' : ''}" data-view="front" title="${t('view_front')}">
-            <span class="btn-label">${t('view_front')}</span>
+          <button class="view-btn-pill ${this.currentView === 'back' ? 'active' : ''}" data-view="back" title="Hinten">
+            <span>Hinten</span>
           </button>
-          <button class="view-btn ${this.currentView === 'back' ? 'active' : ''}" data-view="back" title="${t('view_back')}">
-            <span class="btn-label">${t('view_back')}</span>
+          <button class="view-btn-pill ${this.currentView === 'left' ? 'active' : ''}" data-view="left" title="Links">
+            <span>Links</span>
           </button>
-          <button class="view-btn ${this.currentView === 'left' ? 'active' : ''}" data-view="left" title="${t('view_left')}">
-            <span class="btn-label">${t('view_left')}</span>
-          </button>
-          <button class="view-btn ${this.currentView === 'right' ? 'active' : ''}" data-view="right" title="${t('view_right')}">
-            <span class="btn-label">${t('view_right')}</span>
-          </button>
-          <button class="view-btn ${this.currentView === 'top' ? 'active' : ''}" data-view="top" title="${t('view_top')}">
-            <span class="btn-label">${t('view_top')}</span>
+          <button class="view-btn-pill ${this.currentView === 'right' ? 'active' : ''}" data-view="right" title="Rechts">
+            <span>Rechts</span>
           </button>
         </div>
 
-        <div class="view-divider"></div>
+        <div class="view-pill-divider"></div>
 
-        <div class="view-action-group">
-          <button class="action-toggle-btn" id="btn-zoom-in" title="${t('zoom_in')}">
-            <span class="btn-icon-svg">${ICONS.plus}</span>
-          </button>
-          <button class="action-toggle-btn" id="btn-zoom-out" title="${t('zoom_out')}">
-            <span class="btn-icon-svg">${ICONS.minus}</span>
-          </button>
-          <button class="action-toggle-btn" id="btn-toggle-wireframe" title="Drahtgitter / Wireframe">
-            <span class="btn-icon-svg">${ICONS.wireframe}</span>
-          </button>
-          <button class="action-toggle-btn" id="btn-toggle-spin" title="${t('view_spin')}">
-            <span class="btn-icon-svg">${ICONS.spin}</span>
-          </button>
-          <button class="action-toggle-btn" id="btn-quick-screenshot" title="${t('save_screenshot')}">
-            <span class="btn-icon-svg">${ICONS.camera}</span>
-          </button>
-          ${this.viewer?.getState()?.activeProduct?.comparisonPhoto ? `
-            <button class="action-toggle-btn" id="btn-view-comparison" title="${t('photo_comparison_view')}">
-              <span class="btn-icon-svg">${ICONS.eye}</span>
-            </button>
-          ` : ''}
-
-          <div class="bg-switcher-pill" id="bg-switcher-group" title="${t('bg_label')}">
-            <button class="bg-pill-btn ${(this.viewer?.currentBackground || 'light') === 'light' ? 'active' : ''}" data-bg="light" title="${t('bg_studio_light')}">☀️</button>
-            <button class="bg-pill-btn ${(this.viewer?.currentBackground) === 'white' ? 'active' : ''}" data-bg="white" title="${t('bg_white')}">⚪</button>
-            <button class="bg-pill-btn ${(this.viewer?.currentBackground) === 'dark' ? 'active' : ''}" data-bg="dark" title="${t('bg_studio_dark')}">🌙</button>
-          </div>
-
-          <button class="action-toggle-btn ${this.isFullscreen ? 'active' : ''}" id="btn-toggle-fullscreen" title="${fsTitle}">
-            <span class="btn-icon-svg" id="fs-icon-container">${fsIcon}</span>
-          </button>
+        <!-- Zoom Controls -->
+        <div class="view-zoom-group-new">
+          <button class="btn-zoom-circle" id="btn-zoom-out" title="Verkleinern">−</button>
+          <span class="zoom-level-text" id="zoom-level-text">${Math.round(this.zoomPercent)} %</span>
+          <button class="btn-zoom-circle" id="btn-zoom-in" title="Vergrößern">+</button>
         </div>
+
+        <div class="view-pill-divider"></div>
+
+        <!-- Reset Camera View -->
+        <button class="btn-reset-view-circle" id="btn-reset-camera-view" title="Ansicht zurücksetzen">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>
+        </button>
       </div>
     `;
 
@@ -95,12 +71,17 @@ export class ViewControls {
   }
 
   bindEvents() {
+    const updateZoomDisplay = () => {
+      const el = this.container.querySelector('#zoom-level-text');
+      if (el) el.textContent = `${Math.round(this.zoomPercent)} %`;
+    };
+
     // 3D Angle buttons
-    this.container.querySelectorAll('.view-btn').forEach(btn => {
+    this.container.querySelectorAll('.view-btn-pill').forEach(btn => {
       btn.addEventListener('click', () => {
         const view = btn.dataset.view;
         this.currentView = view;
-        this.container.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+        this.container.querySelectorAll('.view-btn-pill').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
         if (this.viewer) {
@@ -113,14 +94,38 @@ export class ViewControls {
     const btnZoomIn = this.container.querySelector('#btn-zoom-in');
     if (btnZoomIn) {
       btnZoomIn.addEventListener('click', () => {
-        if (this.viewer) this.viewer.zoom(0.84);
+        if (this.viewer) {
+          this.viewer.zoom(0.85);
+          this.zoomPercent = Math.min(250, (this.zoomPercent || 100) + 15);
+          updateZoomDisplay();
+        }
       });
     }
 
     const btnZoomOut = this.container.querySelector('#btn-zoom-out');
     if (btnZoomOut) {
       btnZoomOut.addEventListener('click', () => {
-        if (this.viewer) this.viewer.zoom(1.19);
+        if (this.viewer) {
+          this.viewer.zoom(1.18);
+          this.zoomPercent = Math.max(50, (this.zoomPercent || 100) - 15);
+          updateZoomDisplay();
+        }
+      });
+    }
+
+    // Reset camera view
+    const btnReset = this.container.querySelector('#btn-reset-camera-view');
+    if (btnReset) {
+      btnReset.addEventListener('click', () => {
+        if (this.viewer) {
+          this.viewer.setView('front');
+          this.currentView = 'front';
+          this.zoomPercent = 100;
+          updateZoomDisplay();
+          this.container.querySelectorAll('.view-btn-pill').forEach(b => {
+            b.classList.toggle('active', b.dataset.view === 'front');
+          });
+        }
       });
     }
 
