@@ -1723,10 +1723,22 @@ body {
   font-family: inherit;
   font-size: 13px;
   font-weight: 600;
-  padding: 10px 16px;
+  padding: 0 16px;
+  height: 38px;
+  box-sizing: border-box;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-sm.btn-outline-glass {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12px;
 }
 
 .btn-outline-glass:hover {
@@ -1942,6 +1954,15 @@ body {
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
+}
+
+.modal-footer .btn-primary-action,
+.modal-footer .btn-outline-glass {
+  height: 38px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Modal Nav Tabs (Import Modal) */

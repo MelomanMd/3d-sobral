@@ -207,7 +207,7 @@ export class ExportModal {
               <span class="btn-icon-svg">${ICONS.fileText}</span>
               <span>Produktions-PDF</span>
             </button>
-            <button class="btn-primary-action" id="btn-modal-open-quote" style="background: linear-gradient(135deg, #ff4400 0%, #ff6b35 100%); font-weight: 700; padding: 0 18px;" title="Unverbindliches Angebot mit Stückzahlen anfordern">
+            <button class="btn-primary-action" id="btn-modal-open-quote" style="background: linear-gradient(135deg, #ff4400 0%, #ff6b35 100%); font-weight: 700; height: 38px; padding: 0 18px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;" title="Unverbindliches Angebot mit Stückzahlen anfordern">
               <span class="btn-icon-svg">${ICONS.send}</span>
               <span>Angebot anfordern</span>
             </button>

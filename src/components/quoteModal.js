@@ -135,7 +135,7 @@ export class QuoteModal {
             <span>Produktions-PDF</span>
           </button>
 
-          <button class="btn-primary-action" id="btn-submit-quote" style="background: linear-gradient(135deg, #ff4400 0%, #ff6b35 100%); font-weight: 700; padding: 0 24px;">
+          <button class="btn-primary-action" id="btn-submit-quote" style="background: linear-gradient(135deg, #ff4400 0%, #ff6b35 100%); font-weight: 700; height: 38px; padding: 0 24px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;">
             <span class="btn-icon-svg">${ICONS.send}</span>
             <span>Angebot anfordern</span>
           </button>
