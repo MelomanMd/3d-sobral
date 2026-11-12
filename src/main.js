@@ -9,7 +9,7 @@ import { ExportModal, DiscardModal } from './components/exportModal.js';
 import { AiGenerateModal } from './components/aiGenerateModal.js';
 import { QuoteModal } from './components/quoteModal.js';
 import { CreationScreen } from './components/creationScreen.js';
-import { ProductCatalog } from './core/products.js';
+import { ProductCatalog, resolveAssetUrl } from './core/products.js';
 import { ProductSwitcher } from './components/productSwitcher.js';
 import { FloatingGizmo } from './components/floatingGizmo.js';
 import { HistoryManager } from './core/history.js';
@@ -104,6 +104,12 @@ let state = {
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', async () => {
+  document.querySelectorAll('.stage-watermark-logo, .hud-sobral-logo').forEach((img) => {
+    if (img.tagName === 'IMG') {
+      img.src = resolveAssetUrl('images/sobral-workwear-logo.svg');
+    }
+  });
+
   const canvasContainer = document.getElementById('canvas-container');
   const viewControlsRoot = document.getElementById('view-controls-root');
   const tabContentRoot = document.getElementById('tab-content-root');

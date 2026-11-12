@@ -5479,3 +5479,133 @@ dialog.comparison-dialog-root::backdrop {
   font-size: 12px;
   color: #c2410c;
 }
+
+
+/* ==========================================================================
+   FIGMA 2026 TYPOGRAPHY, TABS, SPACING & MAGENTO CSS ISOLATION
+   Overrides Magento/Hyva global heading line-heights (100px/80px/26px)
+   and aligns sidebar header, tabs, paddings, and buttons with Figma.
+   ========================================================================== */
+
+#configurator-modal-window,
+#configurator-modal-window button,
+#configurator-modal-window input,
+#configurator-modal-window select,
+#configurator-modal-window textarea,
+#configurator-modal-window span,
+#configurator-modal-window p,
+#configurator-modal-window label,
+.figma-draft-backdrop,
+.figma-draft-backdrop button,
+.figma-draft-backdrop p,
+.figma-draft-backdrop span,
+.figma-draft-backdrop label {
+  font-family: 'Neue DIN', 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.35;
+}
+
+#configurator-modal-window h1,
+#configurator-modal-window h2,
+#configurator-modal-window h3,
+#configurator-modal-window h4,
+.figma-draft-backdrop h1,
+.figma-draft-backdrop h2,
+.figma-draft-backdrop h3 {
+  font-family: 'Neue DIN', 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1.2;
+}
+
+.configurator-modal-window .sidebar-header-new {
+  padding: 24px 24px 12px 24px !important;
+  border-bottom: none !important;
+  align-items: center !important;
+}
+
+.configurator-modal-window .sidebar-title-main {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0.2px !important;
+  color: #1d1d1b !important;
+}
+
+.configurator-modal-window .sidebar-title-sub {
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 1.35 !important;
+  color: #6b7280 !important;
+  margin-top: 3px !important;
+}
+
+.configurator-modal-window .config-stepper {
+  background: #ffffff !important;
+  padding: 10px 24px 0 24px !important;
+  gap: 8px !important;
+  border-bottom: none !important;
+}
+
+.configurator-modal-window .stepper-tab {
+  background: #f4f5f7 !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 2px !important;
+  padding: 10px 8px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.configurator-modal-window .stepper-tab:hover {
+  background: #eceef1 !important;
+}
+
+.configurator-modal-window .stepper-tab.active {
+  background: #fff5ee !important;
+  border-bottom: 2px solid #ff4400 !important;
+}
+
+.configurator-modal-window .stepper-label {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.6px !important;
+}
+
+.configurator-modal-window .tab-content-container {
+  padding: 18px 24px 20px 24px !important;
+}
+
+.configurator-modal-window .tab-content-container h3 {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0.2px !important;
+  margin-bottom: 4px !important;
+}
+
+.configurator-modal-window .tab-content-container p {
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+}
+
+.configurator-modal-window .sidebar-footer-new {
+  padding: 14px 24px 20px 24px !important;
+  gap: 8px !important;
+}
+
+.configurator-modal-window .btn-footer-download,
+.configurator-modal-window .btn-footer-draft,
+.configurator-modal-window .btn-footer-quote {
+  height: 44px !important;
+  padding: 0 12px !important;
+  border-radius: 2px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
