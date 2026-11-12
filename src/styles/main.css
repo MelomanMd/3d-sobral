@@ -5703,7 +5703,107 @@ dialog.comparison-dialog-root::backdrop {
   justify-content: center !important;
 }
 
-/* Desktop HUD spacing polish at 1440px */
+/* 3D Fullscreen / Expanded Stage Mode */
+.btn-hud-fullscreen-stage {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 4px;
+  background: rgba(29, 29, 27, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.btn-hud-fullscreen-stage:hover {
+  background: rgba(255, 68, 0, 0.9);
+  border-color: #ff4800;
+  color: #ffffff;
+}
+
+/* Expanded state on Desktop */
+.configurator-modal-window.stage-expanded .sidebar-panel {
+  display: none !important;
+}
+
+.configurator-modal-window.stage-expanded .viewport-area {
+  flex: 1 1 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Expanded state on Mobile & Tablet */
+@media (max-width: 860px) {
+  .btn-hud-fullscreen-stage {
+    height: 32px !important;
+    padding: 0 10px !important;
+    font-size: 11px !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    border: none !important;
+  }
+
+  .btn-hud-fullscreen-stage:hover {
+    background: #f4f5f7 !important;
+    color: #111111 !important;
+  }
+
+  .btn-hud-fullscreen-stage .fs-text {
+    display: none !important;
+  }
+
+  .configurator-modal-window.stage-expanded .viewport-area {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    flex: 1 1 100% !important;
+  }
+
+  .configurator-modal-window.stage-expanded .sidebar-panel {
+    display: none !important;
+  }
+
+  /* When expanded on mobile, bring up camera navigation & zoom so user can rotate/zoom comfortably */
+  .configurator-modal-window.stage-expanded .stage-hud-bottom-center,
+  .configurator-modal-window.stage-expanded #view-controls-root {
+    display: flex !important;
+    bottom: 24px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: calc(100% - 24px) !important;
+    justify-content: center !important;
+  }
+
+  .configurator-modal-window.stage-expanded .figma-cam-buttons {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    justify-content: center !important;
+  }
+
+  .configurator-modal-window.stage-expanded .figma-cam-btn {
+    height: 34px !important;
+    padding: 0 12px !important;
+    font-size: 11px !important;
+  }
+
+  .configurator-modal-window.stage-expanded .figma-cam-zoom-box {
+    height: 34px !important;
+    padding: 0 10px !important;
+  }
+
+  .configurator-modal-window.stage-expanded .figma-zoom-text {
+    font-size: 11px !important;
+  }
+}
 .configurator-modal-window .btn-hud-change-product-figma,
 .configurator-modal-window .btn-hud-ai-generate {
   height: 36px;

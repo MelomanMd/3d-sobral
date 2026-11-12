@@ -685,6 +685,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // 12.1a. Fullscreen / Expanded 3D Stage Mode
+  const btnFullscreenStage = document.getElementById('btn-fullscreen-stage');
+  const modalWindow = document.getElementById('configurator-modal-window');
+  if (btnFullscreenStage && modalWindow) {
+    btnFullscreenStage.addEventListener('click', () => {
+      const isExpanded = modalWindow.classList.toggle('stage-expanded');
+      const iconExpand = btnFullscreenStage.querySelector('.icon-expand');
+      const iconCollapse = btnFullscreenStage.querySelector('.icon-collapse');
+      const fsText = btnFullscreenStage.querySelector('.fs-text');
+      if (iconExpand) iconExpand.style.display = isExpanded ? 'none' : 'inline-block';
+      if (iconCollapse) iconCollapse.style.display = isExpanded ? 'inline-block' : 'none';
+      if (fsText) fsText.textContent = isExpanded ? 'SCHLIESSEN' : '3D VOLLBILD';
+
+      setTimeout(() => {
+        if (viewer) viewer.onWindowResize();
+      }, 100);
+      setTimeout(() => {
+        if (viewer) viewer.onWindowResize();
+      }, 350);
+    });
+  }
+
   // 12.1b. AI Realistic Model Generation Button
   const btnAiGenerate = document.getElementById('btn-ai-generate');
   if (btnAiGenerate) {
