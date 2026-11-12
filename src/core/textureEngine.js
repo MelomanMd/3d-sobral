@@ -268,8 +268,9 @@ export class TextureEngine {
 
     const text = item.uppercase ? item.text.toUpperCase() : item.text;
 
-    if (item.curve && Math.abs(item.curve) > 5) {
-      this.drawCurvedText(ctx, text, baseFontSize, item.curve, item);
+    const curveVal = item.arc ?? item.curve ?? 0;
+    if (curveVal && Math.abs(curveVal) > 5) {
+      this.drawCurvedText(ctx, text, baseFontSize, curveVal, item);
     } else {
       this.drawDirectText(ctx, text, 0, 0, item);
     }

@@ -4985,6 +4985,19 @@ dialog.comparison-dialog-root::backdrop {
   gap: 10px;
 }
 
+.figma-stepper-select {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1D1D1B;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+}
+
 .figma-stepper-box {
   display: flex;
   flex-direction: column;

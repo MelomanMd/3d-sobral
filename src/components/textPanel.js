@@ -236,7 +236,12 @@ export class TextPanel {
               <div class="figma-stepper-box">
                 <label class="figma-stepper-label">KONTURFARBE</label>
                 <div class="figma-stepper-controls">
-                  <span class="step-val" id="val-strokecolor">${activeItem.strokeWidth ? 'Schwarz' : 'Keine'}</span>
+                  <select class="figma-stepper-select" id="select-stroke-color">
+                    <option value="none" ${!activeItem.strokeWidth ? 'selected' : ''}>Keine</option>
+                    ${TEXT_PALETTES.map(p => `
+                      <option value="${p.hex}" ${activeItem.strokeWidth && (activeItem.strokeColor || '#000000').toLowerCase() === p.hex.toLowerCase() ? 'selected' : ''}>${p.name}</option>
+                    `).join('')}
+                  </select>
                 </div>
               </div>
 
@@ -421,12 +426,16 @@ export class TextPanel {
       });
     }
 
-    // Stroke color input
-    const inputStrokeColor = this.container.querySelector('#input-stroke-color');
-    if (inputStrokeColor) {
-      inputStrokeColor.addEventListener('input', (e) => {
-        activeItem.strokeColor = e.target.value;
-        if (!activeItem.strokeWidth) activeItem.strokeWidth = 2;
+    // Stroke color select
+    const selStrokeColor = this.container.querySelector('#select-stroke-color');
+    if (selStrokeColor) {
+      selStrokeColor.addEventListener('change', (e) => {
+        if (e.target.value === 'none') {
+          activeItem.strokeWidth = 0;
+        } else {
+          activeItem.strokeColor = e.target.value;
+          if (!activeItem.strokeWidth) activeItem.strokeWidth = 2;
+        }
         if (this.onUpdate) this.onUpdate('decals');
         this.render();
       });
