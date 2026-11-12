@@ -173,8 +173,8 @@ body.sobral-theme-2026 {
 }
 
 .configurator-modal-window {
-  width: min(1680px, 90vw);
-  height: min(1040px, 90vh);
+  width: min(1560px, 88vw);
+  height: min(920px, 84vh);
   background: #222337;
   border-radius: 0;
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.1);
@@ -5701,4 +5701,162 @@ dialog.comparison-dialog-root::backdrop {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
+}
+
+/* Desktop HUD spacing polish at 1440px */
+.configurator-modal-window .btn-hud-change-product-figma,
+.configurator-modal-window .btn-hud-ai-generate {
+  height: 36px;
+  padding: 0 14px;
+  font-size: 11px;
+}
+
+.configurator-modal-window .btn-hud-action-sq {
+  width: 36px;
+  height: 36px;
+}
+
+/* Mobile & Tablet Responsive Overrides */
+@media (max-width: 860px) {
+  .configurator-modal-window {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    flex-direction: column !important;
+  }
+
+  .configurator-modal-window .viewport-area {
+    height: 42vh !important;
+    min-height: 250px !important;
+    flex: none !important;
+  }
+
+  .configurator-modal-window .sidebar-panel {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .configurator-modal-window .stage-hud-top-left {
+    top: 10px !important;
+    left: 10px !important;
+    gap: 8px !important;
+  }
+
+  .configurator-modal-window .hud-sobral-logo {
+    height: 26px !important;
+  }
+
+  .configurator-modal-window .hud-brand-text {
+    display: none !important;
+  }
+
+  .configurator-modal-window .stage-hud-top-right {
+    top: 10px !important;
+    right: 10px !important;
+    gap: 4px !important;
+  }
+
+  .configurator-modal-window .btn-hud-ai-generate,
+  .configurator-modal-window .btn-hud-change-product-figma {
+    height: 30px !important;
+    padding: 0 8px !important;
+    font-size: 9px !important;
+    white-space: nowrap !important;
+  }
+
+  .configurator-modal-window .btn-hud-action-sq {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .configurator-modal-window .stage-hud-bottom-center {
+    bottom: 8px !important;
+    left: 8px !important;
+    right: 8px !important;
+    transform: none !important;
+    width: calc(100% - 16px) !important;
+  }
+
+  .configurator-modal-window .figma-cam-buttons {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .configurator-modal-window .figma-cam-btn {
+    height: 28px !important;
+    padding: 0 8px !important;
+    font-size: 9px !important;
+  }
+
+  .configurator-modal-window .figma-cam-zoom-box {
+    height: 28px !important;
+    padding: 0 8px !important;
+    gap: 4px;
+  }
+
+  .configurator-modal-window .figma-zoom-text {
+    font-size: 9px !important;
+    min-width: 32px !important;
+  }
+
+  .configurator-modal-window .figma-cam-subtext {
+    font-size: 10px !important;
+  }
+
+  .configurator-modal-window .sidebar-header-new {
+    padding: 12px 14px 6px 14px !important;
+  }
+
+  .configurator-modal-window .sidebar-title-main {
+    font-size: 16px !important;
+  }
+
+  .configurator-modal-window .sidebar-title-sub {
+    font-size: 11px !important;
+  }
+
+  .configurator-modal-window .config-stepper {
+    padding: 6px 14px 0 14px !important;
+    gap: 4px !important;
+  }
+
+  .configurator-modal-window .stepper-tab {
+    height: 34px !important;
+    padding: 4px 3px !important;
+  }
+
+  .configurator-modal-window .stepper-label {
+    font-size: 8.5px !important;
+    letter-spacing: 0.1px !important;
+    white-space: nowrap !important;
+  }
+
+  .configurator-modal-window .tab-content-container {
+    padding: 10px 14px 12px 14px !important;
+  }
+
+  .configurator-modal-window .sidebar-footer-new {
+    padding: 10px 14px 12px 14px !important;
+    gap: 6px !important;
+    grid-template-columns: auto 1fr 1.2fr !important;
+  }
+
+  .configurator-modal-window .btn-footer-download,
+  .configurator-modal-window .btn-footer-draft,
+  .configurator-modal-window .btn-footer-quote {
+    height: 36px !important;
+    padding: 0 7px !important;
+    font-size: 8.5px !important;
+    letter-spacing: 0.1px !important;
+    white-space: nowrap !important;
+  }
 }
