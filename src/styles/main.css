@@ -5775,33 +5775,45 @@ dialog.comparison-dialog-root::backdrop {
   .configurator-modal-window.stage-expanded .stage-hud-bottom-center,
   .configurator-modal-window.stage-expanded #view-controls-root {
     display: flex !important;
-    bottom: 24px !important;
-    left: 12px !important;
-    right: 12px !important;
-    width: calc(100% - 24px) !important;
+    bottom: 18px !important;
+    left: 8px !important;
+    right: 8px !important;
+    width: calc(100% - 16px) !important;
     justify-content: center !important;
   }
 
   .configurator-modal-window.stage-expanded .figma-cam-buttons {
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 6px !important;
+    gap: 4px !important;
     justify-content: center !important;
+    max-width: 100% !important;
   }
 
   .configurator-modal-window.stage-expanded .figma-cam-btn {
-    height: 34px !important;
-    padding: 0 12px !important;
-    font-size: 11px !important;
+    height: 30px !important;
+    padding: 0 8px !important;
+    font-size: 9.5px !important;
   }
 
   .configurator-modal-window.stage-expanded .figma-cam-zoom-box {
-    height: 34px !important;
-    padding: 0 10px !important;
+    height: 30px !important;
+    padding: 0 8px !important;
+    gap: 4px !important;
   }
 
   .configurator-modal-window.stage-expanded .figma-zoom-text {
-    font-size: 11px !important;
+    font-size: 10px !important;
+    min-width: 36px !important;
+  }
+
+  .configurator-modal-window.stage-expanded .figma-zoom-btn {
+    font-size: 13px !important;
+    padding: 0 2px !important;
+  }
+
+  .configurator-modal-window.stage-expanded .figma-cam-subtext {
+    display: none !important;
   }
 }
 .configurator-modal-window .btn-hud-change-product-figma,
