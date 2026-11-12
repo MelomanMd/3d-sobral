@@ -468,7 +468,7 @@ export class ProductCatalog {
       price: newProductData.price || '49.00 €',
       sku: newProductData.sku || `SOB-CUST-${Math.floor(100 + Math.random() * 900)}`,
       silhouette: newProductData.silhouette || 'tshirt',
-      baseColor: newProductData.baseColor || '#741b2c',
+      baseColor: newProductData.baseColor || '#242935',
       modelUrl: newProductData.modelUrl || '/shirt_baked.glb',
       frontPreview: newProductData.frontPreview || null,
       backPreview: newProductData.backPreview || null,

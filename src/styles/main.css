@@ -183,11 +183,10 @@ body.sobral-theme-2026 {
 .hud-brand-badge {
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(18, 20, 28, 0.72);
   padding: 6px 12px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
 }
 
 .hud-sobral-logo {
@@ -245,9 +244,7 @@ body.sobral-theme-2026 {
   gap: 8px;
   padding: 10px 18px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(24, 26, 36, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.22);
   color: #ffffff;
   font-family: 'Neue DIN', sans-serif;
@@ -272,9 +269,7 @@ body.sobral-theme-2026 {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(24, 26, 36, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.22);
   color: #ffffff;
   display: flex;
@@ -308,9 +303,7 @@ body.sobral-theme-2026 {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.96);
   padding: 5px 8px;
   border-radius: 9999px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
@@ -1870,8 +1863,6 @@ body.sobral-theme-2026 {
   left: 50%;
   transform: translateX(-50%);
   background: var(--floating-bar-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-glass);
   padding: 6px 10px;
   border-radius: var(--radius-full);
@@ -2224,9 +2215,7 @@ body.sobral-theme-2026 {
   position: absolute;
   top: 18px;
   left: 20px;
-  background: rgba(18, 20, 24, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(18, 20, 24, 0.85);
   border: 1px solid var(--border-glass);
   padding: 6px 14px;
   border-radius: var(--radius-full);
@@ -2244,8 +2233,6 @@ body.sobral-theme-2026 {
 .sidebar-panel {
   width: var(--sidebar-width);
   background: var(--bg-surface);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
   border-left: 1px solid var(--border-glass);
   display: flex;
   flex-direction: column;

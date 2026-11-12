@@ -34,6 +34,9 @@ export class ShirtViewer {
     this.componentVisibility = { prints: true, straps: true, inside: true };
     this.isWireframe = false;
 
+    this._needsRender = true;
+    this._rafId = null;
+
     this.isAutoRotating = false;
     this.isTransitioningCamera = false;
 
@@ -74,6 +77,11 @@ export class ShirtViewer {
       this.currentBackground = localStorage.getItem('sobral_viewer_bg') || 'dark';
     } catch (e) {}
 
+    this._isUpdatingControls = false;
+    this._prevCamPos = new THREE.Vector3();
+    this._prevCamQuat = new THREE.Quaternion();
+    this._prevTarget = new THREE.Vector3();
+
     this.loadingIndicator = new ModelLoadingIndicator(this.container, () => this.loadModel(this.lastRequestedModelUrl));
     this.init();
   }
@@ -97,7 +105,7 @@ export class ShirtViewer {
       powerPreference: 'high-performance'
     });
     this.renderer.setSize(width, height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.shadowMap.enabled = true;
@@ -116,8 +124,17 @@ export class ShirtViewer {
     this.controls.target.set(0, 0.05, 0);
     this.controls.update();
 
+    this.controls.addEventListener('change', () => {
+      if (!this._isUpdatingControls) {
+        this.requestRender();
+      }
+    });
     this.controls.addEventListener('start', () => {
       this.cameraTransition = null;
+      this.requestRender();
+    });
+    this.controls.addEventListener('end', () => {
+      this.requestRender();
     });
 
     // 5. Lighting Setup
@@ -136,9 +153,9 @@ export class ShirtViewer {
     this.setupPointerEvents();
     window.addEventListener('resize', this.onWindowResize.bind(this));
 
-    // 9. Start Render Loop
+    // 9. Start On-Demand Render Loop
     this.animate = this.animate.bind(this);
-    requestAnimationFrame(this.animate);
+    this.requestRender();
   }
 
   setupLighting() {
@@ -149,8 +166,8 @@ export class ShirtViewer {
     const keyLight = new THREE.DirectionalLight(0xffffff, 1.4);
     keyLight.position.set(2, 3, 2.5);
     keyLight.castShadow = true;
-    keyLight.shadow.mapSize.width = 2048;
-    keyLight.shadow.mapSize.height = 2048;
+    keyLight.shadow.mapSize.width = 1024;
+    keyLight.shadow.mapSize.height = 1024;
     keyLight.shadow.bias = -0.0001;
     this.scene.add(keyLight);
     this.lights.key = keyLight;
@@ -459,6 +476,7 @@ export class ShirtViewer {
 
               this.textureEngine.render(this.getState()).then(() => {
                 dynamicTexture.needsUpdate = true;
+                this.requestRender();
               });
             }
           });
@@ -504,6 +522,7 @@ export class ShirtViewer {
         this.container.dispatchEvent(new CustomEvent('model-loaded'));
         // animate() hides the indicator only after rendering the first frame.
         this.pendingReadyLoadId = currentLoadId;
+        this.requestRender();
         } catch (error) {
           this.failModelLoad(currentLoadId, error);
         }
@@ -598,6 +617,7 @@ export class ShirtViewer {
     } else if (this.shirtMaterial) {
       this.shirtMaterial.color.set(0xffffff);
     }
+    this.requestRender();
   }
 
   async updateDecals(stateOverride = null) {
@@ -843,6 +863,7 @@ export class ShirtViewer {
         }
       }
     }
+    this.requestRender();
   }
 
   setupPointerEvents() {
@@ -1241,6 +1262,7 @@ export class ShirtViewer {
       this.lights.fill.intensity = 1.4;
       this.lights.rim.intensity = 2.0;
     }
+    this.requestRender();
   }
 
   setCameraPreset(presetName) {
@@ -1284,6 +1306,7 @@ export class ShirtViewer {
       this.camera.position.lerpVectors(startPos, targetPosition, ease);
       this.controls.target.lerpVectors(startLook, targetLookAt, ease);
       this.controls.update();
+      this.requestRender();
 
       if (progress < 1.0) {
         requestAnimationFrame(updateCam);
@@ -1299,6 +1322,9 @@ export class ShirtViewer {
     this.isAutoRotating = state !== null ? state : !this.isAutoRotating;
     this.controls.autoRotate = this.isAutoRotating;
     this.controls.autoRotateSpeed = 2.5;
+    if (this.isAutoRotating) {
+      this.requestRender();
+    }
     return this.isAutoRotating;
   }
 
@@ -1306,14 +1332,27 @@ export class ShirtViewer {
     if (!this.container || !this.renderer || !this.camera) return;
     const width = this.container.clientWidth;
     const height = this.container.clientHeight;
+    if (!width || !height) return;
 
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
+    this.requestRender();
+  }
+
+  requestRender() {
+    this._needsRender = true;
+    if (!this._rafId && this.renderer) {
+      this._rafId = requestAnimationFrame(this.animate);
+    }
   }
 
   animate() {
-    requestAnimationFrame(this.animate);
+    this._rafId = null;
+
+    let active = this._needsRender || this.isAutoRotating || this.pendingReadyLoadId === this._loadId;
+    this._needsRender = false;
+
     if (this.cameraTransition) {
       const now = performance.now();
       const t = Math.min((now - this.cameraTransition.start) / 450, 1.0);
@@ -1323,18 +1362,90 @@ export class ShirtViewer {
       if (t >= 1.0) {
         this.cameraTransition = null;
       }
+      active = true;
     }
-    this.controls.update();
-    this.renderer.render(this.scene, this.camera);
+
+    this._prevCamPos.copy(this.camera.position);
+    this._prevCamQuat.copy(this.camera.quaternion);
+    this._prevTarget.copy(this.controls.target);
+
+    let controlsChanged = false;
+    this._isUpdatingControls = true;
+    try {
+      controlsChanged = this.controls.update();
+    } finally {
+      this._isUpdatingControls = false;
+    }
+
+    // Measure actual pose delta so Three.js OrbitControls floating-point clamping
+    // at minDistance/maxDistance does not spin an infinite rAF render loop.
+    const controlsMoved = controlsChanged && (
+      this._prevCamPos.distanceToSquared(this.camera.position) > 1e-10 ||
+      8 * (1 - Math.abs(this._prevCamQuat.dot(this.camera.quaternion))) > 1e-10 ||
+      this._prevTarget.distanceToSquared(this.controls.target) > 1e-10
+    );
+    if (controlsMoved) {
+      active = true;
+    }
+
+    if (active) {
+      this.renderer.render(this.scene, this.camera);
+    }
+
     if (this.pendingReadyLoadId === this._loadId) {
       this.pendingReadyLoadId = null;
       this.isModelLoading = false;
       this.loadingIndicator.hide();
       this.container.dispatchEvent(new CustomEvent('model-ready'));
     }
+
+    if (this._needsRender || this.cameraTransition || this.isAutoRotating || controlsMoved) {
+      this._rafId = requestAnimationFrame(this.animate);
+    }
   }
 
-  // Capture angle snapshot with clean texture (no gizmos)
+  computeModelFraming(presetName, aspect = 1.0, fillRatio = 0.84) {
+    if (!this.shirtGroup) {
+      return { center: new THREE.Vector3(0, 0.02, 0), distance: 1.75 };
+    }
+
+    this.scene.updateMatrixWorld(true);
+    const box = new THREE.Box3();
+    this.shirtGroup.traverse((child) => {
+      if (child.isMesh && child.visible) {
+        box.expandByObject(child);
+      }
+    });
+    if (box.isEmpty()) {
+      box.setFromObject(this.shirtGroup);
+    }
+
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+
+    let projWidth = size.x;
+    let projHeight = size.y;
+    let projDepth = size.z;
+
+    if (presetName === 'left' || presetName === 'right') {
+      projWidth = size.z;
+      projDepth = size.x;
+    } else if (presetName === 'perspective' || !presetName) {
+      projWidth = Math.hypot(size.x, size.z);
+      projDepth = Math.hypot(size.x, size.z) * 0.5;
+    }
+
+    const vFov = THREE.MathUtils.degToRad(this.camera?.fov || 38);
+    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * Math.max(aspect, 0.1));
+
+    const distV = (projHeight / (2 * fillRatio)) / Math.tan(vFov / 2);
+    const distH = (projWidth / (2 * fillRatio)) / Math.tan(hFov / 2);
+    const distance = Math.max(distV, distH, 0.35) + projDepth * 0.5;
+
+    return { center, distance };
+  }
+
+  // Capture angle snapshot with full model framing (head/helmet to shoes) regardless of current zoom/orbit
   async captureAngle(presetName, width = 1200, height = 1200, isClean = true) {
     if (isClean && this.textureEngine) {
       await this.textureEngine.render(this.getState(), { hideSelection: true });
@@ -1343,47 +1454,57 @@ export class ShirtViewer {
     const savedPos = this.camera.position.clone();
     const savedTarget = this.controls.target.clone();
     const savedAspect = this.camera.aspect;
+    const savedRatio = this.renderer.getPixelRatio();
     const savedSize = new THREE.Vector2();
     this.renderer.getSize(savedSize);
+    const wasGizmoVisible = this.gizmoGroup?.visible;
 
-    const radius = 1.62;
-    const targetY = 0.0;
+    if (this.gizmoGroup) {
+      this.gizmoGroup.visible = false;
+    }
+
+    const aspect = width / height;
+    const { center, distance } = this.computeModelFraming(presetName, aspect, 0.84);
 
     switch (presetName) {
       case 'front':
-        this.camera.position.set(0, targetY, radius);
+        this.camera.position.set(center.x, center.y, center.z + distance);
         break;
       case 'back':
-        this.camera.position.set(0, targetY, -radius);
+        this.camera.position.set(center.x, center.y, center.z - distance);
         break;
       case 'left':
-        this.camera.position.set(-radius, targetY, 0);
+        this.camera.position.set(center.x - distance, center.y, center.z);
         break;
       case 'right':
-        this.camera.position.set(radius, targetY, 0);
+        this.camera.position.set(center.x + distance, center.y, center.z);
         break;
       case 'perspective':
       default:
-        this.camera.position.set(radius * 0.65, targetY + 0.18, radius * 0.75);
+        this.camera.position.set(center.x + distance * 0.55, center.y + distance * 0.12, center.z + distance * 0.82);
         break;
     }
 
-    this.controls.target.set(0, targetY, 0);
-    this.controls.update();
-
-    this.camera.aspect = width / height;
+    this.camera.aspect = aspect;
+    this.camera.lookAt(center);
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(width, height);
+    this.camera.updateMatrixWorld(true);
+    this.renderer.setPixelRatio(1);
+    this.renderer.setSize(width, height, false);
 
     this.renderer.render(this.scene, this.camera);
     const dataUrl = this.renderer.domElement.toDataURL('image/png', 1.0);
 
+    this.renderer.setPixelRatio(savedRatio);
     this.camera.position.copy(savedPos);
     this.controls.target.copy(savedTarget);
-    this.controls.update();
     this.camera.aspect = savedAspect;
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(savedSize.x, savedSize.y);
+    this.controls.update();
+    this.renderer.setSize(savedSize.x, savedSize.y, false);
+    if (this.gizmoGroup && wasGizmoVisible !== undefined) {
+      this.gizmoGroup.visible = wasGizmoVisible;
+    }
     this.renderer.render(this.scene, this.camera);
 
     if (isClean && this.textureEngine) {
@@ -1427,11 +1548,11 @@ export class ShirtViewer {
     ctx.fillStyle = '#ffffff';
     ctx.font = "bold 44px 'Space Grotesk', 'Montserrat', sans-serif";
     ctx.textAlign = 'center';
-    ctx.fillText(t('mockup_header') || 'SOBRAL 3D WORKWEAR SPECIFICATION', width / 2, 85);
+    ctx.fillText('SOBRAL DESIGN-ENTWURF', width / 2, 85);
 
     ctx.font = "600 20px 'Space Grotesk', 'Montserrat', sans-serif";
     ctx.fillStyle = '#ff4400';
-    ctx.fillText(t('mockup_subheader') || 'Offizielles SOBRAL.CH Produktions- und Freigabemuster', width / 2, 122);
+    ctx.fillText('Unverbindliche Design-Vorschau', width / 2, 122);
 
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
     ctx.lineWidth = 1.5;
@@ -1453,7 +1574,7 @@ export class ShirtViewer {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     ctx.font = "bold 16px monospace";
     ctx.textAlign = 'right';
-    ctx.fillText(`SOBRAL.CH • 3D CUSTOM STUDIO • GENERATED: ${new Date().toLocaleDateString()}`, width - 80, height - 30);
+    ctx.fillText(`SOBRAL.CH • ENTWURF • ${new Date().toLocaleDateString()}`, width - 80, height - 30);
 
     return canvas.toDataURL('image/png', 1.0);
   }
@@ -1524,6 +1645,7 @@ export class ShirtViewer {
         this.controls.target.copy(center);
         this.controls.update();
       }
+      this.requestRender();
     }
   }
 
@@ -1532,6 +1654,7 @@ export class ShirtViewer {
     if (this.camera && this.controls) {
       this.camera.position.sub(this.controls.target).multiplyScalar(factor).add(this.controls.target);
       this.controls.update();
+      this.requestRender();
     }
   }
 
@@ -1553,6 +1676,7 @@ export class ShirtViewer {
         }
       });
     }
+    this.requestRender();
   }
 
   setComponentVisibility(opts = {}) {
@@ -1577,6 +1701,7 @@ export class ShirtViewer {
         o.visible = inside;
       }
     });
+    this.requestRender();
   }
 
   setBackground(bgType = 'dark') {

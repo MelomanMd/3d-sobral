@@ -372,7 +372,7 @@ export class LogoPanel {
             this.activeLogoId = newLogo.id;
           }
           this.closeLibraryModal();
-          if (this.onUpdate) this.onUpdate();
+          if (this.onUpdate) this.onUpdate('decals');
           this.render();
         }
       });
@@ -450,7 +450,7 @@ export class LogoPanel {
         const item = this.state.logos.find(l => l.id === id);
         if (item) {
           item.visible = !item.visible;
-          if (this.onUpdate) this.onUpdate();
+          if (this.onUpdate) this.onUpdate('decals');
           this.render();
         }
       });
@@ -465,7 +465,7 @@ export class LogoPanel {
         if (this.activeLogoId === id) {
           this.activeLogoId = this.state.logos[0]?.id || null;
         }
-        if (this.onUpdate) this.onUpdate();
+        if (this.onUpdate) this.onUpdate('decals');
         this.render();
       });
     });
@@ -481,7 +481,7 @@ export class LogoPanel {
         activeItem.targetArticle = e.target.value;
         const defaultZones = ARTICLE_ZONES[activeItem.targetArticle] || ARTICLE_ZONES.primary;
         activeItem.zone = defaultZones[0].key;
-        if (this.onUpdate) this.onUpdate();
+        if (this.onUpdate) this.onUpdate('decals');
         this.render();
       });
     }
@@ -491,7 +491,7 @@ export class LogoPanel {
     if (selZone) {
       selZone.addEventListener('change', (e) => {
         activeItem.zone = e.target.value;
-        if (this.onUpdate) this.onUpdate();
+        if (this.onUpdate) this.onUpdate('decals');
         this.render();
       });
     }
@@ -518,7 +518,7 @@ export class LogoPanel {
           activeItem.offsetY = (activeItem.offsetY || 0) - 5;
         }
 
-        if (this.onUpdate) this.onUpdate();
+        if (this.onUpdate) this.onUpdate('decals');
         this.render();
       });
     });
@@ -548,7 +548,7 @@ export class LogoPanel {
       };
       this.state.logos.push(newLogo);
       this.activeLogoId = newLogo.id;
-      if (this.onUpdate) this.onUpdate();
+      if (this.onUpdate) this.onUpdate('decals');
       this.render();
     };
     reader.readAsDataURL(file);

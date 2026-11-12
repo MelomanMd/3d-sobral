@@ -4,7 +4,7 @@ export class HistoryManager {
   constructor(initialState, onStateRestore) {
     this.undoStack = [];
     this.redoStack = [];
-    this.maxHistory = 40;
+    this.maxHistory = 25;
     this.onStateRestore = onStateRestore;
 
     // Push initial snapshot
@@ -14,14 +14,47 @@ export class HistoryManager {
     this.notifyChange();
   }
 
-  clone(obj) {
-    return JSON.parse(JSON.stringify(obj));
+  // Shallow-structural snapshot: preserves immutable string references (like logo data URLs)
+  // and product catalog descriptor instead of serializing megabytes on every click.
+  clone(state) {
+    if (!state || typeof state !== 'object') return state;
+    return {
+      ...state,
+      colors: state.colors ? { ...state.colors } : {},
+      texts: Array.isArray(state.texts) ? state.texts.map(t => ({ ...t })) : [],
+      logos: Array.isArray(state.logos) ? state.logos.map(l => ({ ...l })) : []
+    };
+  }
+
+  statesEqual(a, b) {
+    if (a === b) return true;
+    if (!a || !b) return false;
+    if (a.activeProduct?.id !== b.activeProduct?.id || a.patternId !== b.patternId || a.selectedItemId !== b.selectedItemId) {
+      return false;
+    }
+    const aColors = a.colors || {};
+    const bColors = b.colors || {};
+    const colorKeys = new Set([...Object.keys(aColors), ...Object.keys(bColors)]);
+    for (const k of colorKeys) {
+      if (aColors[k] !== bColors[k]) return false;
+    }
+    const itemsEqual = (arr1 = [], arr2 = []) => {
+      if (arr1.length !== arr2.length) return false;
+      for (let i = 0; i < arr1.length; i++) {
+        const x = arr1[i], y = arr2[i];
+        const keys = new Set([...Object.keys(x), ...Object.keys(y)]);
+        for (const k of keys) {
+          if (x[k] !== y[k]) return false;
+        }
+      }
+      return true;
+    };
+    return itemsEqual(a.texts, b.texts) && itemsEqual(a.logos, b.logos);
   }
 
   push(state) {
     const newSnapshot = this.clone(state);
-    // Ignore if identical to current snapshot
-    if (JSON.stringify(newSnapshot) === JSON.stringify(this.currentSnapshot)) {
+    if (this.statesEqual(newSnapshot, this.currentSnapshot)) {
       return;
     }
 

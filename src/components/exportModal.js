@@ -1,5 +1,6 @@
 import confetti from 'canvas-confetti';
-import { downloadProductionPdf } from '../core/pdfExport.js';
+import { downloadDraftPdf } from '../core/pdfExport.js';
+import { compositeBrandedExport } from '../core/exportCompositor.js';
 
 /**
  * Figma Redesign 2026: Export / Save Draft Modal (Frames 1876:9135 - 1876:9492)
@@ -33,8 +34,8 @@ export class ExportModal {
         </div>
 
         <div class="figma-draft-desc-box">
-          <div class="figma-draft-desc-lead" id="draft-desc-lead">PDF · Übersicht mit Outfit und Personalisierungen</div>
-          <div class="figma-draft-desc-sub" id="draft-desc-sub">Der Export wird im Klickdummy beispielhaft dargestellt.</div>
+          <div class="figma-draft-desc-lead" id="draft-desc-lead">PDF · Vorläufiger Design-Entwurf (4 Ansichten)</div>
+          <div class="figma-draft-desc-sub" id="draft-desc-sub">Unverbindliche Vorschau zur Abstimmung – keine technische Spezifikation.</div>
         </div>
 
         <button class="figma-btn-primary-orange" id="btn-draft-action">ALS PDF SPEICHERN</button>
@@ -63,16 +64,16 @@ export class ExportModal {
     const actionBtn = card.querySelector('#btn-draft-action');
 
     if (format === 'pdf') {
-      if (leadEl) leadEl.textContent = 'PDF · Übersicht mit Outfit und Personalisierungen';
-      if (subEl) subEl.textContent = 'Der Export wird im Klickdummy beispielhaft dargestellt.';
+      if (leadEl) leadEl.textContent = 'PDF · Vorläufiger Design-Entwurf (4 Ansichten)';
+      if (subEl) subEl.textContent = 'Unverbindliche Vorschau zur Abstimmung – keine technische Spezifikation.';
       if (actionBtn) actionBtn.textContent = 'ALS PDF SPEICHERN';
     } else if (format === 'png') {
-      if (leadEl) leadEl.textContent = 'PNG · Bild mit transparentem Hintergrund';
-      if (subEl) subEl.textContent = 'Der Export wird im Klickdummy beispielhaft dargestellt.';
+      if (leadEl) leadEl.textContent = 'PNG · Hochauflösendes Bild mit Sobral-Hintergrund';
+      if (subEl) subEl.textContent = 'Vollständige Modellansicht auf dunklem Sobral-Hintergrund.';
       if (actionBtn) actionBtn.textContent = 'ALS PNG SPEICHERN';
     } else if (format === 'jpg') {
-      if (leadEl) leadEl.textContent = 'JPG · Kompaktes Bild mit Hintergrund';
-      if (subEl) subEl.textContent = 'Der Export wird im Klickdummy beispielhaft dargestellt.';
+      if (leadEl) leadEl.textContent = 'JPG · Kompaktes Bild mit Sobral-Hintergrund';
+      if (subEl) subEl.textContent = 'Vollständige Modellansicht auf dunklem Sobral-Hintergrund.';
       if (actionBtn) actionBtn.textContent = 'ALS JPG SPEICHERN';
     }
   }
@@ -99,9 +100,7 @@ export class ExportModal {
 
       // 2. Perform export based on format
       if (this.activeFormat === 'pdf') {
-        if (typeof downloadProductionPdf === 'function') {
-          await downloadProductionPdf(this.viewer, this.state);
-        }
+        await downloadDraftPdf(this.viewer, this.state);
       } else if (this.activeFormat === 'png') {
         if (this.viewer) {
           const url = await this.viewer.captureAngle('front', 1920, 1920, true);
@@ -109,7 +108,7 @@ export class ExportModal {
         }
       } else if (this.activeFormat === 'jpg') {
         if (this.viewer) {
-          const url = await this.viewer.captureAngle('front', 1920, 1920, false);
+          const url = await this.viewer.captureAngle('front', 1920, 1920, true);
           await this.triggerFileDownload(url, `sobral-scene-${Date.now()}.jpg`, 'image/jpeg');
         }
       }
@@ -129,23 +128,8 @@ export class ExportModal {
   }
 
   async triggerFileDownload(dataUrl, filename, mimeType) {
-    let blob;
-    if (mimeType === 'image/jpeg') {
-      const img = new Image();
-      await new Promise((res) => { img.onload = res; img.src = dataUrl; });
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#222337'; // 3D stage background color
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-      blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
-    } else {
-      const resp = await fetch(dataUrl);
-      blob = await resp.blob();
-    }
-
+    const quality = mimeType === 'image/jpeg' ? 0.92 : 1.0;
+    const { blob } = await compositeBrandedExport(dataUrl, { mimeType, quality });
     if (!blob) return;
     const blobUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');

@@ -1,55 +1,14 @@
 import { t } from '../core/i18n.js';
 import { ICONS } from '../core/icons.js';
 import { getMaterialColorControls } from '../core/materialColors.js';
+import { BASE_PALETTES, getProductZonePalette } from '../core/productPalettes.js';
 
-export const HELMET_PALETTE = [
-  { name: 'Gelb', hex: '#FFCF24' },
-  { name: 'Blau', hex: '#4D9CFF' },
-  { name: 'Weiss', hex: '#FFFFFF' },
-  { name: 'Orange', hex: '#FF7A00' },
-  { name: 'Grün', hex: '#1E5E1E' },
-  { name: 'Schwarz', hex: '#1D1D1B' }
-];
-
-export const PRIMARY_PALETTE = [
-  { name: '8894 Marineblau / Grau', hex: '#242935' },
-  { name: 'Weiss / Dunkelgrau', hex: '#FFFFFF' },
-  { name: 'Rot / Schwarz', hex: '#C3303C' },
-  { name: 'Kornblumenblau / Schwarz', hex: '#284282' },
-  { name: 'Dunkelmarineblau / Schwarz', hex: '#1B2034' },
-  { name: 'Grau / Schwarz', hex: '#70757E' }
-];
-
-export const TROUSERS_PALETTE = [
-  { name: '8600 Marineblau', hex: '#242935' },
-  { name: 'Grau', hex: '#5A6069' },
-  { name: 'Schwarz', hex: '#1D1D1B' },
-  { name: 'Waldgrün', hex: '#2D4436' },
-  { name: 'Kornblumenblau', hex: '#284282' },
-  { name: 'Braun / Sand', hex: '#7D6246' }
-];
-
-export const BOOTS_PALETTE = [
-  { name: 'Schwarz', hex: '#1D1D1B' },
-  { name: 'Grau', hex: '#5A6069' },
-  { name: 'Braun', hex: '#5C3D24' }
-];
-
-export const ACCENT_PALETTE = [
-  { name: 'Orange', hex: '#FF4400' },
-  { name: 'Gelb', hex: '#FFCF24' },
-  { name: 'Rot', hex: '#C3303C' },
-  { name: 'Weiss', hex: '#FFFFFF' },
-  { name: 'Schwarz', hex: '#1D1D1B' },
-  { name: 'Grau', hex: '#70757E' }
-];
-
-export const COLLAR_PALETTE = [
-  { name: 'Marineblau', hex: '#242935' },
-  { name: 'Schwarz', hex: '#1D1D1B' },
-  { name: 'Grau', hex: '#5A6069' },
-  { name: 'Weiss', hex: '#FFFFFF' }
-];
+export const HELMET_PALETTE = BASE_PALETTES.helmet;
+export const PRIMARY_PALETTE = BASE_PALETTES.tops;
+export const TROUSERS_PALETTE = BASE_PALETTES.trousers;
+export const BOOTS_PALETTE = BASE_PALETTES.boots;
+export const ACCENT_PALETTE = BASE_PALETTES.accent;
+export const COLLAR_PALETTE = BASE_PALETTES.collar;
 
 export const OUTFIT_ELEMENTS = [
   {
@@ -62,15 +21,15 @@ export const OUTFIT_ELEMENTS = [
   {
     id: 'primary',
     name: 'Oberteil',
-    brandModel: 'BLÅKLÄDER · T-Shirt 3379',
-    defaultColorName: '8894 Marineblau / Grau',
+    brandModel: 'BLÅKLÄDER · Arbeits-Oberteil',
+    defaultColorName: 'Marineblau',
     palette: PRIMARY_PALETTE
   },
   {
     id: 'trousers',
     name: 'Arbeitshose',
-    brandModel: 'BLÅKLÄDER · Handwerker Arbeitshose 1750',
-    defaultColorName: '8600 Marineblau',
+    brandModel: 'BLÅKLÄDER · Handwerker Arbeitshose',
+    defaultColorName: 'Marineblau',
     palette: TROUSERS_PALETTE
   },
   {
@@ -111,7 +70,14 @@ export class ColorPanel {
     const isWorker = activeProduct.silhouette === 'worker' || activeProduct.category === 'outfits';
 
     if (isWorker) {
-      return OUTFIT_ELEMENTS;
+      return OUTFIT_ELEMENTS.map(el => {
+        const palette = getProductZonePalette(activeProduct, el.id);
+        return {
+          ...el,
+          defaultColorName: palette[0]?.name || el.defaultColorName,
+          palette
+        };
+      });
     }
 
     // Standalone product: query controls from viewer or product definition
@@ -127,63 +93,34 @@ export class ColorPanel {
       controls = getMaterialColorControls(activeProduct, roles);
     }
 
+    const resolveZoneTitle = (zoneId, fallbackTitle) => {
+      if (zoneId !== 'primary') return fallbackTitle;
+      if (activeProduct.silhouette === 'helmet' || activeProduct.category === 'headwear') return 'Kopfschutz';
+      if (activeProduct.silhouette === 'trousers' || activeProduct.category === 'bottoms') return 'Arbeitshose';
+      if (activeProduct.silhouette === 'shoes' || activeProduct.category === 'shoes') return 'Sicherheitsschuhe';
+      if (activeProduct.category === 'tops' || activeProduct.category === 'outerwear') return 'Oberteil';
+      return fallbackTitle;
+    };
+
     if (controls && controls.length > 0) {
       return controls.map(ctrl => {
-        let palette = PRIMARY_PALETTE;
-        let cardName = ctrl.name || 'Farbe';
-
-        if (activeProduct.silhouette === 'helmet' || activeProduct.category === 'headwear') {
-          if (ctrl.id === 'collar') {
-            palette = COLLAR_PALETTE;
-          } else if (ctrl.id === 'accent') {
-            palette = ACCENT_PALETTE;
-          } else {
-            palette = HELMET_PALETTE;
-          }
-        } else if (activeProduct.silhouette === 'trousers' || activeProduct.category === 'bottoms') {
-          palette = TROUSERS_PALETTE;
-          if (ctrl.id === 'primary') cardName = 'Arbeitshose';
-        } else if (activeProduct.silhouette === 'shoes' || activeProduct.category === 'shoes') {
-          palette = BOOTS_PALETTE;
-          if (ctrl.id === 'primary') cardName = 'Sicherheitsschuhe';
-        } else if (ctrl.id === 'accent') {
-          palette = ACCENT_PALETTE;
-        } else if (ctrl.id === 'collar') {
-          palette = COLLAR_PALETTE;
-        } else {
-          palette = PRIMARY_PALETTE;
-          if (ctrl.id === 'primary' && (activeProduct.category === 'tops' || activeProduct.category === 'outerwear')) {
-            cardName = 'Oberteil';
-          }
-        }
-
+        const palette = getProductZonePalette(activeProduct, ctrl.id);
         return {
           id: ctrl.id,
-          name: cardName,
+          name: resolveZoneTitle(ctrl.id, ctrl.name || 'Farbe'),
           brandModel: activeProduct.name || ctrl.sub || '',
           defaultColorName: palette[0].name,
-          palette: palette
+          palette
         };
       });
     }
 
     // Fallback single card for single garment scans
-    let catName = 'Oberteil';
-    let pal = PRIMARY_PALETTE;
-    if (activeProduct.silhouette === 'helmet' || activeProduct.category === 'headwear') {
-      catName = 'Kopfschutz';
-      pal = HELMET_PALETTE;
-    } else if (activeProduct.silhouette === 'trousers' || activeProduct.category === 'bottoms') {
-      catName = 'Arbeitshose';
-      pal = TROUSERS_PALETTE;
-    } else if (activeProduct.silhouette === 'shoes' || activeProduct.category === 'shoes') {
-      catName = 'Sicherheitsschuhe';
-      pal = BOOTS_PALETTE;
-    }
+    const pal = getProductZonePalette(activeProduct, 'primary');
 
     return [{
       id: 'primary',
-      name: catName,
+      name: resolveZoneTitle('primary', 'Oberteil'),
       brandModel: activeProduct.name,
       defaultColorName: pal[0].name,
       palette: pal
@@ -264,24 +201,34 @@ export class ColorPanel {
       });
     });
 
-    // Swatch Click
+    // Swatch Click (update active state in-place without rebuilding entire panel DOM)
     this.container.querySelectorAll('.figma-square-swatch').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const zone = btn.dataset.zone;
         const hex = btn.dataset.hex;
+        const name = btn.dataset.name;
         this.activeZone = zone;
         this.state.colors[zone] = hex;
+
+        const card = btn.closest('.figma-outfit-card');
+        if (card) {
+          card.querySelectorAll('.figma-square-swatch').forEach(s => {
+            s.classList.toggle('active', s === btn);
+          });
+          const statusEl = card.querySelector('.figma-color-status-name');
+          if (statusEl && name) {
+            statusEl.textContent = name;
+          }
+        }
 
         if (this.viewer) {
           this.viewer.updateMaterialColor(this.state.colors);
         }
 
         if (this.onUpdate) {
-          this.onUpdate();
+          this.onUpdate('colors');
         }
-
-        this.render();
       });
     });
   }

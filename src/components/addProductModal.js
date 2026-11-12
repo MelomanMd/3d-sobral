@@ -116,7 +116,7 @@ export class AddProductModal {
 
           <!-- Upload Slots Grid for 4 angles -->
           <div class="upload-slots-section">
-            <h3 class="slots-section-title">Produktfotos für 2D-Studio (4 Ansichten)</h3>
+            <h3 class="slots-section-title">Produktfotos für Vorschau (4 Ansichten)</h3>
 
             <div class="upload-slots-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
               <!-- Slot 1: Front Photo -->

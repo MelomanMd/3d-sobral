@@ -16,6 +16,7 @@ import { DEFAULT_LOGOS, getLogoDataUrl } from './core/defaultLogos.js';
 import { PATTERNS } from './core/patterns.js';
 import { t, getLang, setLang } from './core/i18n.js';
 import { ICONS } from './core/icons.js';
+import { compositeBrandedExport } from './core/exportCompositor.js';
 
 // Initial App State
 let state = {
@@ -191,9 +192,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const randLabel = document.getElementById('randomize-label');
     if (randLabel) randLabel.textContent = t('random_design');
-
-    const exportLabel = document.getElementById('export-label');
-    if (exportLabel) exportLabel.textContent = t('download_mockup');
 
     const hintText = document.getElementById('viewport-hint-text');
     if (hintText) hintText.textContent = t('viewport_hint');
@@ -483,25 +481,52 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (btnUndo) btnUndo.addEventListener('click', () => historyManager.undo());
   if (btnRedo) btnRedo.addEventListener('click', () => historyManager.redo());
 
-  // 10. State Update & History Push
+  // 10. State Update & History Push (split pipeline for smooth interaction)
   let updateTimeout = null;
-  const onStateUpdate = () => {
+  let pendingUpdateReason = null;
+  const mergeReasons = (prev, next) => {
+    if (!prev) return next;
+    if (prev === next) return prev;
+    return 'all';
+  };
+
+  const onStateUpdate = (reason = 'all') => {
+    pendingUpdateReason = mergeReasons(pendingUpdateReason, reason);
     if (updateTimeout) cancelAnimationFrame(updateTimeout);
     updateTimeout = requestAnimationFrame(async () => {
-      await textureEngine.render(state);
-      if (viewer) {
-        viewer.updateMaterialColor(state.colors);
-        viewer.updateDecals();
+      const currentReason = pendingUpdateReason || 'all';
+      pendingUpdateReason = null;
+
+      const isMultiMesh = !!viewer?.isMultiMesh;
+      const needsTextureRender = !isMultiMesh || currentReason === 'all' || currentReason === 'texture';
+      const needsDecals = currentReason === 'all' || currentReason === 'decals';
+
+      if (needsTextureRender) {
+        await textureEngine.render(state);
+        if (viewer?.shirtMaterial?.map) {
+          viewer.shirtMaterial.map.needsUpdate = true;
+          viewer.requestRender();
+        }
       }
-      if (photoMockupViewer) {
+
+      if (viewer) {
+        if (currentReason === 'colors' || currentReason === 'all') {
+          viewer.updateMaterialColor(state.colors);
+        }
+        if (needsDecals) {
+          await viewer.updateDecals();
+        }
+      }
+
+      if (photoMockupViewer?.active) {
         photoMockupViewer.render();
       }
     });
   };
 
   let historyDebounce = null;
-  const onStateChange = () => {
-    onStateUpdate();
+  const onStateChange = (reason = 'all') => {
+    onStateUpdate(reason);
     floatingGizmo.update();
     clearTimeout(historyDebounce);
     historyDebounce = setTimeout(() => {
@@ -701,14 +726,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // 17. Export / Snapshot Modal
-  const btnExport = document.getElementById('btn-open-export');
-  if (btnExport) {
-    btnExport.addEventListener('click', () => {
-      const modal = new ExportModal(viewer, state);
-      modal.open();
-    });
-  }
-
   const btnSidebarExport = document.getElementById('btn-sidebar-export');
   if (btnSidebarExport) {
     btnSidebarExport.addEventListener('click', () => {
@@ -717,29 +734,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 17.1 Direct High-Res Download Button (Figma DOWNLOAD)
+  // 17.1 Direct High-Res Download Button (Branded full-model PNG)
   const btnSidebarDownload = document.getElementById('btn-sidebar-download');
   if (btnSidebarDownload) {
     btnSidebarDownload.addEventListener('click', async () => {
       if (viewer) {
-        const url = await viewer.captureAngle('front', 1920, 1920, true);
+        const rawUrl = await viewer.captureAngle('front', 1920, 1920, true);
+        const { blob } = await compositeBrandedExport(rawUrl, { mimeType: 'image/png', quality: 1.0 });
+        if (!blob) return;
+        const blobUrl = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.download = `sobral-look-${Date.now()}.png`;
-        link.href = url;
+        link.href = blobUrl;
+        document.body.appendChild(link);
         link.click();
+        setTimeout(() => {
+          if (link.parentNode) link.parentNode.removeChild(link);
+          URL.revokeObjectURL(blobUrl);
+        }, 1500);
       }
     });
   }
 
   // 17b. Direct Quote Request Modal
-  const btnQuote = document.getElementById('btn-open-quote');
-  if (btnQuote) {
-    btnQuote.addEventListener('click', () => {
-      const quoteModal = new QuoteModal(viewer, state);
-      quoteModal.open();
-    });
-  }
-
   const btnSidebarQuote = document.getElementById('btn-sidebar-quote');
   if (btnSidebarQuote) {
     btnSidebarQuote.addEventListener('click', () => {

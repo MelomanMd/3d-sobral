@@ -307,7 +307,7 @@ export class TextPanel {
         };
         this.state.texts.push(newItem);
         this.activeTextId = newId;
-        if (this.onUpdate) this.onUpdate();
+        if (this.onUpdate) this.onUpdate('decals');
         this.render();
       });
     }
@@ -329,7 +329,7 @@ export class TextPanel {
         const item = this.state.texts.find(t => t.id === id);
         if (item) {
           item.visible = !item.visible;
-          if (this.onUpdate) this.onUpdate();
+          if (this.onUpdate) this.onUpdate('decals');
           this.render();
         }
       });
@@ -344,7 +344,7 @@ export class TextPanel {
         if (this.activeTextId === id) {
           this.activeTextId = this.state.texts[0]?.id || null;
         }
-        if (this.onUpdate) this.onUpdate();
+        if (this.onUpdate) this.onUpdate('decals');
         this.render();
       });
     });
@@ -352,14 +352,18 @@ export class TextPanel {
     const activeItem = this.state.texts.find(t => t.id === this.activeTextId) || this.state.texts[0];
     if (!activeItem) return;
 
-    // Text value input
+    // Text value input (debounced 3D decal projection to keep typing smooth)
     const inputVal = this.container.querySelector('#input-text-val');
     if (inputVal) {
+      let inputTimer = null;
       inputVal.addEventListener('input', (e) => {
         activeItem.text = e.target.value;
         const cardName = this.container.querySelector(`.figma-layer-card[data-id="${activeItem.id}"] .figma-layer-name`);
         if (cardName) cardName.textContent = activeItem.text || 'LEERER TEXT';
-        if (this.onUpdate) this.onUpdate();
+        clearTimeout(inputTimer);
+        inputTimer = setTimeout(() => {
+          if (this.onUpdate) this.onUpdate('decals');
+        }, 120);
       });
     }
 
@@ -370,7 +374,7 @@ export class TextPanel {
         activeItem.targetArticle = e.target.value;
         const defaultZones = ARTICLE_ZONES[activeItem.targetArticle] || ARTICLE_ZONES.primary;
         activeItem.zone = defaultZones[0].key;
-        if (this.onUpdate) this.onUpdate();
+        if (this.onUpdate) this.onUpdate('decals');
         this.render();
       });
     }
@@ -380,7 +384,7 @@ export class TextPanel {
     if (selZone) {
       selZone.addEventListener('change', (e) => {
         activeItem.zone = e.target.value;
-        if (this.onUpdate) this.onUpdate();
+        if (this.onUpdate) this.onUpdate('decals');
         this.render();
       });
     }
@@ -390,7 +394,7 @@ export class TextPanel {
     if (selFont) {
       selFont.addEventListener('change', (e) => {
         activeItem.fontFamily = e.target.value;
-        if (this.onUpdate) this.onUpdate();
+        if (this.onUpdate) this.onUpdate('decals');
       });
     }
 
@@ -399,7 +403,7 @@ export class TextPanel {
     if (selColor) {
       selColor.addEventListener('change', (e) => {
         activeItem.color = e.target.value;
-        if (this.onUpdate) this.onUpdate();
+        if (this.onUpdate) this.onUpdate('decals');
       });
     }
 
@@ -409,7 +413,7 @@ export class TextPanel {
       inputStrokeColor.addEventListener('input', (e) => {
         activeItem.strokeColor = e.target.value;
         if (!activeItem.strokeWidth) activeItem.strokeWidth = 2;
-        if (this.onUpdate) this.onUpdate();
+        if (this.onUpdate) this.onUpdate('decals');
         this.render();
       });
     }
@@ -440,7 +444,7 @@ export class TextPanel {
           activeItem.offsetX = (activeItem.offsetX || 0) - 5;
         }
 
-        if (this.onUpdate) this.onUpdate();
+        if (this.onUpdate) this.onUpdate('decals');
         this.render();
       });
     });

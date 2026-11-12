@@ -2,6 +2,8 @@ import { jsPDF } from 'jspdf';
 import { getZoneName } from './textureEngine.js';
 import { PATTERNS } from './patterns.js';
 import { captureProductionReport } from './productionReport.js';
+import { compositeBrandedExport } from './exportCompositor.js';
+import { findColorName } from './productPalettes.js';
 
 const RAL_PANTONE_DATABASE = [
   { name: 'Reinorange', hex: '#ff4400', ral: 'RAL 2004', pantone: 'Pantone 021 C' },
@@ -189,6 +191,162 @@ export async function downloadProductionPdf(viewer, state, sizeMatrix = null) {
   const doc = await generateProductionPdf(viewer, state, sizeMatrix);
   const safeTitle = (state.activeProduct?.name || 'Sobral_Workwear').replace(/[^a-zA-Z0-9_-]/g, '_');
   const filename = `${safeTitle}_Produktions_Spezifikation.pdf`;
+  doc.save(filename);
+  return filename;
+}
+
+/**
+ * Generates a simplified, customer-facing Design Draft PDF (no signature block,
+ * no technical placement coordinates or calibration tables).
+ */
+export async function generateDraftPdf(viewer, state) {
+  if (!viewer || viewer.isModelLoading) {
+    throw new Error('Bitte warten, bis das 3D-Modell geladen ist.');
+  }
+
+  const product = state.activeProduct || {};
+  const title = product.name || 'SOBRAL Workwear';
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+  const margin = 14;
+  const contentWidth = 182;
+
+  // Header
+  doc.setFillColor(24, 25, 31);
+  doc.rect(0, 0, 210, 26, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.text('SOBRAL - DESIGN-ENTWURF (VORSCHAU)', margin, 11);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(220, 224, 232);
+  doc.text(`${title}  |  Stand: ${new Date().toLocaleDateString('de-CH')}`, margin, 18.5);
+
+  // Subtle status note (preliminary visual draft, no technical specification or signature)
+  let y = 34;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(181, 50, 5);
+  doc.text('UNVERBINDLICHER DESIGN-ENTWURF (VORLÄUFIGE VORSCHAU)', margin, y);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(90, 96, 108);
+  y += 5;
+  doc.text('Beispielhafte Darstellung zur Abstimmung – keine verbindliche Produktions- oder Farbspezifikation.', margin, y);
+  y += 7;
+
+  // Capture all 4 standard views with full-model framing & Sobral dark branded background
+  const viewSpecs = [
+    { id: 'front', label: 'Vorne' },
+    { id: 'back', label: 'Hinten' },
+    { id: 'left', label: 'Links' },
+    { id: 'right', label: 'Rechts' }
+  ];
+
+  const views = [];
+  for (const spec of viewSpecs) {
+    const rawUrl = await viewer.captureAngle(spec.id, 1080, 1080, true);
+    const branded = await compositeBrandedExport(rawUrl, { mimeType: 'image/jpeg', quality: 0.92, width: 1080, height: 1080 });
+    views.push({ ...spec, image: branded.dataUrl });
+  }
+
+  // Render 2x2 large view grid so details and colors are easy to review
+  const cardGap = 6;
+  const cardSize = (contentWidth - cardGap) / 2; // 88 mm
+  for (let i = 0; i < views.length; i++) {
+    const col = i % 2;
+    const row = Math.floor(i / 2);
+    const x = margin + col * (cardSize + cardGap);
+    const cardY = y + row * (cardSize + 10);
+
+    doc.addImage(views[i].image, 'JPEG', x, cardY, cardSize, cardSize, `draft-${views[i].id}`, 'FAST');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(35, 42, 54);
+    doc.text(views[i].label.toUpperCase(), x + cardSize / 2, cardY + cardSize + 4.5, { align: 'center' });
+  }
+
+  y += 2 * (cardSize + 10) + 4;
+
+  // Compact configuration overview at the bottom
+  const ensureSpace = (needed) => {
+    if (y + needed <= 278) return;
+    doc.addPage();
+    doc.setFillColor(24, 25, 31);
+    doc.rect(0, 0, 210, 18, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text('SOBRAL - DESIGN-ENTWURF (UEBERSICHT)', margin, 11.5);
+    y = 26;
+  };
+
+  ensureSpace(24);
+  doc.setDrawColor(225, 229, 235);
+  doc.line(margin, y, margin + contentWidth, y);
+  y += 6;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9.5);
+  doc.setTextColor(24, 25, 31);
+  doc.text('KONFIGURATION', margin, y);
+  y += 5.5;
+
+  const writeLine = (lineText, fontSize = 8, color = [55, 65, 81]) => {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(fontSize);
+    doc.setTextColor(...color);
+    const wrapped = doc.splitTextToSize(String(lineText), contentWidth);
+    for (const line of wrapped) {
+      ensureSpace(5);
+      doc.text(line, margin, y);
+      y += 4.3;
+    }
+  };
+
+  writeLine(`Produkt: ${title}`);
+
+  const usesMaterials = viewer.isMultiMesh;
+  const fallbackNames = { primary: 'Grundfarbe', accent: 'Akzentfarbe', collar: 'Details', secondary: 'Zusatzfarbe' };
+  const controls = usesMaterials
+    ? viewer.getColorControls()
+    : (PATTERNS.find(p => p.id === state.patternId) || PATTERNS[0]).colorZones.map(id => ({ id, name: fallbackNames[id] || id }));
+
+  if (controls.length) {
+    const colorSummary = controls
+      .map(c => `${c.name}: ${findColorName(state.colors?.[c.id], product, c.id) || 'Standard'}`)
+      .join('  |  ');
+    writeLine(`Farbauswahl (ca.): ${colorSummary}`);
+  }
+
+  const logos = (state.logos || []).filter(l => l.visible);
+  const texts = (state.texts || []).filter(t => t.visible && t.text?.trim());
+  if (logos.length || texts.length) {
+    const itemsList = [
+      ...logos.map(l => `Logo "${l.name || 'Logo'}" (${product.zones?.[l.zone]?.name || getZoneName(l.zone)})`),
+      ...texts.map(t => `Text "${t.text}" (${product.zones?.[t.zone]?.name || getZoneName(t.zone)})`)
+    ];
+    writeLine(`Personalisierung: ${itemsList.join('  •  ')}`);
+  } else {
+    writeLine('Personalisierung: Keine Logos oder Texte ausgewaehlt.');
+  }
+
+  const pages = doc.getNumberOfPages();
+  for (let p = 1; p <= pages; p++) {
+    doc.setPage(p);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(120, 128, 140);
+    doc.text(`SOBRAL Workwear  |  Unverbindlicher Design-Entwurf  |  Seite ${p} / ${pages}`, 105, 290, { align: 'center' });
+  }
+
+  return doc;
+}
+
+export async function downloadDraftPdf(viewer, state) {
+  const doc = await generateDraftPdf(viewer, state);
+  const safeTitle = (state.activeProduct?.name || 'Sobral_Workwear').replace(/[^a-zA-Z0-9_-]/g, '_');
+  const filename = `${safeTitle}_Entwurf.pdf`;
   doc.save(filename);
   return filename;
 }
