@@ -4470,13 +4470,13 @@ dialog.comparison-dialog-root::backdrop {
 .figma-cam-btn {
   background: #FFFFFF;
   color: #1D1D1B;
-  font-family: 'Neue DIN', sans-serif;
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.5px;
+  font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.4px;
   height: 38px;
   padding: 0 18px;
-  border-radius: 4px;
+  border-radius: 2px;
   border: none;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
@@ -4497,31 +4497,32 @@ dialog.comparison-dialog-root::backdrop {
 
 .figma-cam-zoom-box {
   background: #FFFFFF;
-  border-radius: 4px;
+  border-radius: 2px;
   height: 38px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 12px;
+  padding: 0 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .figma-zoom-btn {
   background: transparent;
   border: none;
-  font-size: 16px;
-  font-weight: 700;
+  font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
   color: #1D1D1B;
   cursor: pointer;
   padding: 0 4px;
 }
 
 .figma-zoom-text {
-  font-family: 'Neue DIN', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
+  font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
   color: #1D1D1B;
-  min-width: 44px;
+  min-width: 48px;
   text-align: center;
 }
 
@@ -5643,6 +5644,8 @@ dialog.comparison-dialog-root::backdrop {
 .configurator-modal-window .hud-title-main,
 .configurator-modal-window .btn-hud-change-product-figma,
 .configurator-modal-window .btn-hud-ai-generate,
+.configurator-modal-window .figma-cam-btn,
+.configurator-modal-window .figma-zoom-text,
 .figma-draft-backdrop .figma-draft-title {
   font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif !important;
 }
