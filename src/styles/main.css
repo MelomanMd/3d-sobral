@@ -5931,50 +5931,85 @@ dialog.comparison-dialog-root::backdrop {
   .configurator-modal-window.stage-expanded .figma-cam-buttons {
     display: flex !important;
     flex-wrap: nowrap !important;
-    gap: 4px !important;
+    gap: 5px !important;
     justify-content: center !important;
     align-items: center !important;
     max-width: 100% !important;
-    background: rgba(29, 29, 27, 0.88) !important;
-    padding: 4px 6px !important;
-    border-radius: 8px !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important;
+    background: transparent !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
     box-sizing: border-box !important;
     pointer-events: auto !important;
   }
 
   .configurator-modal-window.stage-expanded .figma-cam-btn {
-    height: 30px !important;
-    padding: 0 7px !important;
-    font-size: 10px !important;
+    height: 34px !important;
+    padding: 0 10px !important;
+    font-family: 'Neue DIN', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.3px !important;
     border-radius: 4px !important;
+    border: none !important;
+    background: #FFFFFF !important;
+    color: #1D1D1B !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22) !important;
     flex-shrink: 0 !important;
     white-space: nowrap !important;
+    cursor: pointer !important;
+  }
+
+  .configurator-modal-window.stage-expanded .figma-cam-btn.active {
+    background: #1D1D1B !important;
+    color: #FFFFFF !important;
   }
 
   .configurator-modal-window.stage-expanded .figma-cam-zoom-box {
-    height: 30px !important;
-    padding: 0 6px !important;
-    gap: 3px !important;
+    height: 34px !important;
+    padding: 0 8px !important;
+    gap: 4px !important;
     border-radius: 4px !important;
+    border: none !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22) !important;
     flex-shrink: 0 !important;
     white-space: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
   }
 
   .configurator-modal-window.stage-expanded .figma-zoom-text {
-    font-size: 10px !important;
-    min-width: 34px !important;
+    font-family: 'Neue DIN', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #1D1D1B !important;
+    min-width: 36px !important;
+    text-align: center !important;
   }
 
   .configurator-modal-window.stage-expanded .figma-zoom-btn {
-    font-size: 13px !important;
-    padding: 0 2px !important;
+    font-family: 'Neue DIN', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #1D1D1B !important;
+    padding: 0 3px !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
   }
 
   .configurator-modal-window.stage-expanded .figma-cam-subtext {
-    display: none !important;
+    display: block !important;
+    font-family: 'Neue DIN', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 11px !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7) !important;
+    margin-top: 6px !important;
+    text-align: center !important;
+    letter-spacing: 0.2px !important;
   }
 }
 .configurator-modal-window .btn-hud-change-product-figma,
@@ -6166,20 +6201,39 @@ dialog.comparison-dialog-root::backdrop {
   }
 
   .configurator-modal-window.stage-expanded .stage-hud-bottom-right {
-    bottom: 64px !important;
+    bottom: 96px !important;
     right: 14px !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
+    flex-direction: row !important;
+    align-items: center !important;
     gap: 8px !important;
     z-index: 35 !important;
   }
 
   .configurator-modal-window.stage-expanded .stage-hud-bottom-right .btn-hud-fullscreen-stage {
-    background: rgba(29, 29, 27, 0.88) !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+  }
+
+  .configurator-modal-window.stage-expanded .stage-hud-bottom-right .btn-hud-ai-generate {
+    height: 34px !important;
+    padding: 0 12px !important;
+    font-family: 'Neue DIN', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    background: #ff4800 !important;
     color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 8px rgba(255, 68, 0, 0.35) !important;
   }
 
   .configurator-modal-window .stage-hud-bottom-center,
