@@ -73,7 +73,7 @@ let state = {
   logos: [
     {
       id: 'logo_firmenlogo',
-      name: 'FIRMENLOGO',
+      name: 'Firmenlogo',
       src: getLogoDataUrl(DEFAULT_LOGOS[0]),
       targetArticle: 'primary',
       zone: 'chest_left',
@@ -87,7 +87,7 @@ let state = {
     },
     {
       id: 'logo_rueckenlogo',
-      name: 'RÜCKENLOGO',
+      name: 'Rückenlogo',
       src: getLogoDataUrl(DEFAULT_LOGOS[0]),
       targetArticle: 'primary',
       zone: 'back_center',
@@ -573,13 +573,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (subTitle) subTitle.textContent = '2 / 3 · Namen, Teamtexte oder Nummern';
       } else if (tabName === 'logos') {
         if (mainTitle) mainTitle.textContent = 'DEINE LOGOS';
-        if (subTitle) subTitle.textContent = '3 / 3 · Logos hinzufügen und platzieren';
+        if (subTitle) subTitle.textContent = '3 / 3 · Dein Outfit personalisieren';
       }
     } else {
       if (subTitle) {
         if (tabName === 'colors') subTitle.textContent = '1 / 3 · Produkte und Farben wählen';
         else if (tabName === 'text') subTitle.textContent = '2 / 3 · Beschriftung anpassen';
-        else if (tabName === 'logos') subTitle.textContent = '3 / 3 · Logo hochladen & platzieren';
+        else if (tabName === 'logos') subTitle.textContent = '3 / 3 · Dein Outfit personalisieren';
       }
     }
 

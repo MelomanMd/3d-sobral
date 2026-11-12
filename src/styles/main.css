@@ -4850,6 +4850,82 @@ dialog.comparison-dialog-root::backdrop {
   padding-bottom: 4px;
 }
 
+.figma-logos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-x: visible;
+  padding-bottom: 0;
+  margin-bottom: 14px;
+}
+
+.figma-logo-row-container {
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.figma-logo-row-container.active {
+  border-color: #ff4800;
+  background: #fff8f5;
+}
+
+.figma-logo-select-btn {
+  flex: 1;
+  height: 40px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1d1d1b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.figma-logo-select-btn:hover {
+  border-color: #9ca3af;
+  background: #f9fafb;
+}
+
+.figma-logo-row-container.active .figma-logo-select-btn,
+.figma-logo-select-btn.is-active {
+  border-color: #ff4800;
+  color: #ff4800;
+}
+
+.figma-logo-row-container .btn-delete-logo {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #111111;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.figma-logo-row-container .btn-delete-logo:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
 .figma-layer-card {
   flex: 1;
   min-width: 140px;
@@ -6032,11 +6108,13 @@ dialog.comparison-dialog-root::backdrop {
   }
 
   .configurator-modal-window .btn-hud-change-product-figma {
-    height: 34px !important;
-    padding: 0 12px !important;
-    font-size: 10.5px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.3px !important;
+    height: 36px !important;
+    padding: 0 14px !important;
+    font-family: 'Neue DIN', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
     background: #ffffff !important;
     color: #111111 !important;
     border-radius: 6px !important;
@@ -6326,6 +6404,108 @@ dialog.comparison-dialog-root::backdrop {
   .configurator-modal-window .btn-delete-logo:hover {
     background: #f3f4f6 !important;
     border-color: #9ca3af !important;
+  }
+
+  /* Logo Tab on Mobile (Figma media_1794503049502_a33f3791) */
+  .configurator-modal-window .figma-logo-actions-row {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin-bottom: 14px !important;
+  }
+
+  .configurator-modal-window .figma-logo-actions-row button,
+  .configurator-modal-window #btn-open-upload-zone,
+  .configurator-modal-window #btn-open-library {
+    width: 100% !important;
+    height: 44px !important;
+    flex: none !important;
+    border-radius: 6px !important;
+    font-family: 'Neue DIN', sans-serif !important;
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    text-transform: none !important;
+    letter-spacing: 0.1px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+  }
+
+  .configurator-modal-window #btn-open-upload-zone {
+    background: #1d1d1b !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .configurator-modal-window #btn-open-library {
+    background: #ffffff !important;
+    color: #1d1d1b !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .configurator-modal-window .figma-logos-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin-bottom: 16px !important;
+  }
+
+  .configurator-modal-window .figma-logo-row-container {
+    background: #f8f9fa !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    padding: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .configurator-modal-window .figma-logo-select-btn {
+    flex: 1 !important;
+    height: 40px !important;
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 4px !important;
+    font-family: 'Neue DIN', sans-serif !important;
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    color: #1d1d1b !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    padding: 0 12px !important;
+    text-transform: none !important;
+  }
+
+  .configurator-modal-window .figma-logo-row-container.active .figma-logo-select-btn,
+  .configurator-modal-window .figma-logo-select-btn.is-active {
+    border-color: #ff4800 !important;
+    background: #fff8f5 !important;
+  }
+
+  .configurator-modal-window .figma-logo-row-container .btn-delete-logo {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    padding: 0 !important;
   }
 
   .configurator-modal-window .figma-outfit-card {

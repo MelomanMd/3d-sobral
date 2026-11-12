@@ -74,13 +74,13 @@ export class LogoPanel {
           <p class="figma-panel-subtitle">Logos hinzufügen und auf deinem Outfit platzieren.</p>
         </div>
 
-        <!-- 2. Action Buttons Row: + LOGO HOCHLADEN & MEINE LOGO-BIBLIOTHEK -->
+        <!-- 2. Action Buttons Row: + Logo hochladen & Meine Logo-Bibliothek -->
         <div class="figma-logo-actions-row">
           <button class="btn-figma-black-action" id="btn-open-upload-zone">
-            + LOGO HOCHLADEN
+            + Logo hochladen
           </button>
           <button class="btn-figma-white-action" id="btn-open-library">
-            MEINE LOGO-BIBLIOTHEK
+            Meine Logo-Bibliothek
           </button>
         </div>
 
@@ -90,36 +90,27 @@ export class LogoPanel {
           <span>Datei hier ablegen (PNG, SVG, JPG, WebP)</span>
         </div>
 
-        <!-- 3. Horizontal Cards for Logo Layers -->
-        <div class="figma-items-cards-grid">
+        <!-- 3. Full-width Rows for Logo Layers (Figma media_1794503049502_a33f3791) -->
+        <div class="figma-items-cards-grid figma-logos-list">
           ${this.state.logos.length === 0 ? `
             <div style="grid-column: 1 / -1; padding: 28px 16px; text-align: center; background: #f8f9fa; border-radius: 6px; border: 1px dashed #d1d5db; color: #6b7280;">
               <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: #1d1d1b; font-family: 'Neue DIN', sans-serif;">Keine Logos vorhanden</p>
-              <span style="font-size: 12px;">Klicke oben auf „+ LOGO HOCHLADEN“ oder „MEINE LOGO-BIBLIOTHEK“.</span>
+              <span style="font-size: 12px;">Klicke oben auf „+ Logo hochladen“ oder „Meine Logo-Bibliothek“.</span>
             </div>
           ` : this.state.logos.map((item, idx) => {
             const isActive = item.id === (activeItem ? activeItem.id : '');
+            const displayName = item.name || (idx === 0 ? 'Firmenlogo' : 'Rückenlogo');
             return `
-              <div class="figma-layer-card ${isActive ? 'active' : ''}" data-id="${item.id}">
-                <div class="figma-layer-card-text">
-                  <span class="figma-layer-name">${item.name || (idx === 0 ? 'FIRMENLOGO' : 'RÜCKENLOGO')}</span>
-                  <span class="figma-layer-meta">${resolveArticleName(item)} · ${resolveZoneName(item)}</span>
-                </div>
-                <div class="figma-layer-actions">
-                  <button class="btn-figma-icon btn-toggle-logo-vis" title="Sichtbarkeit" data-id="${item.id}">
-                    ${item.visible ? `
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    ` : `
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                    `}
-                  </button>
-                  <button class="btn-figma-icon btn-delete-logo" title="Löschen" data-id="${item.id}" aria-label="Löschen">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18"/>
-                      <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                  </button>
-                </div>
+              <div class="figma-logo-row-container ${isActive ? 'active' : ''}" data-id="${item.id}">
+                <button type="button" class="figma-logo-select-btn ${isActive ? 'is-active' : ''}" data-id="${item.id}">
+                  ${displayName}
+                </button>
+                <button type="button" class="btn-figma-icon btn-delete-logo" title="Löschen" data-id="${item.id}" aria-label="Löschen">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
               </div>
             `;
           }).join('')}
@@ -436,12 +427,15 @@ export class LogoPanel {
       });
     }
 
-    // Select logo layer card
-    this.container.querySelectorAll('.figma-layer-card').forEach(card => {
+    // Select logo layer card or row container
+    this.container.querySelectorAll('.figma-layer-card, .figma-logo-row-container, .figma-logo-select-btn').forEach(card => {
       card.addEventListener('click', (e) => {
         if (e.target.closest('.btn-figma-icon')) return;
-        this.activeLogoId = card.dataset.id;
-        this.render();
+        const id = card.dataset.id || card.closest('[data-id]')?.dataset.id;
+        if (id) {
+          this.activeLogoId = id;
+          this.render();
+        }
       });
     });
 
