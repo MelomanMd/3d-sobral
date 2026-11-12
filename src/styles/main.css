@@ -5724,6 +5724,15 @@ dialog.comparison-dialog-root::backdrop {
   height: 36px;
 }
 
+.configurator-modal-window .btn-footer-download.desktop-only,
+.configurator-modal-window .btn-footer-quote.desktop-only {
+  display: inline-flex !important;
+}
+
+.configurator-modal-window .btn-footer-next.mobile-only {
+  display: none !important;
+}
+
 .desktop-only {
   display: inline-flex !important;
 }
@@ -5733,11 +5742,11 @@ dialog.comparison-dialog-root::backdrop {
 }
 
 .desktop-label {
-  display: inline;
+  display: inline !important;
 }
 
 .mobile-label {
-  display: none;
+  display: none !important;
 }
 
 /* Mobile & Tablet Responsive Overrides */
@@ -5970,6 +5979,15 @@ dialog.comparison-dialog-root::backdrop {
     box-sizing: border-box !important;
   }
 
+  .configurator-modal-window .btn-footer-download.desktop-only,
+  .configurator-modal-window .btn-footer-quote.desktop-only {
+    display: none !important;
+  }
+
+  .configurator-modal-window .btn-footer-next.mobile-only {
+    display: inline-flex !important;
+  }
+
   .desktop-only {
     display: none !important;
   }
@@ -5979,11 +5997,11 @@ dialog.comparison-dialog-root::backdrop {
   }
 
   .desktop-label {
-    display: none;
+    display: none !important;
   }
 
   .mobile-label {
-    display: inline;
+    display: inline !important;
   }
 
   .configurator-modal-window .btn-footer-draft {
