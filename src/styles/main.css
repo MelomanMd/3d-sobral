@@ -5711,6 +5711,14 @@ dialog.comparison-dialog-root::backdrop {
   font-size: 11px;
 }
 
+.configurator-modal-window .figma-cards-list {
+  gap: 8px;
+}
+
+.configurator-modal-window .figma-product-card {
+  padding: 11px 16px;
+}
+
 .configurator-modal-window .btn-hud-action-sq {
   width: 36px;
   height: 36px;
@@ -5750,7 +5758,7 @@ dialog.comparison-dialog-root::backdrop {
   }
 
   .configurator-modal-window .hud-sobral-logo {
-    height: 26px !important;
+    height: 24px !important;
   }
 
   .configurator-modal-window .hud-brand-text {
@@ -5761,6 +5769,9 @@ dialog.comparison-dialog-root::backdrop {
     top: 10px !important;
     right: 10px !important;
     gap: 4px !important;
+    max-width: calc(100% - 82px) !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
   }
 
   .configurator-modal-window .btn-hud-ai-generate,
@@ -5771,7 +5782,15 @@ dialog.comparison-dialog-root::backdrop {
     white-space: nowrap !important;
   }
 
-  .configurator-modal-window .btn-hud-action-sq {
+  .configurator-modal-window .figma-cards-list {
+  gap: 8px;
+}
+
+.configurator-modal-window .figma-product-card {
+  padding: 11px 16px;
+}
+
+.configurator-modal-window .btn-hud-action-sq {
     width: 30px !important;
     height: 30px !important;
   }
