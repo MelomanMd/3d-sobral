@@ -4562,9 +4562,9 @@ dialog.comparison-dialog-root::backdrop {
 }
 
 .stepper-tab.active {
-  background: #FFF5EE !important;
+  background: #FFF0E8 !important;
   color: #1D1D1B !important;
-  border-bottom: 3px solid #FF4400 !important;
+  border-bottom: 2px solid #FF4400 !important;
 }
 
 /* Sidebar Footer with 3 buttons */
@@ -5622,10 +5622,11 @@ dialog.comparison-dialog-root::backdrop {
 
 .configurator-modal-window .stepper-tab {
   font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif !important;
-  background: #f4f5f7 !important;
+  background: #f7f8f9 !important;
+  color: #1d1d1b !important;
   border: none !important;
   border-bottom: 2px solid transparent !important;
-  border-radius: 2px !important;
+  border-radius: 0 !important;
   padding: 10px 8px !important;
   height: 44px !important;
   display: flex !important;
@@ -5638,7 +5639,8 @@ dialog.comparison-dialog-root::backdrop {
 }
 
 .configurator-modal-window .stepper-tab.active {
-  background: #fff5ee !important;
+  background: #fff0e8 !important;
+  color: #1d1d1b !important;
   border-bottom: 2px solid #ff4400 !important;
 }
 
