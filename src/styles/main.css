@@ -4396,6 +4396,55 @@ dialog.comparison-dialog-root::backdrop {
   gap: 8px;
 }
 
+.btn-stage-close {
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  z-index: 26;
+  border-radius: 4px;
+}
+
+.btn-stage-close:hover {
+  opacity: 0.8;
+  transform: scale(1.08);
+}
+
+@media (min-width: 861px) {
+  /* On desktop, the sidebar has btn-sidebar-close; only show stage close when stage is expanded */
+  .configurator-modal-window:not(.stage-expanded) .btn-stage-close {
+    display: none !important;
+  }
+}
+
+/* Bottom-Right Stage Actions: AI Preview + Fullscreen 3D */
+.stage-hud-bottom-right {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+@media (min-width: 861px) {
+  .configurator-modal-window:not(.stage-expanded) .stage-hud-bottom-right {
+    bottom: 80px;
+    right: 24px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+}
+
 .btn-hud-change-product-figma {
   background: #FFFFFF;
   color: #1D1D1B;
@@ -5925,10 +5974,10 @@ dialog.comparison-dialog-root::backdrop {
 
   .configurator-modal-window .stage-hud-top-left {
     position: absolute !important;
-    top: 12px !important;
-    left: 12px !important;
-    gap: 6px !important;
-    max-width: calc(100% - 175px) !important;
+    top: 14px !important;
+    left: 14px !important;
+    gap: 8px !important;
+    max-width: calc(100% - 70px) !important;
     display: flex !important;
     align-items: center !important;
     z-index: 25 !important;
@@ -5936,7 +5985,7 @@ dialog.comparison-dialog-root::backdrop {
   }
 
   .configurator-modal-window .hud-sobral-logo {
-    height: 22px !important;
+    height: 24px !important;
     width: auto !important;
   }
 
@@ -5946,12 +5995,10 @@ dialog.comparison-dialog-root::backdrop {
   }
 
   .configurator-modal-window .hud-title-main {
-    font-size: 11px !important;
+    font-size: 12px !important;
     letter-spacing: 0.5px !important;
     color: #ffffff !important;
     white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
   }
 
   .configurator-modal-window .hud-title-sub {
@@ -5960,40 +6007,101 @@ dialog.comparison-dialog-root::backdrop {
 
   .configurator-modal-window .stage-hud-top-right {
     position: absolute !important;
-    top: 10px !important;
-    right: 12px !important;
-    gap: 6px !important;
+    top: 12px !important;
+    right: 14px !important;
+    gap: 10px !important;
     max-width: none !important;
     display: flex !important;
-    align-items: center !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
     z-index: 25 !important;
     pointer-events: auto !important;
   }
 
-  .configurator-modal-window .btn-hud-ai-generate,
+  .configurator-modal-window .btn-stage-close {
+    display: flex !important;
+    background: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
+    padding: 2px !important;
+    cursor: pointer !important;
+  }
+
   .configurator-modal-window .btn-hud-action-sq {
     display: none !important;
   }
 
   .configurator-modal-window .btn-hud-change-product-figma {
-    height: 32px !important;
-    padding: 0 8px !important;
-    font-size: 9.5px !important;
+    height: 34px !important;
+    padding: 0 12px !important;
+    font-size: 10.5px !important;
     font-weight: 600 !important;
-    letter-spacing: 0.2px !important;
+    letter-spacing: 0.3px !important;
     background: #ffffff !important;
     color: #111111 !important;
     border-radius: 6px !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
     white-space: nowrap !important;
-    order: 1 !important;
     flex-shrink: 0 !important;
   }
 
-  @media (max-width: 374px) {
-    .configurator-modal-window .hud-title-main {
-      display: none !important;
-    }
+  /* Bottom-Right Controls: AI Model + Fullscreen Stage */
+  .configurator-modal-window .stage-hud-bottom-right {
+    position: absolute !important;
+    bottom: 12px !important;
+    right: 14px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    z-index: 25 !important;
+    pointer-events: auto !important;
+  }
+
+  .configurator-modal-window .stage-hud-bottom-right .btn-hud-ai-generate {
+    display: inline-flex !important;
+    height: 32px !important;
+    padding: 0 10px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    border-radius: 6px !important;
+    gap: 5px !important;
+    box-shadow: 0 2px 8px rgba(255, 68, 0, 0.35) !important;
+    flex-shrink: 0 !important;
+  }
+
+  .configurator-modal-window .stage-hud-bottom-right .btn-hud-fullscreen-stage {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    border: none !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+  }
+
+  .configurator-modal-window.stage-expanded .stage-hud-bottom-right {
+    bottom: 64px !important;
+    right: 14px !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 8px !important;
+    z-index: 35 !important;
+  }
+
+  .configurator-modal-window.stage-expanded .stage-hud-bottom-right .btn-hud-fullscreen-stage {
+    background: rgba(29, 29, 27, 0.88) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
   }
 
   .configurator-modal-window .stage-hud-bottom-center,

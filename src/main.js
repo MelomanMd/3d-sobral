@@ -717,23 +717,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 12.2. Close Configurator Button (Figma Frame 1876:9611 Discard Modal)
+  const triggerCloseConfigurator = () => {
+    const discardModal = new DiscardModal(
+      () => {
+        const exportModal = new ExportModal(viewer, state);
+        exportModal.open();
+      },
+      () => {
+        const modalBackdrop = document.getElementById('configurator-modal-backdrop');
+        const shopBackdrop = document.querySelector('.shop-background-backdrop');
+        if (modalBackdrop) modalBackdrop.style.display = 'none';
+        if (shopBackdrop) shopBackdrop.style.display = 'none';
+      }
+    );
+    discardModal.open();
+  };
+
   const btnCloseConfigurator = document.getElementById('btn-close-configurator');
   if (btnCloseConfigurator) {
-    btnCloseConfigurator.addEventListener('click', () => {
-      const discardModal = new DiscardModal(
-        () => {
-          const exportModal = new ExportModal(viewer, state);
-          exportModal.open();
-        },
-        () => {
-          const modalBackdrop = document.getElementById('configurator-modal-backdrop');
-          const shopBackdrop = document.querySelector('.shop-background-backdrop');
-          if (modalBackdrop) modalBackdrop.style.display = 'none';
-          if (shopBackdrop) shopBackdrop.style.display = 'none';
-        }
-      );
-      discardModal.open();
-    });
+    btnCloseConfigurator.addEventListener('click', triggerCloseConfigurator);
+  }
+  const btnStageClose = document.getElementById('btn-stage-close');
+  if (btnStageClose) {
+    btnStageClose.addEventListener('click', triggerCloseConfigurator);
   }
 
   // 13. Randomize Design Button

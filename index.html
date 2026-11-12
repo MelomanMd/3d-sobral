@@ -38,30 +38,40 @@
           </div>
         </div>
 
-        <!-- Top-Right Action HUD: AI Preview + Switch Product + Undo/Redo + Fullscreen 3D -->
+        <!-- Top-Right Action HUD: Close Button + Switch Product + Undo/Redo -->
         <div class="stage-hud-top-right">
-          <button class="btn-hud-fullscreen-stage" id="btn-fullscreen-stage" title="3D-Bühne vergrößern / verkleinern">
-            <svg class="icon-expand" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-            <svg class="icon-collapse" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14L3 21"/></svg>
-            <span class="fs-text">3D VOLLBILD</span>
-          </button>
-          <button class="btn-hud-ai-generate" id="btn-ai-generate" title="Realistisches KI-Modell (Foto & Video) generieren">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8L20 10.7l-6.1 1.9L12 18.4l-1.9-5.8L4 10.7l6.1-1.9L12 3z"/></svg>
-            <span>KI-MODELL</span>
+          <button class="btn-stage-close" id="btn-stage-close" title="Konfigurator schließen" aria-label="Schließen">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
           </button>
           <button class="btn-hud-change-product-figma" id="btn-change-product" title="Anderes Produkt auswählen">
             PRODUKT WECHSELN
           </button>
-          <button class="btn-hud-action-sq" id="btn-undo" title="Rückgängig (Ctrl + Z)" disabled>
+          <button class="btn-hud-action-sq desktop-only" id="btn-undo" title="Rückgängig (Ctrl + Z)" disabled>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>
           </button>
-          <button class="btn-hud-action-sq" id="btn-redo" title="Wiederholen (Ctrl + Y)" disabled>
+          <button class="btn-hud-action-sq desktop-only" id="btn-redo" title="Wiederholen (Ctrl + Y)" disabled>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"/></svg>
           </button>
         </div>
 
         <!-- 3D Canvas -->
         <div id="canvas-container"></div>
+
+        <!-- Bottom-Right Floating Stage Actions: AI Preview + Fullscreen 3D -->
+        <div class="stage-hud-bottom-right" id="stage-hud-bottom-right">
+          <button class="btn-hud-ai-generate" id="btn-ai-generate" title="Realistisches KI-Modell (Foto & Video) generieren">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8L20 10.7l-6.1 1.9L12 18.4l-1.9-5.8L4 10.7l6.1-1.9L12 3z"/></svg>
+            <span>KI-MODELL</span>
+          </button>
+          <button class="btn-hud-fullscreen-stage" id="btn-fullscreen-stage" title="3D-Bühne vergrößern / verkleinern">
+            <svg class="icon-expand" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            <svg class="icon-collapse" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14L3 21"/></svg>
+            <span class="fs-text">3D VOLLBILD</span>
+          </button>
+        </div>
 
         <!-- Floating Camera Controls Root (Bottom-Center) -->
         <div id="view-controls-root"></div>
