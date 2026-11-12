@@ -546,6 +546,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelectorAll('.stepper-tab, .tab-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.tab === tabName);
     });
+
+    // Update mobile next button label
+    const btnMobileNext = document.getElementById('btn-mobile-next-step');
+    if (btnMobileNext) {
+      if (tabName === 'colors') {
+        btnMobileNext.textContent = 'Weiter: Beschriftung';
+      } else if (tabName === 'text') {
+        btnMobileNext.textContent = 'Weiter: Logo';
+      } else {
+        btnMobileNext.textContent = 'Angebot anfordern';
+      }
+    }
+
+    // Update mobile drawer subtitle step indicator
+    const subTitle = document.querySelector('.sidebar-title-sub');
+    if (subTitle) {
+      if (tabName === 'colors') subTitle.textContent = '1 / 3 · Produkte und Farben wählen';
+      else if (tabName === 'text') subTitle.textContent = '2 / 3 · Beschriftung anpassen';
+      else if (tabName === 'logos') subTitle.textContent = '3 / 3 · Logo hochladen & platzieren';
+    }
+
     renderActivePanel();
   };
 
@@ -637,6 +658,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       setActiveTab(btn.dataset.tab);
     });
   });
+
+  // Mobile Bottom "Weiter" Button
+  const btnMobileNext = document.getElementById('btn-mobile-next-step');
+  if (btnMobileNext) {
+    btnMobileNext.addEventListener('click', () => {
+      if (activeTab === 'colors') {
+        setActiveTab('text');
+      } else if (activeTab === 'text') {
+        setActiveTab('logos');
+      } else {
+        const quoteModal = new QuoteModal(viewer, state);
+        quoteModal.open();
+      }
+    });
+  }
 
   // 12.1. Change Product HUD Button
   const btnChangeProduct = document.getElementById('btn-change-product');

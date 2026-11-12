@@ -91,16 +91,20 @@
         <!-- Active Tab Container -->
         <div class="tab-content-container" id="tab-content-root"></div>
 
-        <!-- Persistent Sidebar Footer Actions (Figma 3-button layout) -->
+        <!-- Persistent Sidebar Footer Actions (Figma 3-button layout on desktop, 2-button on mobile) -->
         <div class="sidebar-footer-new">
-          <button class="btn-footer-download" id="btn-sidebar-download" title="Direkter Download">
+          <button class="btn-footer-download desktop-only" id="btn-sidebar-download" title="Direkter Download">
             DOWNLOAD
           </button>
           <button class="btn-footer-draft" id="btn-sidebar-export" title="Entwurf speichern & Spezifikationen">
-            ENTWURF SPEICHERN
+            <span class="desktop-label">ENTWURF SPEICHERN</span>
+            <span class="mobile-label">Speichern</span>
           </button>
-          <button class="btn-footer-quote" id="btn-sidebar-quote" title="Unverbindliches Angebot anfordern">
+          <button class="btn-footer-quote desktop-only" id="btn-sidebar-quote" title="Unverbindliches Angebot anfordern">
             ANGEBOT ANFORDERN
+          </button>
+          <button class="btn-footer-next mobile-only" id="btn-mobile-next-step" title="Nächster Schritt">
+            Weiter: Beschriftung
           </button>
         </div>
       </aside>

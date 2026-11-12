@@ -221,9 +221,9 @@ export class DiscardModal {
         <h2 class="figma-draft-title">ENTWURF VERWERFEN?</h2>
         <p class="figma-draft-subtitle" style="margin-bottom: 32px;">Ohne Speichern gehen deine Änderungen beim Schliessen verloren.</p>
 
-        <button class="figma-btn-primary-orange" id="btn-discard-return">ZURÜCK ZUM ENTWURF</button>
-        <button class="figma-btn-outline-white" id="btn-discard-save">ZUERST SPEICHERN</button>
-        <button class="figma-btn-outline-white" id="btn-discard-exit">OHNE SPEICHERN SCHLIESSEN</button>
+        <button class="figma-btn-primary-orange" id="btn-discard-return">Weiter bearbeiten</button>
+        <button class="figma-btn-outline-white" id="btn-discard-save">Zuerst speichern</button>
+        <button class="figma-btn-outline-white" id="btn-discard-exit">Ohne Speichern schliessen</button>
       </div>
     `;
 

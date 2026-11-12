@@ -5724,6 +5724,22 @@ dialog.comparison-dialog-root::backdrop {
   height: 36px;
 }
 
+.desktop-only {
+  display: inline-flex !important;
+}
+
+.mobile-only {
+  display: none !important;
+}
+
+.desktop-label {
+  display: inline;
+}
+
+.mobile-label {
+  display: none;
+}
+
 /* Mobile & Tablet Responsive Overrides */
 @media (max-width: 860px) {
   .configurator-modal-window {
@@ -5733,12 +5749,72 @@ dialog.comparison-dialog-root::backdrop {
     max-height: 100dvh !important;
     border-radius: 0 !important;
     flex-direction: column !important;
+    background: #000000 !important;
   }
 
   .configurator-modal-window .viewport-area {
-    height: 42vh !important;
-    min-height: 250px !important;
+    height: 38vh !important;
+    min-height: 270px !important;
+    max-height: 340px !important;
     flex: none !important;
+    background: radial-gradient(ellipse at 50% 80%, #d83d06 0%, #3a0d02 45%, #000000 85%) !important;
+  }
+
+  .configurator-modal-window .stage-watermark {
+    opacity: 0.12 !important;
+    top: 45% !important;
+    width: 65% !important;
+  }
+
+  .configurator-modal-window .stage-hud-top-left {
+    top: 14px !important;
+    left: 14px !important;
+    gap: 8px !important;
+  }
+
+  .configurator-modal-window .hud-sobral-logo {
+    height: 28px !important;
+  }
+
+  .configurator-modal-window .hud-brand-text {
+    display: flex !important;
+  }
+
+  .configurator-modal-window .hud-title-main {
+    font-size: 14px !important;
+    color: #ffffff !important;
+  }
+
+  .configurator-modal-window .hud-title-sub {
+    display: none !important;
+  }
+
+  .configurator-modal-window .stage-hud-top-right {
+    top: 14px !important;
+    right: 14px !important;
+    gap: 8px !important;
+    max-width: none !important;
+  }
+
+  .configurator-modal-window .btn-hud-ai-generate,
+  .configurator-modal-window .btn-hud-action-sq {
+    display: none !important;
+  }
+
+  .configurator-modal-window .btn-hud-change-product-figma {
+    height: 32px !important;
+    padding: 0 14px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .configurator-modal-window .stage-hud-bottom-center,
+  .configurator-modal-window #view-controls-root {
+    display: none !important;
   }
 
   .configurator-modal-window .sidebar-panel {
@@ -5747,135 +5823,198 @@ dialog.comparison-dialog-root::backdrop {
     max-width: 100% !important;
     flex: 1 !important;
     min-height: 0 !important;
-  }
-}
-
-@media (max-width: 640px) {
-  .configurator-modal-window .stage-hud-top-left {
-    top: 10px !important;
-    left: 10px !important;
-    gap: 8px !important;
+    background: #ffffff !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border-left: none !important;
+    border-top: 1px solid #e5e7eb !important;
+    overflow: hidden !important;
   }
 
-  .configurator-modal-window .hud-sobral-logo {
-    height: 24px !important;
-  }
-
-  .configurator-modal-window .hud-brand-text {
-    display: none !important;
-  }
-
-  .configurator-modal-window .stage-hud-top-right {
-    top: 10px !important;
-    right: 10px !important;
-    gap: 4px !important;
-    max-width: calc(100% - 82px) !important;
-    flex-wrap: wrap !important;
-    justify-content: flex-end !important;
-  }
-
-  .configurator-modal-window .btn-hud-ai-generate,
-  .configurator-modal-window .btn-hud-change-product-figma {
-    height: 30px !important;
-    padding: 0 8px !important;
-    font-size: 9px !important;
-    white-space: nowrap !important;
-  }
-
-  .configurator-modal-window .figma-cards-list {
-  gap: 8px;
-}
-
-.configurator-modal-window .figma-product-card {
-  padding: 11px 16px;
-}
-
-.configurator-modal-window .btn-hud-action-sq {
-    width: 30px !important;
-    height: 30px !important;
-  }
-
-  .configurator-modal-window .stage-hud-bottom-center {
-    bottom: 8px !important;
-    left: 8px !important;
-    right: 8px !important;
-    transform: none !important;
-    width: calc(100% - 16px) !important;
-  }
-
-  .configurator-modal-window .figma-cam-buttons {
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-
-  .configurator-modal-window .figma-cam-btn {
-    height: 28px !important;
-    padding: 0 8px !important;
-    font-size: 9px !important;
-  }
-
-  .configurator-modal-window .figma-cam-zoom-box {
-    height: 28px !important;
-    padding: 0 8px !important;
-    gap: 4px;
-  }
-
-  .configurator-modal-window .figma-zoom-text {
-    font-size: 9px !important;
-    min-width: 32px !important;
-  }
-
-  .configurator-modal-window .figma-cam-subtext {
-    font-size: 10px !important;
-  }
-
-  .configurator-modal-window .sidebar-header-new {
-    padding: 12px 14px 6px 14px !important;
-  }
-
-  .configurator-modal-window .sidebar-title-main {
-    font-size: 16px !important;
-  }
-
-  .configurator-modal-window .sidebar-title-sub {
-    font-size: 11px !important;
-  }
-
+  /* Sticky Tab bar right under 3D canvas */
   .configurator-modal-window .config-stepper {
-    padding: 6px 14px 0 14px !important;
-    gap: 4px !important;
+    order: 1 !important;
+    background: #ffffff !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    display: flex !important;
+    height: 48px !important;
   }
 
   .configurator-modal-window .stepper-tab {
-    height: 34px !important;
-    padding: 4px 3px !important;
+    flex: 1 !important;
+    height: 48px !important;
+    border-radius: 0 !important;
+    padding: 0 8px !important;
+    background: #fafafa !important;
+    border: none !important;
+    border-bottom: 3px solid transparent !important;
+    border-right: 1px solid #f0f2f5 !important;
+  }
+
+  .configurator-modal-window .stepper-tab:last-child {
+    border-right: none !important;
+  }
+
+  .configurator-modal-window .stepper-tab.active {
+    background: #fff8f5 !important;
+    border-bottom: 3px solid #ff4800 !important;
   }
 
   .configurator-modal-window .stepper-label {
-    font-size: 8.5px !important;
-    letter-spacing: 0.1px !important;
-    white-space: nowrap !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #111111 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
   }
 
+  .configurator-modal-window .stepper-tab:not(.active) .stepper-label {
+    color: #4b5563 !important;
+  }
+
+  /* Drawer Header */
+  .configurator-modal-window .sidebar-header-new {
+    order: 2 !important;
+    padding: 16px 18px 8px 18px !important;
+    border-bottom: none !important;
+  }
+
+  .configurator-modal-window .sidebar-title-main {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    color: #111111 !important;
+    letter-spacing: 0.2px !important;
+  }
+
+  .configurator-modal-window .sidebar-title-sub {
+    font-size: 13px !important;
+    color: #6b7280 !important;
+    margin-top: 3px !important;
+    font-weight: 500 !important;
+  }
+
+  .configurator-modal-window .btn-sidebar-close {
+    position: absolute !important;
+    top: 14px !important;
+    right: 14px !important;
+    z-index: 40 !important;
+    color: #ffffff !important;
+    background: transparent !important;
+  }
+
+  /* Drawer Body Scroll */
   .configurator-modal-window .tab-content-container {
-    padding: 10px 14px 12px 14px !important;
+    order: 3 !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 8px 18px 20px 18px !important;
   }
 
+  /* Hide redundant title in tab panel header on mobile */
+  .configurator-modal-window .figma-panel-header {
+    display: none !important;
+  }
+
+  .configurator-modal-window .figma-outfit-card {
+    background: #f8f9fa !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .configurator-modal-window .figma-card-name {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #111111 !important;
+  }
+
+  .configurator-modal-window .figma-card-brand {
+    font-size: 11px !important;
+    color: #6b7280 !important;
+  }
+
+  .configurator-modal-window .figma-card-color-status {
+    display: none !important;
+  }
+
+  .configurator-modal-window .figma-swatches-row {
+    margin-top: 10px !important;
+    gap: 8px !important;
+  }
+
+  .configurator-modal-window .figma-square-swatch {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 2px !important;
+    border: 1px solid #d1d5db !important;
+  }
+
+  .configurator-modal-window .figma-square-swatch.active {
+    border: 2px solid #ff4800 !important;
+    box-shadow: inset 0 0 0 2px #ffffff !important;
+  }
+
+  /* Sticky Footer Toolbar */
   .configurator-modal-window .sidebar-footer-new {
-    padding: 10px 14px 12px 14px !important;
-    gap: 6px !important;
-    grid-template-columns: auto 1fr 1.2fr !important;
+    order: 4 !important;
+    background: #ffffff !important;
+    border-top: 1px solid #e5e7eb !important;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05) !important;
+    padding: 12px 18px 16px 18px !important;
+    display: flex !important;
+    gap: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
-  .configurator-modal-window .btn-footer-download,
-  .configurator-modal-window .btn-footer-draft,
-  .configurator-modal-window .btn-footer-quote {
-    height: 36px !important;
-    padding: 0 7px !important;
-    font-size: 8.5px !important;
-    letter-spacing: 0.1px !important;
-    white-space: nowrap !important;
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: inline-flex !important;
+  }
+
+  .desktop-label {
+    display: none;
+  }
+
+  .mobile-label {
+    display: inline;
+  }
+
+  .configurator-modal-window .btn-footer-draft {
+    flex: 1 !important;
+    max-width: 35% !important;
+    height: 46px !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+  }
+
+  .configurator-modal-window .btn-footer-next {
+    flex: 2 !important;
+    height: 46px !important;
+    background: #ff4800 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease !important;
+  }
+
+  .configurator-modal-window .btn-footer-next:active {
+    background: #e03f00 !important;
   }
 }
