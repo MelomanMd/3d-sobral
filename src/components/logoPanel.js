@@ -4,12 +4,12 @@ import { ICONS } from '../core/icons.js';
 import { ARTICLE_TARGETS, ARTICLE_ZONES } from './textPanel.js';
 import { DEFAULT_LOGOS, getLogoDataUrl } from '../core/defaultLogos.js';
 
-export const SOBRAL_PRESET_LOGOS = [
-  { id: 'logo_sobral_main', name: 'SOBRAL WORKWEAR (Official)', src: getLogoDataUrl(DEFAULT_LOGOS[0]), type: 'vector' },
-  { id: 'logo_sobral_crest', name: 'SOBRAL Emblem Circle', src: getLogoDataUrl(DEFAULT_LOGOS[1]), type: 'vector' },
-  { id: 'logo_sobral_wings', name: 'Aero Speed Wings', src: getLogoDataUrl(DEFAULT_LOGOS[2]), type: 'vector' },
-  { id: 'logo_sobral_shield', name: 'Cyber Shield Pro', src: getLogoDataUrl(DEFAULT_LOGOS[3]), type: 'vector' }
-];
+export const SOBRAL_PRESET_LOGOS = DEFAULT_LOGOS.map((logo, idx) => ({
+  id: logo.id || `logo_preset_${idx}`,
+  name: logo.name,
+  src: getLogoDataUrl(logo),
+  type: 'vector'
+}));
 
 export class LogoPanel {
   constructor(containerElement, state, onUpdate) {
@@ -57,8 +57,8 @@ export class LogoPanel {
     if (mainTitle) mainTitle.textContent = 'MEINE LOGO-BIBLIOTHEK';
     if (subTitle) subTitle.textContent = '3 / 3 · Dein Outfit personalisieren';
 
-    // In Figma design, the saved corporate logo for logged-in user is SOBRAL WORKWEAR
-    const libraryLogos = [SOBRAL_PRESET_LOGOS[0]];
+    const userSavedLogos = (this.state.logos || []).filter(l => l.src && !SOBRAL_PRESET_LOGOS.some(p => p.src === l.src));
+    const libraryLogos = [...userSavedLogos, ...SOBRAL_PRESET_LOGOS];
 
     this.container.innerHTML = `
       <div class="figma-subpanel-wrapper">
@@ -72,7 +72,7 @@ export class LogoPanel {
         <!-- 2. Library Logo Cards -->
         <div class="figma-library-cards-list">
           ${libraryLogos.map(logo => {
-            const shortName = logo.name.toUpperCase().includes('SOBRAL') ? 'SOBRAL' : (logo.name.split(/[\s\(\-\_]/)[0] || 'Logo');
+            const shortName = logo.name.toUpperCase().includes('SOBRAL') ? 'SOBRAL' : logo.name;
             return `
               <div class="figma-library-logo-card">
                 <div class="figma-library-logo-preview">
@@ -129,7 +129,7 @@ export class LogoPanel {
     this.container.querySelectorAll('.btn-figma-use-logo').forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.id;
-        const preset = SOBRAL_PRESET_LOGOS.find(p => p.id === id);
+        const preset = (this.state.logos || []).find(p => p.id === id) || SOBRAL_PRESET_LOGOS.find(p => p.id === id);
         if (preset) {
           const targetArticle = this.getTargetArticles()[0]?.id || 'primary';
           const defaultZones = ARTICLE_ZONES[targetArticle] || ARTICLE_ZONES.primary;

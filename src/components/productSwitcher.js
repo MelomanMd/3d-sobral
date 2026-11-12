@@ -30,12 +30,8 @@ export class ProductSwitcher {
     const existing = document.getElementById('mobile-product-picker-modal');
     if (existing) existing.remove();
 
-    const mobileProducts = [
-      { id: 'helmet', label: 'Kopfschutz · KASK SUPERPLASMA AQ' },
-      { id: 'primary', label: 'Oberteil · BLÅKLÄDER T-Shirt 3379' },
-      { id: 'trousers', label: 'Arbeitshose · BLÅKLÄDER 1750' },
-      { id: 'boots', label: 'Sicherheitsschuhe · Pro Safety Boot' }
-    ];
+    const products = this.catalog.getProducts() || [];
+    const activeProduct = this.catalog.getActiveProduct();
 
     const backdrop = document.createElement('div');
     backdrop.className = 'mobile-select-picker-backdrop';
@@ -43,12 +39,16 @@ export class ProductSwitcher {
     backdrop.innerHTML = `
       <div class="mobile-select-picker-sheet" role="dialog" aria-modal="true" aria-label="PRODUKT WECHSELN">
         <h3 class="mobile-select-picker-title" style="text-transform: uppercase;">PRODUKT WECHSELN</h3>
-        <div class="mobile-select-picker-options">
-          ${mobileProducts.map(p => `
-            <button type="button" class="btn-mobile-select-option" data-article="${p.id}">
-              ${p.label}
-            </button>
-          `).join('')}
+        <div class="mobile-select-picker-options" style="max-height: 60vh; overflow-y: auto;">
+          ${products.map(p => {
+            const isSelected = activeProduct && activeProduct.id === p.id;
+            const catName = p.categoryName || (p.category === 'tops' ? 'Oberteil' : (p.category === 'bottoms' ? 'Arbeitshose' : (p.category === 'headwear' ? 'Kopfschutz' : (p.category === 'outerwear' ? 'Jacke' : 'Produkt'))));
+            return `
+              <button type="button" class="btn-mobile-select-option ${isSelected ? 'is-selected' : ''}" data-product-id="${p.id}">
+                ${catName} · ${p.name}
+              </button>
+            `;
+          }).join('')}
           <button type="button" class="btn-mobile-select-cancel" id="btn-mobile-product-cancel">
             Abbrechen
           </button>
@@ -79,8 +79,10 @@ export class ProductSwitcher {
     backdrop.querySelectorAll('.btn-mobile-select-option').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const articleId = btn.dataset.article;
-        this.handleMobileArticleSelect(articleId);
+        const productId = btn.dataset.productId;
+        if (productId) {
+          this.catalog.setActiveProduct(productId);
+        }
         closeWithAnimation();
       });
     });
