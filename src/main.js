@@ -652,7 +652,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           exportModal.open();
         },
         () => {
-          window.location.href = '/';
+          const modalBackdrop = document.getElementById('configurator-modal-backdrop');
+          const shopBackdrop = document.querySelector('.shop-background-backdrop');
+          if (modalBackdrop) modalBackdrop.style.display = 'none';
+          if (shopBackdrop) shopBackdrop.style.display = 'none';
         }
       );
       discardModal.open();
