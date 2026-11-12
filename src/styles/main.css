@@ -2,7 +2,7 @@
 
 @font-face {
   font-family: 'Neue DIN';
-  src: url('/fonts/NeueDIN-RegularWeb.woff2') format('woff2');
+  src: url('../fonts/NeueDIN-RegularWeb.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -10,7 +10,7 @@
 
 @font-face {
   font-family: 'Neue DIN';
-  src: url('/fonts/NeueDIN-MediumWeb.woff2') format('woff2');
+  src: url('../fonts/NeueDIN-MediumWeb.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -18,7 +18,47 @@
 
 @font-face {
   font-family: 'Neue DIN';
-  src: url('/fonts/NeueDIN-BoldWeb.woff2') format('woff2');
+  src: url('../fonts/NeueDIN-SemiBoldWeb.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue DIN';
+  src: url('../fonts/NeueDIN-BoldWeb.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue DIN Wide';
+  src: url('../fonts/NeueDINWide-RegularWeb.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue DIN Wide';
+  src: url('../fonts/NeueDINWide-MediumWeb.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue DIN Wide';
+  src: url('../fonts/NeueDINWide-SemiBoldWeb.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue DIN Wide';
+  src: url('../fonts/NeueDINWide-BoldWeb.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -5524,7 +5564,8 @@ dialog.comparison-dialog-root::backdrop {
 }
 
 .configurator-modal-window .sidebar-title-main {
-  font-size: 24px !important;
+  font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif !important;
+  font-size: 21px !important;
   font-weight: 700 !important;
   line-height: 1.15 !important;
   letter-spacing: 0.2px !important;
@@ -5532,6 +5573,7 @@ dialog.comparison-dialog-root::backdrop {
 }
 
 .configurator-modal-window .sidebar-title-sub {
+  font-family: 'Neue DIN', sans-serif !important;
   font-size: 12px !important;
   font-weight: 400 !important;
   line-height: 1.35 !important;
@@ -5547,11 +5589,12 @@ dialog.comparison-dialog-root::backdrop {
 }
 
 .configurator-modal-window .stepper-tab {
+  font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif !important;
   background: #f4f5f7 !important;
   border: none !important;
   border-bottom: 2px solid transparent !important;
   border-radius: 2px !important;
-  padding: 10px 8px !important;
+  padding: 10px 6px !important;
   height: 40px !important;
   display: flex !important;
   align-items: center !important;
@@ -5568,10 +5611,11 @@ dialog.comparison-dialog-root::backdrop {
 }
 
 .configurator-modal-window .stepper-label {
-  font-size: 11px !important;
-  font-weight: 700 !important;
+  font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
   line-height: 1.2 !important;
-  letter-spacing: 0.6px !important;
+  letter-spacing: 0.3px !important;
 }
 
 .configurator-modal-window .tab-content-container {
@@ -5579,16 +5623,26 @@ dialog.comparison-dialog-root::backdrop {
 }
 
 .configurator-modal-window .tab-content-container h3 {
-  font-size: 16px !important;
+  font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif !important;
+  font-size: 14px !important;
   font-weight: 700 !important;
   line-height: 1.25 !important;
   letter-spacing: 0.2px !important;
-  margin-bottom: 4px !important;
+  margin-bottom: 3px !important;
 }
 
 .configurator-modal-window .tab-content-container p {
+  font-family: 'Neue DIN', sans-serif !important;
   font-size: 12px !important;
+  font-weight: 400 !important;
   line-height: 1.35 !important;
+}
+
+.configurator-modal-window .hud-title-main,
+.configurator-modal-window .btn-hud-change-product-figma,
+.configurator-modal-window .btn-hud-ai-generate,
+.figma-draft-backdrop .figma-draft-title {
+  font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif !important;
 }
 
 .configurator-modal-window .sidebar-footer-new {
@@ -5599,10 +5653,11 @@ dialog.comparison-dialog-root::backdrop {
 .configurator-modal-window .btn-footer-download,
 .configurator-modal-window .btn-footer-draft,
 .configurator-modal-window .btn-footer-quote {
+  font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif !important;
   height: 44px !important;
-  padding: 0 12px !important;
+  padding: 0 10px !important;
   border-radius: 2px !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
   font-weight: 700 !important;
   line-height: 1 !important;
   display: inline-flex !important;
