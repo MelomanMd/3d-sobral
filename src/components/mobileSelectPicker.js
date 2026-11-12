@@ -66,6 +66,7 @@ export function openMobileSelectSheet(selectEl) {
 
   document.body.appendChild(backdrop);
   activePickerModal = backdrop;
+  const openedAt = Date.now();
 
   // Animate in
   requestAnimationFrame(() => {
@@ -79,6 +80,14 @@ export function openMobileSelectSheet(selectEl) {
       if (activePickerModal === backdrop) activePickerModal = null;
     }, 220);
   };
+
+  // Prevent clicks inside sheet from bubbling to backdrop
+  const sheet = backdrop.querySelector('.mobile-select-picker-sheet');
+  if (sheet) {
+    sheet.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+  }
 
   // Option click
   backdrop.querySelectorAll('.btn-mobile-select-option').forEach(btn => {
@@ -99,8 +108,9 @@ export function openMobileSelectSheet(selectEl) {
     closeWithAnimation();
   });
 
-  // Backdrop click
+  // Backdrop click (ignore clicks in first 350ms to prevent ghost clicks from the opening tap)
   backdrop.addEventListener('click', (e) => {
+    if (Date.now() - openedAt < 350) return;
     if (e.target === backdrop) {
       closeWithAnimation();
     }
@@ -124,24 +134,23 @@ export function closeMobileSelectSheet() {
 }
 
 export function initMobileSelectPicker() {
-  const handler = (e) => {
+  // 1. Prevent default native picker on pointerdown without triggering open twice
+  document.addEventListener('pointerdown', (e) => {
+    if (window.innerWidth > 860) return;
+    const select = e.target.closest('select.figma-select, select.figma-stepper-select');
+    if (select) {
+      e.preventDefault();
+    }
+  }, { capture: true });
+
+  // 2. Open custom sheet on click
+  document.addEventListener('click', (e) => {
     if (window.innerWidth > 860) return;
     const select = e.target.closest('select.figma-select, select.figma-stepper-select');
     if (!select) return;
     e.preventDefault();
     e.stopPropagation();
     openMobileSelectSheet(select);
-  };
-
-  // Intercept on pointerdown, mousedown and click
-  document.addEventListener('pointerdown', handler, { capture: true });
-  document.addEventListener('mousedown', handler, { capture: true });
-  document.addEventListener('click', (e) => {
-    if (window.innerWidth > 860) return;
-    const select = e.target.closest('select.figma-select, select.figma-stepper-select');
-    if (select) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
   }, { capture: true });
 }
+
