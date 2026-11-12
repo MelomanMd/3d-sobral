@@ -56,6 +56,7 @@ export class TextPanel {
     this.state = state;
     this.onUpdate = onUpdate;
     this.activeTextId = state.texts[0]?.id || null;
+    this.styleExpanded = false;
 
     this.render();
   }
@@ -197,9 +198,12 @@ export class TextPanel {
               </div>
             </div>
 
-            <!-- Subheader: TEXTSTIL ANPASSEN – -->
-            <div class="figma-subheading">TEXTSTIL ANPASSEN –</div>
+            <!-- Subheader: TEXTSTIL ANPASSEN + / – -->
+            <button type="button" class="figma-subheading figma-subheading-toggle" id="btn-toggle-textstyle" aria-expanded="${this.styleExpanded}">
+              TEXTSTIL ANPASSEN ${this.styleExpanded ? '–' : '+'}
+            </button>
 
+            ${this.styleExpanded ? `
             <!-- Stepper Inputs Grid (2 columns) -->
             <div class="figma-steppers-grid">
               <!-- SCHRIFTGRÖSSE -->
@@ -275,6 +279,7 @@ export class TextPanel {
                 </div>
               </div>
             </div>
+            ` : ''}
 
           </div>
         ` : ''}
@@ -285,6 +290,15 @@ export class TextPanel {
   }
 
   bindEvents() {
+    // Toggle TEXTSTIL ANPASSEN accordion
+    const btnToggleStyle = this.container.querySelector('#btn-toggle-textstyle');
+    if (btnToggleStyle) {
+      btnToggleStyle.addEventListener('click', () => {
+        this.styleExpanded = !this.styleExpanded;
+        this.render();
+      });
+    }
+
     // Add text button
     const btnAdd = this.container.querySelector('#btn-add-text');
     if (btnAdd) {

@@ -4963,6 +4963,22 @@ dialog.comparison-dialog-root::backdrop {
   margin-bottom: 2px;
 }
 
+.figma-subheading-toggle {
+  background: transparent;
+  border: none;
+  padding: 2px 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  text-align: left;
+}
+
+.figma-subheading-toggle:hover {
+  color: #FF4400;
+}
+
 .figma-steppers-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
