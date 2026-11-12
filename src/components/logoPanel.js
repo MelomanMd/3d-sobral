@@ -44,6 +44,132 @@ export class LogoPanel {
   }
 
   render() {
+    if (this.isLibraryOpen) {
+      this.renderLibraryView();
+      return;
+    }
+    this.renderMainView();
+  }
+
+  renderLibraryView() {
+    const mainTitle = document.querySelector('.sidebar-title-main');
+    const subTitle = document.querySelector('.sidebar-title-sub');
+    if (mainTitle) mainTitle.textContent = 'MEINE LOGO-BIBLIOTHEK';
+    if (subTitle) subTitle.textContent = '3 / 3 · Dein Outfit personalisieren';
+
+    // In Figma design, the saved corporate logo for logged-in user is SOBRAL WORKWEAR
+    const libraryLogos = [SOBRAL_PRESET_LOGOS[0]];
+
+    this.container.innerHTML = `
+      <div class="figma-subpanel-wrapper">
+        <!-- 1. Header (matching user design) -->
+        <div class="figma-panel-header">
+          <h3 class="figma-panel-title">MEINE LOGO-BIBLIOTHEK</h3>
+          <p class="figma-panel-subtitle">3 / 3 · Dein Outfit personalisieren</p>
+        </div>
+        <p class="figma-panel-subsubtitle">Gespeicherte Logos · angemeldet</p>
+
+        <!-- 2. Library Logo Cards -->
+        <div class="figma-library-cards-list">
+          ${libraryLogos.map(logo => {
+            const shortName = logo.name.toUpperCase().includes('SOBRAL') ? 'SOBRAL' : (logo.name.split(/[\s\(\-\_]/)[0] || 'Logo');
+            return `
+              <div class="figma-library-logo-card">
+                <div class="figma-library-logo-preview">
+                  <img src="${logo.src}" alt="${logo.name}">
+                </div>
+                <button type="button" class="btn-figma-use-logo" data-id="${logo.id}">
+                  ${shortName} · Logo verwenden
+                </button>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <!-- 3. Bottom Action Buttons -->
+        <div class="figma-library-actions-stack">
+          <button type="button" class="btn-figma-library-upload" id="btn-library-upload-new">
+            + Neues Logo hochladen
+          </button>
+          <button type="button" class="btn-figma-library-back" id="btn-library-back">
+            Zurück zu meinen Logos
+          </button>
+        </div>
+
+        <!-- Hidden File Input for uploading from library view -->
+        <input type="file" id="library-file-input" accept="image/png,image/svg+xml,image/jpeg,image/webp" style="display:none">
+      </div>
+    `;
+
+    this.bindLibraryEvents();
+  }
+
+  bindLibraryEvents() {
+    const btnBack = this.container.querySelector('#btn-library-back');
+    if (btnBack) {
+      btnBack.addEventListener('click', () => {
+        this.isLibraryOpen = false;
+        this.render();
+      });
+    }
+
+    const btnUpload = this.container.querySelector('#btn-library-upload-new');
+    const fileInput = this.container.querySelector('#library-file-input');
+    if (btnUpload && fileInput) {
+      btnUpload.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          this.handleFileUpload(file);
+          this.isLibraryOpen = false;
+        }
+      });
+    }
+
+    this.container.querySelectorAll('.btn-figma-use-logo').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const preset = SOBRAL_PRESET_LOGOS.find(p => p.id === id);
+        if (preset) {
+          const targetArticle = this.getTargetArticles()[0]?.id || 'primary';
+          const defaultZones = ARTICLE_ZONES[targetArticle] || ARTICLE_ZONES.primary;
+          const targetZone = defaultZones[0]?.id || 'chest_left';
+
+          const activeItem = this.state.logos.find(l => l.id === this.activeLogoId);
+          if (activeItem) {
+            activeItem.name = preset.name.toUpperCase().includes('SOBRAL') ? 'SOBRAL' : preset.name;
+            activeItem.src = preset.src;
+          } else {
+            const newLogo = {
+              id: 'logo_' + Date.now(),
+              name: preset.name.toUpperCase().includes('SOBRAL') ? 'SOBRAL' : preset.name,
+              src: preset.src,
+              targetArticle,
+              zone: targetZone,
+              scale: 0.45,
+              rotation: 0,
+              offsetX: 0,
+              offsetY: 0,
+              opacity: 1.0,
+              visible: true
+            };
+            this.state.logos.push(newLogo);
+            this.activeLogoId = newLogo.id;
+          }
+          this.isLibraryOpen = false;
+          if (this.onUpdate) this.onUpdate('decals');
+          this.render();
+        }
+      });
+    });
+  }
+
+  renderMainView() {
+    const mainTitle = document.querySelector('.sidebar-title-main');
+    const subTitle = document.querySelector('.sidebar-title-sub');
+    if (mainTitle) mainTitle.textContent = 'DEINE LOGOS';
+    if (subTitle) subTitle.textContent = '3 / 3 · Dein Outfit personalisieren';
+
     const activeItem = this.state.logos.find(l => l.id === this.activeLogoId) || this.state.logos[0];
     const activeTargets = this.getTargetArticles();
     let targetArticle = activeItem?.targetArticle || activeTargets[0].id;
@@ -71,7 +197,7 @@ export class LogoPanel {
         <!-- 1. Header (Figma 03_logo_upload.png) -->
         <div class="figma-panel-header">
           <h3 class="figma-panel-title">DEINE LOGOS</h3>
-          <p class="figma-panel-subtitle">Logos hinzufügen und auf deinem Outfit platzieren.</p>
+          <p class="figma-panel-subtitle">3 / 3 · Dein Outfit personalisieren</p>
         </div>
 
         <!-- 2. Action Buttons Row: + Logo hochladen & Meine Logo-Bibliothek -->
@@ -410,11 +536,12 @@ export class LogoPanel {
       });
     }
 
-    // Open library modal
+    // Open library view
     const btnLib = this.container.querySelector('#btn-open-library');
     if (btnLib) {
       btnLib.addEventListener('click', () => {
-        this.openLibraryModal();
+        this.isLibraryOpen = true;
+        this.render();
       });
     }
 
