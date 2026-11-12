@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&family=Montserrat:wght@400;500;600;700;800;900&family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @font-face {
   font-family: 'Neue DIN';
@@ -6068,8 +6068,8 @@ dialog.comparison-dialog-root::backdrop {
   .configurator-modal-window.stage-expanded .figma-cam-btn {
     height: 34px !important;
     padding: 0 10px !important;
-    font-family: 'Neue DIN', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    font-size: 11px !important;
+    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 11.5px !important;
     font-weight: 700 !important;
     letter-spacing: 0.3px !important;
     border-radius: 4px !important;
@@ -6102,8 +6102,8 @@ dialog.comparison-dialog-root::backdrop {
   }
 
   .configurator-modal-window.stage-expanded .figma-zoom-text {
-    font-family: 'Neue DIN', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    font-size: 11px !important;
+    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 12px !important;
     font-weight: 700 !important;
     color: #1D1D1B !important;
     min-width: 36px !important;
@@ -6111,7 +6111,7 @@ dialog.comparison-dialog-root::backdrop {
   }
 
   .configurator-modal-window.stage-expanded .figma-zoom-btn {
-    font-family: 'Neue DIN', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif !important;
     font-size: 15px !important;
     font-weight: 700 !important;
     color: #1D1D1B !important;
@@ -6123,8 +6123,8 @@ dialog.comparison-dialog-root::backdrop {
 
   .configurator-modal-window.stage-expanded .figma-cam-subtext {
     display: block !important;
-    font-family: 'Neue DIN', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    font-size: 11px !important;
+    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 11.5px !important;
     color: rgba(255, 255, 255, 0.85) !important;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7) !important;
     margin-top: 6px !important;
@@ -6179,6 +6179,14 @@ dialog.comparison-dialog-root::backdrop {
 
 /* Mobile & Tablet Responsive Overrides */
 @media (max-width: 860px) {
+  /* Figma 2026 Mobile Typography: Barlow */
+  .configurator-modal-window,
+  .configurator-modal-window *:not(code):not(pre),
+  .mobile-select-picker-sheet,
+  .mobile-select-picker-sheet * {
+    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  }
+
   .configurator-modal-window {
     width: 100vw !important;
     max-width: 100vw !important;
@@ -6265,8 +6273,8 @@ dialog.comparison-dialog-root::backdrop {
   .configurator-modal-window .btn-hud-change-product-figma {
     height: 36px !important;
     padding: 0 14px !important;
-    font-family: 'Neue DIN', sans-serif !important;
-    font-size: 13px !important;
+    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 13.5px !important;
     font-weight: 700 !important;
     text-transform: none !important;
     letter-spacing: 0 !important;
@@ -6347,8 +6355,8 @@ dialog.comparison-dialog-root::backdrop {
   .configurator-modal-window.stage-expanded .stage-hud-bottom-right .btn-hud-ai-generate {
     height: 34px !important;
     padding: 0 12px !important;
-    font-family: 'Neue DIN', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    font-size: 11px !important;
+    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 11.5px !important;
     font-weight: 700 !important;
     background: #ff4800 !important;
     color: #ffffff !important;
@@ -6436,8 +6444,8 @@ dialog.comparison-dialog-root::backdrop {
   }
 
   .configurator-modal-window .stepper-label {
-    font-family: 'Neue DIN', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-    font-size: 13px !important;
+    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 13.5px !important;
     font-weight: 700 !important;
     color: #1d1d1b !important;
     text-transform: none !important;
@@ -6458,14 +6466,16 @@ dialog.comparison-dialog-root::backdrop {
   }
 
   .configurator-modal-window .sidebar-title-main {
-    font-size: 18px !important;
+    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 19px !important;
     font-weight: 800 !important;
     color: #111111 !important;
     letter-spacing: 0.2px !important;
   }
 
   .configurator-modal-window .sidebar-title-sub {
-    font-size: 13px !important;
+    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 13.5px !important;
     color: #6b7280 !important;
     margin-top: 3px !important;
     font-weight: 500 !important;
@@ -6504,8 +6514,8 @@ dialog.comparison-dialog-root::backdrop {
     color: #ffffff !important;
     border: none !important;
     border-radius: 6px !important;
-    font-family: 'Neue DIN', sans-serif !important;
-    font-size: 13.5px !important;
+    font-family: 'Barlow', sans-serif !important;
+    font-size: 14px !important;
     font-weight: 700 !important;
     text-transform: none !important;
     letter-spacing: 0.1px !important;
@@ -6549,8 +6559,8 @@ dialog.comparison-dialog-root::backdrop {
   }
 
   .configurator-modal-window .figma-layer-name {
-    font-family: 'Neue DIN', sans-serif !important;
-    font-size: 13.5px !important;
+    font-family: 'Barlow', sans-serif !important;
+    font-size: 14px !important;
     font-weight: 700 !important;
     color: #1d1d1b !important;
     white-space: nowrap !important;
@@ -6613,8 +6623,8 @@ dialog.comparison-dialog-root::backdrop {
     height: 44px !important;
     flex: none !important;
     border-radius: 6px !important;
-    font-family: 'Neue DIN', sans-serif !important;
-    font-size: 13.5px !important;
+    font-family: 'Barlow', sans-serif !important;
+    font-size: 14px !important;
     font-weight: 700 !important;
     text-transform: none !important;
     letter-spacing: 0.1px !important;
@@ -6665,8 +6675,8 @@ dialog.comparison-dialog-root::backdrop {
     background: #ffffff !important;
     border: 1px solid #d1d5db !important;
     border-radius: 4px !important;
-    font-family: 'Neue DIN', sans-serif !important;
-    font-size: 13.5px !important;
+    font-family: 'Barlow', sans-serif !important;
+    font-size: 14px !important;
     font-weight: 700 !important;
     color: #1d1d1b !important;
     display: flex !important;
@@ -6795,9 +6805,9 @@ dialog.comparison-dialog-root::backdrop {
     color: #ffffff !important;
     border: none !important;
     border-radius: 6px !important;
-    font-size: 14px !important;
+    font-size: 14.5px !important;
     font-weight: 700 !important;
-    font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif !important;
+    font-family: 'Barlow', sans-serif !important;
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
@@ -6814,7 +6824,7 @@ dialog.comparison-dialog-root::backdrop {
     border-radius: 6px !important;
     border: 1px solid #d1d5db !important;
     background-color: #ffffff !important;
-    font-family: 'Neue DIN', sans-serif !important;
+    font-family: 'Barlow', sans-serif !important;
     font-size: 14px !important;
     font-weight: 600 !important;
     color: #1d1d1b !important;
@@ -6875,13 +6885,13 @@ dialog.comparison-dialog-root::backdrop {
 }
 
 .mobile-select-picker-title {
-  font-family: 'Neue DIN', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: #111111;
-  margin: 0 0 20px 0;
-  text-align: left;
-  line-height: 1.2;
+  font-family: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  color: #111111 !important;
+  margin: 0 0 20px 0 !important;
+  text-align: left !important;
+  line-height: 1.2 !important;
 }
 
 .mobile-select-picker-options {
@@ -6901,10 +6911,10 @@ dialog.comparison-dialog-root::backdrop {
   background: #ffffff;
   border: 1px solid #c9c9c9;
   border-radius: 6px;
-  font-family: 'Neue DIN', sans-serif;
-  font-size: 14.5px;
-  font-weight: 700;
-  color: #1d1d1b;
+  font-family: 'Barlow', sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #1d1d1b !important;
   display: flex;
   align-items: center;
   justify-content: center;
