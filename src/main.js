@@ -563,25 +563,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Update mobile drawer title and subtitle step indicator
     const mainTitle = document.querySelector('.sidebar-title-main');
     const subTitle = document.querySelector('.sidebar-title-sub');
-    if (window.innerWidth <= 860) {
-      if (tabName === 'colors') {
-        const prod = state.activeProduct;
-        const isWorker = prod?.silhouette === 'worker' || prod?.category === 'outfits';
-        if (mainTitle) mainTitle.textContent = isWorker ? 'DEIN KOMPLETT-OUTFIT' : (prod?.name?.toUpperCase() || 'DEIN OUTFIT');
-        if (subTitle) subTitle.textContent = '1 / 3 · Produkte und Farben wählen';
-      } else if (tabName === 'text') {
-        if (mainTitle) mainTitle.textContent = 'DEINE BESCHRIFTUNG';
-        if (subTitle) subTitle.textContent = '2 / 3 · Namen, Teamtexte oder Nummern';
-      } else if (tabName === 'logos') {
-        if (mainTitle) mainTitle.textContent = 'DEINE LOGOS';
-        if (subTitle) subTitle.textContent = '3 / 3 · Dein Outfit personalisieren';
-      }
-    } else {
-      if (subTitle) {
-        if (tabName === 'colors') subTitle.textContent = '1 / 3 · Produkte und Farben wählen';
-        else if (tabName === 'text') subTitle.textContent = '2 / 3 · Beschriftung anpassen';
-        else if (tabName === 'logos') subTitle.textContent = '3 / 3 · Dein Outfit personalisieren';
-      }
+    const prod = state.activeProduct;
+    const isWorker = prod?.silhouette === 'worker' || prod?.category === 'outfits';
+    const mainTitleText = isWorker ? 'DEIN KOMPLETT-OUTFIT' : (prod?.name?.toUpperCase() || 'DEIN OUTFIT');
+    if (mainTitle) mainTitle.textContent = mainTitleText;
+
+    if (tabName === 'colors') {
+      if (subTitle) subTitle.textContent = '1 / 3 · Produkte und Farben wählen';
+    } else if (tabName === 'text') {
+      if (subTitle) subTitle.textContent = '2 / 3 · Beschriftung anpassen';
+    } else if (tabName === 'logos') {
+      if (subTitle) subTitle.textContent = '3 / 3 · Logo hochladen & platzieren';
     }
 
     renderActivePanel();

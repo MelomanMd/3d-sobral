@@ -18,7 +18,133 @@ export class ProductSwitcher {
   }
 
   toggleDropdown() {
+    if (window.innerWidth <= 860) {
+      this.openMobileProductSheet();
+      return;
+    }
     this.openModal();
+  }
+
+  openMobileProductSheet() {
+    this.closeModal();
+    const existing = document.getElementById('mobile-product-picker-modal');
+    if (existing) existing.remove();
+
+    const mobileProducts = [
+      { id: 'helmet', label: 'Kopfschutz · KASK SUPERPLASMA AQ' },
+      { id: 'primary', label: 'Oberteil · BLÅKLÄDER T-Shirt 3379' },
+      { id: 'trousers', label: 'Arbeitshose · BLÅKLÄDER 1750' },
+      { id: 'boots', label: 'Sicherheitsschuhe · Pro Safety Boot' }
+    ];
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'mobile-select-picker-backdrop';
+    backdrop.id = 'mobile-product-picker-modal';
+    backdrop.innerHTML = `
+      <div class="mobile-select-picker-sheet" role="dialog" aria-modal="true" aria-label="PRODUKT WECHSELN">
+        <h3 class="mobile-select-picker-title" style="text-transform: uppercase;">PRODUKT WECHSELN</h3>
+        <div class="mobile-select-picker-options">
+          ${mobileProducts.map(p => `
+            <button type="button" class="btn-mobile-select-option" data-article="${p.id}">
+              ${p.label}
+            </button>
+          `).join('')}
+          <button type="button" class="btn-mobile-select-cancel" id="btn-mobile-product-cancel">
+            Abbrechen
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(backdrop);
+    const openedAt = Date.now();
+    let touchStartedOnBackdrop = false;
+
+    requestAnimationFrame(() => {
+      backdrop.classList.add('is-open');
+    });
+
+    const closeWithAnimation = () => {
+      backdrop.classList.remove('is-open');
+      setTimeout(() => {
+        backdrop.remove();
+      }, 220);
+    };
+
+    const sheet = backdrop.querySelector('.mobile-select-picker-sheet');
+    if (sheet) {
+      sheet.addEventListener('click', (e) => e.stopPropagation());
+    }
+
+    backdrop.querySelectorAll('.btn-mobile-select-option').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const articleId = btn.dataset.article;
+        this.handleMobileArticleSelect(articleId);
+        closeWithAnimation();
+      });
+    });
+
+    backdrop.querySelector('#btn-mobile-product-cancel')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeWithAnimation();
+    });
+
+    backdrop.addEventListener('pointerdown', (e) => {
+      if (e.target === backdrop) touchStartedOnBackdrop = true;
+    });
+
+    backdrop.addEventListener('click', (e) => {
+      if (Date.now() - openedAt < 500) return;
+      if (e.target === backdrop && touchStartedOnBackdrop) {
+        closeWithAnimation();
+      }
+      touchStartedOnBackdrop = false;
+    });
+  }
+
+  handleMobileArticleSelect(articleId) {
+    const activeTabBtn = document.querySelector('.stepper-tab.active');
+    const currentTab = activeTabBtn ? activeTabBtn.dataset.tab : 'colors';
+
+    if (currentTab === 'colors') {
+      const cards = document.querySelectorAll('.figma-outfit-card');
+      let targetCard = null;
+      cards.forEach(c => {
+        const text = c.textContent.toLowerCase();
+        if (articleId === 'helmet' && (text.includes('kask') || text.includes('kopfschutz'))) targetCard = c;
+        else if (articleId === 'primary' && (text.includes('t-shirt') || text.includes('oberteil') || text.includes('3379'))) targetCard = c;
+        else if (articleId === 'trousers' && (text.includes('arbeitshose') || text.includes('1750') || text.includes('hose'))) targetCard = c;
+        else if (articleId === 'boots' && (text.includes('schuhe') || text.includes('boot') || text.includes('pro safety'))) targetCard = c;
+      });
+      if (targetCard) {
+        targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetCard.style.outline = '2px solid #ff4800';
+        targetCard.style.outlineOffset = '2px';
+        setTimeout(() => {
+          targetCard.style.outline = '';
+          targetCard.style.outlineOffset = '';
+        }, 1500);
+      }
+    } else if (currentTab === 'text') {
+      const sel = document.querySelector('#select-target-article');
+      if (sel) {
+        const hasOpt = Array.from(sel.options).some(o => o.value === articleId);
+        if (hasOpt) {
+          sel.value = articleId;
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+    } else if (currentTab === 'logos') {
+      const sel = document.querySelector('#select-logo-article');
+      if (sel) {
+        const hasOpt = Array.from(sel.options).some(o => o.value === articleId);
+        if (hasOpt) {
+          sel.value = articleId;
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+    }
   }
 
   openModal() {

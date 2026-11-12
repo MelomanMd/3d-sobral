@@ -108,12 +108,20 @@ export function openMobileSelectSheet(selectEl) {
     closeWithAnimation();
   });
 
-  // Backdrop click (ignore clicks in first 350ms to prevent ghost clicks from the opening tap)
-  backdrop.addEventListener('click', (e) => {
-    if (Date.now() - openedAt < 350) return;
+  // Backdrop click (ignore clicks in first 500ms and require pointerdown to have started on backdrop)
+  let touchStartedOnBackdrop = false;
+  backdrop.addEventListener('pointerdown', (e) => {
     if (e.target === backdrop) {
+      touchStartedOnBackdrop = true;
+    }
+  });
+
+  backdrop.addEventListener('click', (e) => {
+    if (Date.now() - openedAt < 500) return;
+    if (e.target === backdrop && touchStartedOnBackdrop) {
       closeWithAnimation();
     }
+    touchStartedOnBackdrop = false;
   });
 
   // Escape key

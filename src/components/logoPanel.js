@@ -167,8 +167,10 @@ export class LogoPanel {
   renderMainView() {
     const mainTitle = document.querySelector('.sidebar-title-main');
     const subTitle = document.querySelector('.sidebar-title-sub');
-    if (mainTitle) mainTitle.textContent = 'DEINE LOGOS';
-    if (subTitle) subTitle.textContent = '3 / 3 · Dein Outfit personalisieren';
+    const activeProduct = this.catalog?.getActiveProduct ? this.catalog.getActiveProduct() : this.state.activeProduct;
+    const isWorker = activeProduct?.silhouette === 'worker' || activeProduct?.category === 'outfits';
+    if (mainTitle) mainTitle.textContent = isWorker ? 'DEIN KOMPLETT-OUTFIT' : (activeProduct?.name?.toUpperCase() || 'DEIN OUTFIT');
+    if (subTitle) subTitle.textContent = '3 / 3 · Logo hochladen & platzieren';
 
     const activeItem = this.state.logos.find(l => l.id === this.activeLogoId) || this.state.logos[0];
     const activeTargets = this.getTargetArticles();
@@ -200,13 +202,13 @@ export class LogoPanel {
           <p class="figma-panel-subtitle">3 / 3 · Dein Outfit personalisieren</p>
         </div>
 
-        <!-- 2. Action Buttons Row: + Logo hochladen & Meine Logo-Bibliothek -->
+        <!-- 2. Action Buttons Row: + LOGO HOCHLADEN & MEINE LOGO-BIBLIOTHEK (Figma Image 5) -->
         <div class="figma-logo-actions-row">
-          <button class="btn-figma-black-action" id="btn-open-upload-zone">
-            + Logo hochladen
+          <button type="button" class="btn-figma-black-action" id="btn-open-upload-zone">
+            + LOGO HOCHLADEN
           </button>
-          <button class="btn-figma-white-action" id="btn-open-library">
-            Meine Logo-Bibliothek
+          <button type="button" class="btn-figma-white-action" id="btn-open-library">
+            MEINE LOGO-BIBLIOTHEK
           </button>
         </div>
 
@@ -216,27 +218,36 @@ export class LogoPanel {
           <span>Datei hier ablegen (PNG, SVG, JPG, WebP)</span>
         </div>
 
-        <!-- 3. Full-width Rows for Logo Layers (Figma media_1794503049502_a33f3791) -->
-        <div class="figma-items-cards-grid figma-logos-list">
+        <!-- 3. Two-Column Cards Grid for Logos (Figma Image 5) -->
+        <div class="figma-items-cards-grid">
           ${this.state.logos.length === 0 ? `
             <div style="grid-column: 1 / -1; padding: 28px 16px; text-align: center; background: #f8f9fa; border-radius: 6px; border: 1px dashed #d1d5db; color: #6b7280;">
               <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: #1d1d1b; font-family: 'Neue DIN', sans-serif;">Keine Logos vorhanden</p>
-              <span style="font-size: 12px;">Klicke oben auf „+ Logo hochladen“ oder „Meine Logo-Bibliothek“.</span>
+              <span style="font-size: 12px;">Klicke oben auf „+ LOGO HOCHLADEN“ oder „MEINE LOGO-BIBLIOTHEK“.</span>
             </div>
           ` : this.state.logos.map((item, idx) => {
             const isActive = item.id === (activeItem ? activeItem.id : '');
-            const displayName = item.name || (idx === 0 ? 'Firmenlogo' : 'Rückenlogo');
+            const displayName = item.name ? item.name.toUpperCase() : (idx === 0 ? 'FIRMENLOGO' : 'RÜCKENLOGO');
             return `
-              <div class="figma-logo-row-container ${isActive ? 'active' : ''}" data-id="${item.id}">
-                <button type="button" class="figma-logo-select-btn ${isActive ? 'is-active' : ''}" data-id="${item.id}">
-                  ${displayName}
-                </button>
-                <button type="button" class="btn-figma-icon btn-delete-logo" title="Löschen" data-id="${item.id}" aria-label="Löschen">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
-                  </svg>
-                </button>
+              <div class="figma-layer-card ${isActive ? 'active' : ''}" data-id="${item.id}">
+                <div class="figma-layer-card-text">
+                  <span class="figma-layer-name">${displayName}</span>
+                  <span class="figma-layer-meta">${resolveArticleName(item)} · ${resolveZoneName(item)}</span>
+                </div>
+                <div class="figma-layer-actions">
+                  <button type="button" class="btn-figma-icon btn-toggle-logo-vis" title="Sichtbarkeit" data-id="${item.id}" aria-label="Sichtbarkeit">
+                    ${item.visible !== false ? `
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    ` : `
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    `}
+                  </button>
+                  <button type="button" class="btn-figma-icon btn-delete-logo" title="Löschen" data-id="${item.id}" aria-label="Löschen">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
             `;
           }).join('')}
