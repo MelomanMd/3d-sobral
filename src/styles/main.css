@@ -6633,4 +6633,119 @@ dialog.comparison-dialog-root::backdrop {
   .configurator-modal-window .btn-footer-next:active {
     background: #e03f00 !important;
   }
+
+  /* Mobile Select styling with custom downward chevron */
+  .configurator-modal-window .figma-select {
+    height: 44px !important;
+    border-radius: 6px !important;
+    border: 1px solid #d1d5db !important;
+    background-color: #ffffff !important;
+    font-family: 'Neue DIN', sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #1d1d1b !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%231D1D1B' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 14px center !important;
+    padding-right: 36px !important;
+    cursor: pointer !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  }
 }
+
+/* ==========================================================================
+   MOBILE CUSTOM SELECT BOTTOM SHEET (Figma Redesign 2026)
+   Matches media_1794503768880_a48c081e & media_1794503777380_fb05d3e9
+   ========================================================================== */
+
+.mobile-select-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-select-picker-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-select-picker-sheet {
+  background: #ffffff;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 24px 20px 24px 20px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  transform: translateY(100%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.25);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-select-picker-backdrop.is-open .mobile-select-picker-sheet {
+  transform: translateY(0);
+}
+
+.mobile-select-picker-title {
+  font-family: 'Neue DIN', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #111111;
+  margin: 0 0 20px 0;
+  text-align: left;
+  line-height: 1.2;
+}
+
+.mobile-select-picker-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 2px;
+}
+
+.btn-mobile-select-option,
+.btn-mobile-select-cancel {
+  width: 100%;
+  height: 48px;
+  min-height: 48px;
+  background: #ffffff;
+  border: 1px solid #c9c9c9;
+  border-radius: 6px;
+  font-family: 'Neue DIN', sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1d1d1b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+  padding: 0 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.btn-mobile-select-option:hover,
+.btn-mobile-select-cancel:hover,
+.btn-mobile-select-option:active,
+.btn-mobile-select-cancel:active {
+  background: #f8f9fa;
+  border-color: #9ca3af;
+}
+

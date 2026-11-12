@@ -18,6 +18,7 @@ import { PATTERNS } from './core/patterns.js';
 import { t, getLang, setLang } from './core/i18n.js';
 import { ICONS } from './core/icons.js';
 import { compositeBrandedExport } from './core/exportCompositor.js';
+import { initMobileSelectPicker } from './components/mobileSelectPicker.js';
 
 // Initial App State
 let state = {
@@ -592,6 +593,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   renderActivePanel();
   isAppReady = true;
+  initMobileSelectPicker();
 
   // 11. Wire up 3D Mouse Drag, Selection, and Corner Scaling
   viewer.onItemSelect = (type, itemId) => {
