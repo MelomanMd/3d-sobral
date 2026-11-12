@@ -6,6 +6,7 @@ import { TextPanel } from './components/textPanel.js';
 import { LogoPanel } from './components/logoPanel.js';
 import { ViewControls } from './components/viewControls.js';
 import { ExportModal, DiscardModal } from './components/exportModal.js';
+import { AiGenerateModal } from './components/aiGenerateModal.js';
 import { QuoteModal } from './components/quoteModal.js';
 import { CreationScreen } from './components/creationScreen.js';
 import { ProductCatalog } from './core/products.js';
@@ -639,6 +640,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (productSwitcher) {
         productSwitcher.toggleDropdown();
       }
+    });
+  }
+
+  // 12.1b. AI Realistic Model Generation Button
+  const btnAiGenerate = document.getElementById('btn-ai-generate');
+  if (btnAiGenerate) {
+    btnAiGenerate.addEventListener('click', () => {
+      const aiModal = new AiGenerateModal(viewer, state);
+      aiModal.open();
     });
   }
 
