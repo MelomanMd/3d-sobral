@@ -748,7 +748,13 @@ export class ShirtViewer {
           const isHelmet = hit.object.name === 'Worker_helmet';
           const baseScale = (zoneDef?.defaultScale || 1.0) * (logo.scale || 1.0);
           const depth = isHelmet ? 0.025 : Math.min(0.06, 0.12 * baseScale);
-          const size = new THREE.Vector3(0.18 * baseScale, 0.18 * baseScale, depth);
+          const imgW = img.naturalWidth || img.width || 1;
+          const imgH = img.naturalHeight || img.height || 1;
+          const imgAspect = imgW / Math.max(1, imgH);
+          const maxDim = 0.18 * baseScale;
+          const decalW = imgAspect >= 1 ? maxDim : maxDim * imgAspect;
+          const decalH = imgAspect >= 1 ? maxDim / imgAspect : maxDim;
+          const size = new THREE.Vector3(decalW, decalH, depth);
 
           const decalGeo = new DecalGeometry(hit.object, hit.point, orient, size);
           const decalMat = new THREE.MeshStandardMaterial({

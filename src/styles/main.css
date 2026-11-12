@@ -223,14 +223,14 @@ body.sobral-theme-2026 {
 .hud-brand-badge {
   display: flex;
   align-items: center;
-  background: rgba(18, 20, 28, 0.72);
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
 }
 
 .hud-sobral-logo {
-  height: 34px;
+  height: 42px;
   width: auto;
   display: block;
 }
