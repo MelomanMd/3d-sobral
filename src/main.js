@@ -565,15 +565,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const subTitle = document.querySelector('.sidebar-title-sub');
     const prod = state.activeProduct;
     const isWorker = prod?.silhouette === 'worker' || prod?.category === 'outfits';
-    const mainTitleText = isWorker ? 'DEIN KOMPLETT-OUTFIT' : (prod?.name?.toUpperCase() || 'DEIN OUTFIT');
-    if (mainTitle) mainTitle.textContent = mainTitleText;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 860;
 
     if (tabName === 'colors') {
+      if (mainTitle) mainTitle.textContent = isWorker ? 'DEIN KOMPLETT-OUTFIT' : (prod?.name?.toUpperCase() || 'DEIN OUTFIT');
       if (subTitle) subTitle.textContent = '1 / 3 · Produkte und Farben wählen';
     } else if (tabName === 'text') {
-      if (subTitle) subTitle.textContent = '2 / 3 · Beschriftung anpassen';
+      if (mainTitle) mainTitle.textContent = isMobile ? 'DEINE BESCHRIFTUNG' : (isWorker ? 'DEIN KOMPLETT-OUTFIT' : (prod?.name?.toUpperCase() || 'DEIN OUTFIT'));
+      if (subTitle) subTitle.textContent = isMobile ? '2 / 3 · Namen, Teamtexte oder Nummern' : '2 / 3 · Beschriftung anpassen';
     } else if (tabName === 'logos') {
-      if (subTitle) subTitle.textContent = '3 / 3 · Logo hochladen & platzieren';
+      if (mainTitle) mainTitle.textContent = isMobile ? 'DEINE LOGOS' : (isWorker ? 'DEIN KOMPLETT-OUTFIT' : (prod?.name?.toUpperCase() || 'DEIN OUTFIT'));
+      if (subTitle) subTitle.textContent = isMobile ? '3 / 3 · Dein Outfit personalisieren' : '3 / 3 · Logo hochladen & platzieren';
     }
 
     renderActivePanel();

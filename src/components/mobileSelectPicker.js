@@ -246,16 +246,18 @@ export function initMobileSelectPicker() {
     }
   });
 
-  // Mobile pointerdown prevent native popup
+  // Mobile pointerdown opens custom bottom sheet and prevents native OS picker
   document.addEventListener('pointerdown', (e) => {
     if (window.innerWidth > 860) return;
     const select = e.target.closest('select.figma-select, select.figma-stepper-select');
     if (select) {
       e.preventDefault();
+      e.stopPropagation();
+      openMobileSelectSheet(select);
     }
   }, { capture: true });
 
-  // Mobile click opens bottom sheet
+  // Mobile click fallback
   document.addEventListener('click', (e) => {
     if (window.innerWidth > 860) return;
     const select = e.target.closest('select.figma-select, select.figma-stepper-select');
