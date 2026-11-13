@@ -304,6 +304,7 @@ export const DEFAULT_PRODUCTS = [
     sku: 'SOB-WORKER-PRO',
     silhouette: 'worker',
     modelUrl: resolveAssetUrl('/models/sobral-worker.glb'),
+    mobileModelUrl: resolveAssetUrl('/models/sobral-worker-mobile-hq.glb'),
     isMultiMesh: true,
     baseColor: '#243249',
     accentColor: '#ff4400',

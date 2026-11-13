@@ -89,6 +89,10 @@ export class ShirtViewer {
   init() {
     const width = this.container.clientWidth || window.innerWidth;
     const height = this.container.clientHeight || window.innerHeight;
+    const mobileLayout = window.matchMedia('(max-width: 860px)').matches;
+    this.mobileLayout = mobileLayout;
+    this.displayPixelRatio = Math.min(window.devicePixelRatio, 1.5);
+    this.restoreOrbitResolution = false;
 
     // 1. Scene
     this.scene = new THREE.Scene();
@@ -104,18 +108,18 @@ export class ShirtViewer {
       preserveDrawingBuffer: true,
       powerPreference: 'high-performance'
     });
+    this.renderer.setPixelRatio(this.displayPixelRatio);
     this.renderer.setSize(width, height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.0;
-    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.enabled = !mobileLayout;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.container.appendChild(this.renderer.domElement);
 
     // 4. OrbitControls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
-    this.controls.dampingFactor = 0.06;
+    this.controls.dampingFactor = mobileLayout ? 0.14 : 0.06;
     this.controls.enablePan = false;
     this.controls.minDistance = 0.58;
     this.controls.maxDistance = 2.5;
@@ -131,9 +135,14 @@ export class ShirtViewer {
     });
     this.controls.addEventListener('start', () => {
       this.cameraTransition = null;
+      this.restoreOrbitResolution = false;
+      if (this.mobileLayout && this.renderer.getPixelRatio() > 1) {
+        this.renderer.setPixelRatio(1);
+      }
       this.requestRender();
     });
     this.controls.addEventListener('end', () => {
+      this.restoreOrbitResolution = this.mobileLayout;
       this.requestRender();
     });
 
@@ -165,7 +174,7 @@ export class ShirtViewer {
 
     const keyLight = new THREE.DirectionalLight(0xffffff, 1.4);
     keyLight.position.set(2, 3, 2.5);
-    keyLight.castShadow = true;
+    keyLight.castShadow = this.renderer.shadowMap.enabled;
     keyLight.shadow.mapSize.width = 1024;
     keyLight.shadow.mapSize.height = 1024;
     keyLight.shadow.bias = -0.0001;
@@ -245,8 +254,13 @@ export class ShirtViewer {
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath(resolveAssetUrl('/draco/'));
     loader.setDRACOLoader(dracoLoader);
+    const product = this.getState()?.activeProduct;
+    const assetUrl = window.matchMedia('(max-width: 860px)').matches &&
+      product?.modelUrl === modelUrl && product.mobileModelUrl
+      ? product.mobileModelUrl
+      : modelUrl;
     loader.load(
-      modelUrl,
+      assetUrl,
       async (gltf) => {
         dracoLoader.dispose();
         if (this._loadId !== currentLoadId) {
@@ -1392,6 +1406,16 @@ export class ShirtViewer {
     );
     if (controlsMoved) {
       active = true;
+    }
+
+    // Render motion at fewer pixels on high-density phones, then restore a
+    // sharp still frame once OrbitControls' damping has stopped moving.
+    if (this.restoreOrbitResolution && !controlsMoved && !this.cameraTransition && !this.isAutoRotating) {
+      this.restoreOrbitResolution = false;
+      if (this.renderer.getPixelRatio() !== this.displayPixelRatio) {
+        this.renderer.setPixelRatio(this.displayPixelRatio);
+        active = true;
+      }
     }
 
     if (active) {

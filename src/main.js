@@ -290,7 +290,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 5. Create 2D Texture Engine
   const textureEngine = new TextureEngine(2048);
-  await textureEngine.render(state);
+  // Multi-mesh products use their own materials and 3D decals, not this canvas.
+  if (!initialProd.isMultiMesh) await textureEngine.render(state);
 
   // 6. Create 3D Viewer with state getter
   viewer = new ShirtViewer(canvasContainer, textureEngine, () => state);
@@ -419,7 +420,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.colors.trousers = prod.colors?.trousers || '#1b2034';
     state.colors.boots = prod.colors?.boots || '#1a1a1a';
 
-    await textureEngine.render(state);
+    if (!prod.isMultiMesh) await textureEngine.render(state);
     // A newer selection may have happened while fabric/photo rendering awaited.
     if (state.activeProduct !== prod) return;
 
@@ -506,7 +507,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       pendingUpdateReason = null;
 
       const isMultiMesh = !!viewer?.isMultiMesh;
-      const needsTextureRender = !isMultiMesh || currentReason === 'all' || currentReason === 'texture';
+      const needsTextureRender = !isMultiMesh;
       const needsDecals = currentReason === 'all' || currentReason === 'decals';
 
       if (needsTextureRender) {
