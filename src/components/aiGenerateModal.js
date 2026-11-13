@@ -18,6 +18,16 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
+function normalizeMediaUrl(url) {
+  if (!url) return '';
+  // If stored URL points to production CDN, rewrite to current domain /media/
+  if (url.startsWith('https://cdn.sobral.ch/customizer/ai/')) {
+    const origin = (typeof window !== 'undefined' && window.location?.origin) ? window.location.origin : '';
+    return `${origin}/media/customizer/ai/${url.slice('https://cdn.sobral.ch/customizer/ai/'.length)}`;
+  }
+  return url;
+}
+
 export class AiGenerateModal {
   constructor(viewer, state) {
     this.viewer = viewer;
@@ -264,6 +274,8 @@ export class AiGenerateModal {
     const badgeText = statusLabels[item.status] || escapeHtml(item.status).toUpperCase();
     const views = item.inputViews || {};
     const viewKeys = ['front', 'back', 'left', 'right'].filter((k) => views[k]);
+    const imageUrl = normalizeMediaUrl(item.resultImageUrl);
+    const videoUrl = normalizeMediaUrl(item.resultVideoUrl);
 
     container.innerHTML = `
       <div class="ai-result-card">
@@ -275,18 +287,18 @@ export class AiGenerateModal {
           <span class="ai-status-pill ai-status-${escapeHtml(item.status)}">${badgeText}</span>
         </div>
 
-        ${(item.resultImageUrl || item.resultVideoUrl) ? `
+        ${(imageUrl || videoUrl) ? `
           <div class="ai-media-grid">
-            ${item.resultImageUrl ? `
+            ${imageUrl ? `
               <div class="ai-media-box">
-                <img src="${escapeHtml(item.resultImageUrl)}" alt="KI-Foto" class="ai-result-img" />
-                <a href="${escapeHtml(item.resultImageUrl)}" download class="ai-media-dl">Foto herunterladen</a>
+                <img src="${escapeHtml(imageUrl)}" alt="KI-Foto" class="ai-result-img" />
+                <a href="${escapeHtml(imageUrl)}" download class="ai-media-dl">Foto herunterladen</a>
               </div>
             ` : ''}
-            ${item.resultVideoUrl ? `
+            ${videoUrl ? `
               <div class="ai-media-box">
-                <video src="${escapeHtml(item.resultVideoUrl)}" controls playsinline class="ai-result-video"></video>
-                <a href="${escapeHtml(item.resultVideoUrl)}" download class="ai-media-dl">Video herunterladen</a>
+                <video src="${escapeHtml(videoUrl)}" controls playsinline class="ai-result-video"></video>
+                <a href="${escapeHtml(videoUrl)}" download class="ai-media-dl">Video herunterladen</a>
               </div>
             ` : ''}
           </div>
@@ -296,7 +308,7 @@ export class AiGenerateModal {
           <div class="ai-input-views-row">
             ${viewKeys.map((k) => `
               <div class="ai-input-thumb-wrap">
-                <img src="${escapeHtml(views[k])}" alt="${escapeHtml(k)}" class="ai-input-thumb" />
+                <img src="${escapeHtml(normalizeMediaUrl(views[k]))}" alt="${escapeHtml(k)}" class="ai-input-thumb" />
                 <span>${k.toUpperCase()}</span>
               </div>
             `).join('')}
