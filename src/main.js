@@ -717,13 +717,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 12.1b. AI Realistic Model Generation Button
+  // 12.1b. AI Realistic Model Generation Buttons (Desktop & Mobile)
+  const openAiGenerateModal = () => {
+    const aiModal = new AiGenerateModal(viewer, state);
+    aiModal.open();
+  };
   const btnAiGenerate = document.getElementById('btn-ai-generate');
   if (btnAiGenerate) {
-    btnAiGenerate.addEventListener('click', () => {
-      const aiModal = new AiGenerateModal(viewer, state);
-      aiModal.open();
-    });
+    btnAiGenerate.addEventListener('click', openAiGenerateModal);
+  }
+  const btnAiGenerateDesktop = document.getElementById('btn-ai-generate-desktop');
+  if (btnAiGenerateDesktop) {
+    btnAiGenerateDesktop.addEventListener('click', openAiGenerateModal);
   }
 
   // 12.2. Close Configurator Button (Figma Frame 1876:9611 Discard Modal)

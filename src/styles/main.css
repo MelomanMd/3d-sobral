@@ -4436,12 +4436,42 @@ dialog.comparison-dialog-root::backdrop {
 }
 
 @media (min-width: 861px) {
-  .configurator-modal-window:not(.stage-expanded) .stage-hud-bottom-right {
-    bottom: 80px;
-    right: 24px;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
+  /* In computer/desktop version: remove fullscreen button and hide bottom-right stage HUD */
+  .configurator-modal-window .stage-hud-bottom-right,
+  .configurator-modal-window .btn-hud-fullscreen-stage {
+    display: none !important;
+  }
+
+  /* Desktop Top AI Button placed beside Produkt wechseln */
+  .desktop-ai-btn {
+    display: inline-flex !important;
+    height: 36px !important;
+    padding: 0 14px !important;
+    font-family: 'Neue DIN Wide', 'Neue DIN', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.6px !important;
+    background: #ff4800 !important;
+    color: #ffffff !important;
+    border-radius: 4px !important;
+    box-shadow: 0 2px 8px rgba(255, 72, 0, 0.35) !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    gap: 6px !important;
+  }
+
+  .desktop-ai-btn:hover {
+    filter: brightness(1.08) !important;
+    transform: translateY(-1px) !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .desktop-ai-btn {
+    display: none !important;
   }
 }
 
