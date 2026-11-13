@@ -141,8 +141,112 @@ export function closeMobileSelectSheet() {
   }
 }
 
+let activeDesktopDropdown = null;
+
+export function closeDesktopSelectDropdown() {
+  if (activeDesktopDropdown) {
+    activeDesktopDropdown.menu.remove();
+    if (activeDesktopDropdown.selectEl) {
+      activeDesktopDropdown.selectEl.classList.remove('is-dropdown-open');
+    }
+    activeDesktopDropdown = null;
+  }
+}
+
+export function openDesktopSelectDropdown(selectEl) {
+  // If already open for this select, toggle close
+  if (activeDesktopDropdown && activeDesktopDropdown.selectEl === selectEl) {
+    closeDesktopSelectDropdown();
+    return;
+  }
+  closeDesktopSelectDropdown();
+
+  if (!selectEl || !selectEl.options) return;
+
+  const rect = selectEl.getBoundingClientRect();
+  const options = Array.from(selectEl.options).map(opt => ({
+    value: opt.value,
+    text: opt.textContent.trim(),
+    selected: opt.selected
+  }));
+
+  const menu = document.createElement('div');
+  menu.className = 'figma-desktop-select-dropdown';
+  menu.setAttribute('role', 'listbox');
+  menu.innerHTML = options.map(opt => `
+    <div class="figma-desktop-select-option ${opt.selected ? 'is-selected' : ''}" data-value="${opt.value}" role="option" aria-selected="${opt.selected}">
+      ${opt.text}
+    </div>
+  `).join('');
+
+  menu.style.position = 'fixed';
+  menu.style.left = `${rect.left}px`;
+  menu.style.width = `${rect.width}px`;
+  menu.style.top = `${rect.bottom - 1}px`;
+  menu.style.zIndex = '999999';
+
+  document.body.appendChild(menu);
+  selectEl.classList.add('is-dropdown-open');
+
+  activeDesktopDropdown = { menu, selectEl };
+
+  // Adjust if overflowing viewport bottom
+  const menuRect = menu.getBoundingClientRect();
+  if (menuRect.bottom > window.innerHeight - 10) {
+    const spaceAbove = rect.top;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    if (spaceAbove > spaceBelow) {
+      menu.style.top = `${Math.max(10, rect.top - menuRect.height + 1)}px`;
+    } else {
+      menu.style.maxHeight = `${Math.max(100, spaceBelow - 20)}px`;
+    }
+  }
+
+  // Handle option click
+  menu.querySelectorAll('.figma-desktop-select-option').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const val = item.dataset.value;
+      if (selectEl.value !== val) {
+        selectEl.value = val;
+        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      closeDesktopSelectDropdown();
+    });
+  });
+
+  // Prevent click on menu from propagating to document
+  menu.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+  menu.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+  });
+}
+
 export function initMobileSelectPicker() {
-  // 1. Prevent default native picker on pointerdown without triggering open twice
+  // Desktop mousedown interception to prevent native browser select popup
+  document.addEventListener('mousedown', (e) => {
+    if (window.innerWidth <= 860) return;
+    const select = e.target.closest('select.figma-select, select.figma-stepper-select');
+    if (!select) return;
+
+    e.preventDefault();
+    openDesktopSelectDropdown(select);
+  }, { capture: true });
+
+  // Close desktop dropdown on outside mousedown
+  document.addEventListener('mousedown', (e) => {
+    if (window.innerWidth <= 860) return;
+    if (activeDesktopDropdown) {
+      const select = e.target.closest('select.figma-select, select.figma-stepper-select');
+      if (select && select === activeDesktopDropdown.selectEl) return;
+      if (activeDesktopDropdown.menu.contains(e.target)) return;
+      closeDesktopSelectDropdown();
+    }
+  });
+
+  // Mobile pointerdown prevent native popup
   document.addEventListener('pointerdown', (e) => {
     if (window.innerWidth > 860) return;
     const select = e.target.closest('select.figma-select, select.figma-stepper-select');
@@ -151,7 +255,7 @@ export function initMobileSelectPicker() {
     }
   }, { capture: true });
 
-  // 2. Open custom sheet on click
+  // Mobile click opens bottom sheet
   document.addEventListener('click', (e) => {
     if (window.innerWidth > 860) return;
     const select = e.target.closest('select.figma-select, select.figma-stepper-select');
@@ -160,5 +264,22 @@ export function initMobileSelectPicker() {
     e.stopPropagation();
     openMobileSelectSheet(select);
   }, { capture: true });
+
+  // Close desktop dropdown on scroll, resize or Escape
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeDesktopSelectDropdown();
+      closeMobileSelectSheet();
+    }
+  });
+
+  window.addEventListener('scroll', () => {
+    closeDesktopSelectDropdown();
+  }, true);
+
+  window.addEventListener('resize', () => {
+    closeDesktopSelectDropdown();
+    closeMobileSelectSheet();
+  });
 }
 

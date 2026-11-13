@@ -5141,12 +5141,11 @@ dialog.comparison-dialog-root::backdrop {
   text-transform: uppercase;
 }
 
-.figma-input,
-.figma-select {
+.figma-input {
   width: 100%;
   height: 38px;
   padding: 0 10px;
-  border-radius: 4px;
+  border-radius: 2px;
   border: 1px solid #D1D5DB;
   background: #FFFFFF;
   color: #1D1D1B;
@@ -5156,9 +5155,71 @@ dialog.comparison-dialog-root::backdrop {
   box-sizing: border-box;
 }
 
+.figma-select {
+  width: 100%;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 2px;
+  border: 1px solid #D1D5DB;
+  background-color: #FFFFFF;
+  color: #1D1D1B;
+  font-family: 'Neue DIN', 'Barlow', -apple-system, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 8 5' fill='%231D1D1B' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0L4 5L8 0H0Z' fill='%231D1D1B'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 8px 5px;
+  padding-right: 26px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
 .figma-input:focus,
-.figma-select:focus {
-  border-color: #FF4400;
+.figma-select:focus,
+.figma-select.is-dropdown-open {
+  border-color: #9CA3AF;
+}
+
+/* Figma Desktop Select Dropdown (Matching 1:1 Figma Design) */
+.figma-desktop-select-dropdown {
+  position: fixed;
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  border-radius: 0 0 2px 2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  overflow-y: auto;
+  max-height: 260px;
+  font-family: 'Neue DIN', 'Barlow', -apple-system, sans-serif;
+  z-index: 999999;
+}
+
+.figma-desktop-select-option {
+  height: 36px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #1D1D1B;
+  cursor: pointer;
+  background: #FFFFFF;
+  transition: background-color 0.1s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.figma-desktop-select-option:hover,
+.figma-desktop-select-option.is-selected {
+  background-color: #F4F5F7;
+}
+
+.figma-desktop-select-option.is-selected {
+  font-weight: 500;
 }
 
 .figma-color-input-box {
